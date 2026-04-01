@@ -98,13 +98,15 @@
                                 <label for="letter_file" class="block text-sm font-semibold text-gray-700 mb-2">Surat Undangan</label>
                                 <input type="file" name="letter_file" id="letter_file" accept=".pdf" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none file:mr-4 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
                                 <p class="text-xs text-gray-400 mt-1">Format: PDF</p>
+                                <p class="text-xs text-gray-400 mt-1">Max size: 5MB</p>
                                 @error('letter_file') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
                                 <label for="material_file" class="block text-sm font-semibold text-gray-700 mb-2">Materi Rapat</label>
-                                <input type="file" name="material_file" id="material_file" accept=".pdf,.ppt,.pptx" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none file:mr-4 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
-                                <p class="text-xs text-gray-400 mt-1">Format: PDF, PPT, PPTX</p>
+                                <input type="file" name="material_file" id="material_file" accept=".pdf" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none file:mr-4 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
+                                <p class="text-xs text-gray-400 mt-1">Format: PDF</p>
+                                <p class="text-xs text-gray-400 mt-1">Max size: 10MB</p>
                                 @error('material_file') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                             </div>
                         </div>
