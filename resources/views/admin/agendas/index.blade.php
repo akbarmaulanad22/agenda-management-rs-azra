@@ -26,7 +26,8 @@
                     <tr class="border-b border-gray-100">
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Judul</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Lokasi</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Ruangan</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Penyelenggara</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -38,7 +39,8 @@
                                 <a href="{{ route('admin.agendas.show', $agenda) }}" class="text-sm font-semibold text-gray-800 group-hover:text-primary transition-colors">{{ $agenda->title }}</a>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->event_date->translatedFormat('d M Y') }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->location }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->room->room_name ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->organizer }}</td>
                             <td class="px-6 py-4">
                                 @if($agenda->status === 'draft')
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600">Draft</span>
@@ -59,7 +61,7 @@
                                     <a href="{{ route('admin.agendas.edit', $agenda) }}" class="p-2 rounded-xl hover:bg-primary-50 text-gray-400 hover:text-primary transition-colors" title="Ubah">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
                                     </a>
-                                    <a href="{{ route('admin.agendas.pdf', $agenda) }}" target="_blank" class="p-2 rounded-xl hover:bg-secondary-50 text-gray-400 hover:text-secondary transition-colors" title="PDF">
+                                    <a href="{{ route('admin.agendas.export-pdf', $agenda) }}" class="p-2 rounded-xl hover:bg-amber-50 text-gray-400 hover:text-amber-500 transition-colors" title="Export PDF">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
                                     </a>
                                     <div x-data="{ copied: false }" class="relative">
@@ -86,7 +88,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center">
+                            <td colspan="6" class="px-6 py-12 text-center">
                                 <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
                                     <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
                                 </div>

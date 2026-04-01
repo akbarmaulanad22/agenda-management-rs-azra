@@ -6,24 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('invitation_templates', function (Blueprint $table) {
+        Schema::create('agenda_notes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('body_content');
+            $table->foreignId('agenda_id')->constrained('agendas')->cascadeOnDelete();
+            $table->string('topic');
+            $table->text('decision');
+            $table->text('remarks')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('invitation_templates');
+        Schema::dropIfExists('agenda_notes');
     }
 };

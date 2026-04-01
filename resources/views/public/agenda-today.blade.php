@@ -40,56 +40,63 @@
         <div class="px-4 mt-6 space-y-3">
             @forelse ($agendas as $agenda)
                 <a href="{{ route('attendance.show', $agenda) }}"
-                    class="block bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 active:scale-[0.98]">
-                    <div class="flex items-start justify-between gap-3">
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-gray-900 text-sm leading-snug">{{ $agenda->title }}</h3>
-                            <div class="mt-2 space-y-1">
-                                <p class="text-xs text-gray-500 flex items-center gap-1.5">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-primary shrink-0"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    {{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }} WIB
-                                </p>
-                                <p class="text-xs text-gray-500 flex items-center gap-1.5">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-primary shrink-0"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <span class="truncate">{{ $agenda->location }}</span>
-                                </p>
+                    class="group block bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-primary/20 active:scale-[0.98] overflow-hidden">
+
+                    {{-- Color accent bar --}}
+                    <div class="h-1 bg-gradient-to-r from-primary to-primary-400"></div>
+
+                    <div class="p-5">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-gray-900 text-[15px] leading-snug group-hover:text-primary transition-colors">{{ $agenda->title }}</h3>
+
+                                @if($agenda->description)
+                                    <p class="text-xs text-gray-400 mt-1 line-clamp-2">{{ $agenda->description }}</p>
+                                @endif
                             </div>
-                        </div>
-                        <div class="shrink-0 flex flex-col items-end gap-2">
-                            <div class="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary" fill="none"
+
+                            <div class="shrink-0 w-9 h-9 rounded-xl bg-primary-50 group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-all duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary group-hover:text-white transition-colors" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                 </svg>
                             </div>
                         </div>
-                    </div>
 
-                    {{-- Progress Bar --}}
-                    <div class="mt-4">
-                        <div class="flex items-center justify-between mb-1.5">
-                            <span class="text-xs font-medium text-gray-500">Kehadiran</span>
-                            <span
-                                class="text-xs font-semibold text-primary">{{ $agenda->signed_count }}/{{ $agenda->participants_count }}</span>
+                        {{-- Info pills --}}
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary-50 text-xs font-medium text-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }} WIB
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-100 text-xs font-medium text-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                {{ $agenda->room->room_name ?? '-' }}
+                            </span>
                         </div>
-                        <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                            @php
-                                $percentage = $agenda->participants_count > 0
-                                    ? round(($agenda->signed_count / $agenda->participants_count) * 100)
-                                    : 0;
-                            @endphp
-                            <div class="h-2 rounded-full transition-all duration-500 {{ $percentage === 100 ? 'bg-secondary' : 'bg-primary' }}"
-                                style="width: {{ $percentage }}%"></div>
+
+                        {{-- Divider --}}
+                        <div class="border-t border-gray-100 mt-3.5 pt-3.5 flex items-center justify-between">
+                            {{-- Penyelenggara --}}
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                    </svg>
+                                </div>
+                                <span class="text-xs text-gray-500 truncate">{{ $agenda->organizer }}</span>
+                            </div>
+
+                            {{-- Kehadiran badge --}}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shrink-0 {{ $agenda->signed_count > 0 ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400' }}">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-1.053M18 8.625a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4.5 11.25a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0z"/></svg>
+                                {{ $agenda->signed_count }} hadir
+                            </span>
                         </div>
                     </div>
                 </a>

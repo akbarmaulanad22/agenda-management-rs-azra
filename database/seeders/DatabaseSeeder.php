@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\InvitationTemplate;
-use App\Models\Participant;
-use App\Models\Signer;
+use App\Models\Employee;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -18,21 +17,12 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
-        Signer::create([
-            'name' => 'Dr. Ahmad Sudrajat',
-            'position' => 'Kepala Bagian Umum',
-        ]);
+        Room::create(['room_name' => 'Training Center', 'description' => 'Ruang pelatihan utama lantai 2']);
+        Room::create(['room_name' => 'Ruang Rapat Lt. 2', 'description' => 'Ruang rapat kapasitas 20 orang']);
+        Room::create(['room_name' => 'Ruang Rapat Lt. 3', 'description' => 'Ruang rapat kapasitas 15 orang']);
+        Room::create(['room_name' => 'Auditorium', 'description' => 'Auditorium utama kapasitas 100 orang']);
+        Room::create(['room_name' => 'Ruang Direksi', 'description' => 'Ruang rapat direksi']);
 
-        Signer::create([
-            'name' => 'Ir. Budi Santoso, M.T.',
-            'position' => 'Direktur',
-        ]);
-
-        Participant::factory(10)->create();
-
-        InvitationTemplate::create([
-            'name' => 'Template Undangan Rapat Resmi',
-            'body_content' => '<p>Dengan hormat,</p><p>Mengharap kehadiran Bapak/Ibu pada:</p><p><strong>Agenda:</strong> [JUDUL_AGENDA]</p><p><strong>Hari/Tanggal:</strong> [TANGGAL]</p><p><strong>Waktu:</strong> [WAKTU]</p><p><strong>Tempat:</strong> [TEMPAT]</p><p>Demikian undangan ini kami sampaikan, atas perhatian dan kehadirannya kami ucapkan terima kasih.</p>',
-        ]);
+        Employee::factory(20)->create();
     }
 }

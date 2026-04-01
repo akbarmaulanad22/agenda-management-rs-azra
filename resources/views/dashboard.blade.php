@@ -7,8 +7,8 @@
     </x-slot>
 
     @php
-        $totalPeserta = \App\Models\Participant::count();
-        $totalPenandatangan = \App\Models\Signer::count();
+        $totalPegawai = \App\Models\Employee::count();
+        $totalRuangan = \App\Models\Room::count();
         $totalAgenda = \App\Models\Agenda::count();
         $agendaAktif = \App\Models\Agenda::where('status', 'active')->count();
         $agendaDraft = \App\Models\Agenda::where('status', 'draft')->count();
@@ -29,20 +29,20 @@
                 <div class="w-11 h-11 rounded-2xl bg-primary-50 flex items-center justify-center mb-4">
                     <svg class="w-5.5 h-5.5 text-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
                 </div>
-                <p class="text-sm font-medium text-gray-400 mb-1">Total Peserta</p>
-                <p class="text-3xl font-extrabold text-gray-900">{{ number_format($totalPeserta) }}</p>
+                <p class="text-sm font-medium text-gray-400 mb-1">Total Pegawai</p>
+                <p class="text-3xl font-extrabold text-gray-900">{{ number_format($totalPegawai) }}</p>
             </div>
         </div>
 
-        {{-- Stat: Penandatangan --}}
+        {{-- Stat: Ruangan --}}
         <div class="group relative bg-white rounded-3xl border border-gray-100 p-6 hover:shadow-xl hover:shadow-secondary/5 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden">
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-secondary-50 to-transparent rounded-bl-[60px] opacity-60"></div>
             <div class="relative">
                 <div class="w-11 h-11 rounded-2xl bg-secondary-50 flex items-center justify-center mb-4">
-                    <svg class="w-5.5 h-5.5 text-secondary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                    <svg class="w-5.5 h-5.5 text-secondary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg>
                 </div>
-                <p class="text-sm font-medium text-gray-400 mb-1">Penandatangan</p>
-                <p class="text-3xl font-extrabold text-gray-900">{{ number_format($totalPenandatangan) }}</p>
+                <p class="text-sm font-medium text-gray-400 mb-1">Total Ruangan</p>
+                <p class="text-3xl font-extrabold text-gray-900">{{ number_format($totalRuangan) }}</p>
             </div>
         </div>
 
@@ -164,7 +164,7 @@
                             <p class="text-sm font-semibold text-gray-800 truncate group-hover:text-primary transition-colors">{{ $agenda->title }}</p>
                             <div class="flex items-center gap-2 mt-0.5">
                                 <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
-                                <span class="text-xs text-gray-400 truncate">{{ $agenda->location }}</span>
+                                <span class="text-xs text-gray-400 truncate">{{ $agenda->room->room_name ?? '-' }}</span>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 flex-shrink-0">
@@ -200,18 +200,18 @@
                         <span class="text-sm font-semibold">Buat Agenda Baru</span>
                         <svg class="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
                     </a>
-                    <a href="{{ route('admin.participants.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white transition-all duration-200 group">
+                    <a href="{{ route('admin.employees.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white transition-all duration-200 group">
                         <div class="w-8 h-8 rounded-xl bg-secondary/30 flex items-center justify-center">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/></svg>
                         </div>
-                        <span class="text-sm font-semibold">Tambah Peserta</span>
+                        <span class="text-sm font-semibold">Tambah Pegawai</span>
                         <svg class="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
                     </a>
-                    <a href="{{ route('admin.templates.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white transition-all duration-200 group">
+                    <a href="{{ route('admin.rooms.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white transition-all duration-200 group">
                         <div class="w-8 h-8 rounded-xl bg-blue-500/30 flex items-center justify-center">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg>
                         </div>
-                        <span class="text-sm font-semibold">Buat Template</span>
+                        <span class="text-sm font-semibold">Tambah Ruangan</span>
                         <svg class="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
                     </a>
                 </div>
@@ -233,7 +233,7 @@
                         <tr class="border-b border-gray-100">
                             <th class="pb-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Judul</th>
                             <th class="pb-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
-                            <th class="pb-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Lokasi</th>
+                            <th class="pb-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Ruangan</th>
                             <th class="pb-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
                             <th class="pb-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</th>
                         </tr>
@@ -248,7 +248,7 @@
                                     <span class="text-sm text-gray-500">{{ $agenda->event_date->translatedFormat('d M Y') }}</span>
                                 </td>
                                 <td class="py-3.5 pr-4">
-                                    <span class="text-sm text-gray-500">{{ $agenda->location }}</span>
+                                    <span class="text-sm text-gray-500">{{ $agenda->room->room_name ?? '-' }}</span>
                                 </td>
                                 <td class="py-3.5 pr-4">
                                     @if($agenda->status === 'draft')

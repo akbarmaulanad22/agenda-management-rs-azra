@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Agenda extends Model
 {
@@ -14,17 +15,14 @@ class Agenda extends Model
     protected $fillable = [
         'title',
         'description',
-        'location',
         'event_date',
         'event_time',
         'status',
-        'template_id',
-        'created_by_signer_id',
-        'validated_by_signer_id',
-        'letter_place',
-        'letter_number',
-        'letter_recipient',
-        'letter_body',
+        'organizer',
+        'meeting_chair',
+        'room_id',
+        'letter_file_path',
+        'material_file_path',
     ];
 
     protected function casts(): array
@@ -34,25 +32,25 @@ class Agenda extends Model
         ];
     }
 
-    public function template(): BelongsTo
+    public function room(): BelongsTo
     {
-        return $this->belongsTo(InvitationTemplate::class, 'template_id');
+        return $this->belongsTo(Room::class);
     }
 
-    public function creator(): BelongsTo
+    public function employees(): BelongsToMany
     {
-        return $this->belongsTo(Signer::class, 'created_by_signer_id');
-    }
-
-    public function validator(): BelongsTo
-    {
-        return $this->belongsTo(Signer::class, 'validated_by_signer_id');
-    }
-
-    public function participants(): BelongsToMany
-    {
-        return $this->belongsToMany(Participant::class, 'agenda_participant')
-            ->withPivot(['signature_path', 'signed_at'])
+        return $this->belongsToMany(Employee::class, 'agenda_employee')
+            ->withPivot('signature_image_path')
             ->withTimestamps();
+    }
+
+    public function notes(): HasMany
+    {
+        return $this->hasMany(AgendaNote::class);
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(AgendaImage::class);
     }
 }

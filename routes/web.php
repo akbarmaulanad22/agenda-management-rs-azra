@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\InvitationTemplateController;
-use App\Http\Controllers\ParticipantController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicAgendaController;
-use App\Http\Controllers\SignerController;
+use App\Http\Controllers\PublicAgendaInputController;
+use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Route;
 
 // Public agenda list
@@ -24,15 +24,19 @@ Route::middleware('auth')->group(function () {
 
 // Admin routes
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('participants', ParticipantController::class);
-    Route::resource('signers', SignerController::class);
-    Route::resource('templates', InvitationTemplateController::class);
+    Route::resource('employees', EmployeeController::class);
+    Route::resource('rooms', RoomController::class);
     Route::resource('agendas', AgendaController::class);
-    Route::get('agendas/{agenda}/pdf', [AgendaController::class, 'generatePdf'])->name('agendas.pdf');
+    Route::get('agendas/{agenda}/export-pdf', [AgendaController::class, 'exportPdf'])->name('agendas.export-pdf');
 });
 
 // Public attendance routes
 Route::get('/absen/{agenda}', [AttendanceController::class, 'show'])->name('attendance.show');
 Route::post('/absen/{agenda}/sign', [AttendanceController::class, 'sign'])->name('attendance.sign');
+
+// Public agenda input (crowdsourced notes + images)
+Route::get('/agenda/{agenda}/input', [PublicAgendaInputController::class, 'show'])->name('agenda.input');
+Route::post('/agenda/{agenda}/input/note', [PublicAgendaInputController::class, 'storeNote'])->name('agenda.input.note');
+Route::post('/agenda/{agenda}/input/image', [PublicAgendaInputController::class, 'storeImage'])->name('agenda.input.image');
 
 require __DIR__ . '/auth.php';

@@ -3,9 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Agenda;
-use App\Models\InvitationTemplate;
-use App\Models\Participant;
-use App\Models\Signer;
+use App\Models\Employee;
+use App\Models\Room;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,38 +12,44 @@ class AttendanceTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function createActiveAgendaWithParticipant(): array
+    private function createActiveAgendaWithEmployee(): array
     {
-        $template = InvitationTemplate::factory()->create();
-        $signer1 = Signer::factory()->create();
-        $signer2 = Signer::factory()->create();
+        $room = Room::create(['room_name' => 'Test Room']);
 
-        $agenda = Agenda::factory()->create([
+        $agenda = Agenda::create([
+            'title' => 'Test Agenda',
+            'event_date' => now()->toDateString(),
+            'event_time' => '10:00',
             'status' => 'active',
-            'template_id' => $template->id,
-            'created_by_signer_id' => $signer1->id,
-            'validated_by_signer_id' => $signer2->id,
+            'organizer' => 'Test Organizer',
+            'meeting_chair' => 'Test Chair',
+            'room_id' => $room->id,
         ]);
 
-        $participant = Participant::factory()->create();
-        $agenda->participants()->attach($participant->id);
+        $employee = Employee::create([
+            'nip' => '123456789012345678',
+            'full_name' => 'Test Employee',
+            'organization' => 'RS AZRA',
+            'job_position' => 'Dokter',
+            'structural_role' => 'Staf',
+            'profession' => 'Tenaga Medis',
+        ]);
 
-        return [$agenda, $participant];
+        $agenda->employees()->attach($employee->id);
+
+        return [$agenda, $employee];
     }
 
     public function test_prevents_double_attendance(): void
     {
-        [$agenda, $participant] = $this->createActiveAgendaWithParticipant();
+        [$agenda, $employee] = $this->createActiveAgendaWithEmployee();
 
-        // Sign the first time
-        $agenda->participants()->updateExistingPivot($participant->id, [
-            'signature_path' => 'signatures/existing.png',
-            'signed_at' => now(),
+        $agenda->employees()->updateExistingPivot($employee->id, [
+            'signature_image_path' => 'signatures/existing.png',
         ]);
 
-        // Attempt to sign again
         $response = $this->postJson("/absen/{$agenda->id}/sign", [
-            'participant_id' => $participant->id,
+            'employee_id' => $employee->id,
             'signature' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==',
         ]);
 
@@ -54,7 +59,7 @@ class AttendanceTest extends TestCase
 
     public function test_allows_first_attendance(): void
     {
-        [$agenda, $participant] = $this->createActiveAgendaWithParticipant();
+        [$agenda, $employee] = $this->createActiveAgendaWithEmployee();
 
         $pngData = base64_encode(hex2bin(
             '89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489' .
@@ -62,7 +67,7 @@ class AttendanceTest extends TestCase
         ));
 
         $response = $this->postJson("/absen/{$agenda->id}/sign", [
-            'participant_id' => $participant->id,
+            'employee_id' => $employee->id,
             'signature' => 'data:image/png;base64,' . $pngData,
         ]);
 
@@ -70,17 +75,25 @@ class AttendanceTest extends TestCase
         $response->assertJson(['message' => 'Absensi berhasil disimpan.']);
 
         $this->assertNotNull(
-            $agenda->participants()->where('participant_id', $participant->id)->first()->pivot->signed_at
+            $agenda->employees()->where('employee_id', $employee->id)->first()->pivot->signature_image_path
         );
     }
 
-    public function test_rejects_non_participant(): void
+    public function test_rejects_non_employee(): void
     {
-        [$agenda] = $this->createActiveAgendaWithParticipant();
-        $outsider = Participant::factory()->create();
+        [$agenda] = $this->createActiveAgendaWithEmployee();
+
+        $outsider = Employee::create([
+            'nip' => '999999999999999999',
+            'full_name' => 'Outsider',
+            'organization' => 'Other',
+            'job_position' => 'Other',
+            'structural_role' => 'Other',
+            'profession' => 'Other',
+        ]);
 
         $response = $this->postJson("/absen/{$agenda->id}/sign", [
-            'participant_id' => $outsider->id,
+            'employee_id' => $outsider->id,
             'signature' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==',
         ]);
 

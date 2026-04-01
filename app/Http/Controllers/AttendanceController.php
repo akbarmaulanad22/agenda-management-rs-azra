@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agenda;
+use App\Models\Employee;
 use App\Services\SignatureStorageService;
 use Illuminate\Http\Request;
 
@@ -12,21 +13,26 @@ class AttendanceController extends Controller
     {
         abort_unless($agenda->status === 'active', 404);
 
-        $agenda->load(['participants' => function ($query) {
-            $query->orderBy('name');
-        }]);
+        $agenda->load('room');
 
-        $participantsJson = $agenda->participants->map(function ($p) {
+        $signedEmployeeIds = $agenda->employees()
+            ->whereNotNull('agenda_employee.signature_image_path')
+            ->pluck('employees.id')
+            ->toArray();
+
+        $allEmployees = Employee::orderBy('full_name')->get();
+
+        $employeesJson = $allEmployees->map(function ($e) use ($signedEmployeeIds) {
             return [
-                'id' => $p->id,
-                'name' => $p->name,
-                'position' => $p->position,
-                'department' => $p->department,
-                'signed_at' => $p->pivot->signed_at,
+                'id' => $e->id,
+                'name' => $e->full_name,
+                'position' => $e->job_position,
+                'organization' => $e->organization,
+                'signed_at' => in_array($e->id, $signedEmployeeIds),
             ];
         });
 
-        return view('attendance.show', compact('agenda', 'participantsJson'));
+        return view('attendance.show', compact('agenda', 'employeesJson'));
     }
 
     public function sign(Request $request, Agenda $agenda, SignatureStorageService $signatureService)
@@ -34,21 +40,15 @@ class AttendanceController extends Controller
         abort_unless($agenda->status === 'active', 404);
 
         $request->validate([
-            'participant_id' => 'required|exists:participants,id',
+            'employee_id' => 'required|exists:employees,id',
             'signature' => 'required|string',
         ]);
 
-        $pivot = $agenda->participants()
-            ->where('participant_id', $request->participant_id)
+        $pivot = $agenda->employees()
+            ->where('employee_id', $request->employee_id)
             ->first();
 
-        if (!$pivot) {
-            return response()->json([
-                'message' => 'Anda tidak terdaftar dalam agenda ini.'
-            ], 422);
-        }
-
-        if ($pivot->pivot->signed_at) {
+        if ($pivot && $pivot->pivot->signature_image_path) {
             return response()->json([
                 'message' => 'Anda sudah melakukan absensi.'
             ], 422);
@@ -56,10 +56,15 @@ class AttendanceController extends Controller
 
         $signaturePath = $signatureService->storeBase64($request->signature);
 
-        $agenda->participants()->updateExistingPivot($request->participant_id, [
-            'signature_path' => $signaturePath,
-            'signed_at' => now(),
-        ]);
+        if ($pivot) {
+            $agenda->employees()->updateExistingPivot($request->employee_id, [
+                'signature_image_path' => $signaturePath,
+            ]);
+        } else {
+            $agenda->employees()->attach($request->employee_id, [
+                'signature_image_path' => $signaturePath,
+            ]);
+        }
 
         return response()->json([
             'message' => 'Absensi berhasil disimpan.'

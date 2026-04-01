@@ -6,14 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class InvitationTemplate extends Model
+class Room extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'body_content'];
+    protected $fillable = [
+        'room_name',
+        'description',
+    ];
 
     public function agendas(): HasMany
     {
-        return $this->hasMany(Agenda::class, 'template_id');
+        return $this->hasMany(Agenda::class);
     }
 }
