@@ -157,17 +157,28 @@ class AgendaController extends Controller
             }
         }
 
-        // Generate content PDF (attendees, notes, photos) via dompdf
-        $contentPdf = Pdf::loadView(
-            "admin.agendas.export-pdf",
-            compact("agenda", "signatureImages", "agendaImages"),
-        )->setPaper("a4", "portrait");
+        // Generate separate PDFs for each content section
+        $contentSections = [
+            'attendance' => 'Daftar Kehadiran',
+            'notes'      => 'Notulensi Rapat',
+            'photos'     => 'Dokumentasi Foto',
+        ];
 
-        $contentTmpPath =
-            tempnam(sys_get_temp_dir(), "agenda_content_") . ".pdf";
-        file_put_contents($contentTmpPath, $contentPdf->output());
+        $tempPaths = [];
+        foreach ($contentSections as $sectionKey => $sectionLabel) {
+            $section = $sectionKey;
+            $sectionPdf = Pdf::loadView(
+                "admin.agendas.export-pdf",
+                compact("agenda", "signatureImages", "agendaImages", "section"),
+            )->setPaper("a4", "portrait");
 
-        // Collect PDF files to merge: surat undangan → materi → generated content
+            $tmpPath = tempnam(sys_get_temp_dir(), "agenda_{$sectionKey}_") . ".pdf";
+            file_put_contents($tmpPath, $sectionPdf->output());
+            $tempPaths[] = $tmpPath;
+        }
+
+        // Collect PDF files to merge in order:
+        // Surat Undangan → Materi → Daftar Kehadiran → Notulensi → Dokumentasi
         $pdfFiles = [];
 
         if ($agenda->letter_file_path) {
@@ -178,11 +189,10 @@ class AgendaController extends Controller
                 file_exists($letterPath) &&
                 strtolower(pathinfo($letterPath, PATHINFO_EXTENSION)) === "pdf"
             ) {
-                $pdfFiles[] = $letterPath;
+                $pdfFiles[] = ['path' => $letterPath, 'type' => 'letter'];
             }
         }
 
-        // Only merge material if it's a PDF file
         if ($agenda->material_file_path) {
             $materialPath = Storage::disk("public")->path(
                 $agenda->material_file_path,
@@ -192,32 +202,127 @@ class AgendaController extends Controller
                 strtolower(pathinfo($materialPath, PATHINFO_EXTENSION)) ===
                     "pdf"
             ) {
-                $pdfFiles[] = $materialPath;
+                $pdfFiles[] = ['path' => $materialPath, 'type' => 'material'];
             }
         }
 
-        $pdfFiles[] = $contentTmpPath;
+        // Add content section PDFs
+        $sectionKeys = array_keys($contentSections);
+        foreach ($sectionKeys as $idx => $sectionKey) {
+            $pdfFiles[] = ['path' => $tempPaths[$idx], 'type' => $sectionKey];
+        }
 
-        // Merge all PDFs using FPDI
+        // Prepare header info
+        $headerTitle = $agenda->title;
+        $headerDate = $agenda->event_date->translatedFormat('l, d F Y');
+        $headerTime = $agenda->event_time . ' WIB';
+        $headerRoom = $agenda->room->room_name ?? '-';
+        $headerOrganizer = $agenda->organizer;
+        $headerChair = $agenda->meeting_chair;
+
+        // Sub-header labels per type
+        $subHeaders = [
+            'letter'     => 'Surat Undangan',
+            'material'   => 'Materi Rapat',
+            'attendance' => 'Daftar Kehadiran',
+            'notes'      => 'Notulensi Rapat',
+            'photos'     => 'Dokumentasi Foto',
+        ];
+
+        // Merge all PDFs using FPDI — every page gets the same header
         $merger = new \setasign\Fpdi\Fpdi();
+        $merger->SetAutoPageBreak(false);
 
-        foreach ($pdfFiles as $file) {
-            $pageCount = $merger->setSourceFile($file);
+        foreach ($pdfFiles as $fileInfo) {
+            $pageCount = $merger->setSourceFile($fileInfo['path']);
             for ($p = 1; $p <= $pageCount; $p++) {
                 $tpl = $merger->importPage($p);
                 $size = $merger->getTemplateSize($tpl);
+
+                $headerHeight = 36; // mm reserved for header + sub-header
+                $pageWidth = $size['width'];
+                $pageHeight = $size['height'];
+
                 $merger->AddPage($size["orientation"], [
-                    $size["width"],
-                    $size["height"],
+                    $pageWidth,
+                    $pageHeight,
                 ]);
-                $merger->useTemplate($tpl);
+
+                // -- Draw header --
+                // Title
+                $merger->SetFont('Helvetica', 'B', 10);
+                $merger->SetTextColor(0, 0, 0);
+                $merger->SetXY(12, 5);
+                $merger->Cell($pageWidth - 24, 5, $headerTitle, 0, 1, 'L');
+
+                // Info rows
+                $merger->SetTextColor(80, 80, 80);
+                $colWidth = ($pageWidth - 24) / 2;
+
+                // Row 1: Tanggal + Penyelenggara
+                $merger->SetXY(12, 12);
+                $merger->SetFont('Helvetica', 'B', 7.5);
+                $merger->Cell(22, 3.5, 'Tanggal', 0, 0);
+                $merger->Cell(4, 3.5, ':', 0, 0);
+                $merger->SetFont('Helvetica', '', 7.5);
+                $merger->Cell($colWidth - 26, 3.5, $headerDate, 0, 0);
+
+                $merger->SetFont('Helvetica', 'B', 7.5);
+                $merger->Cell(26, 3.5, 'Penyelenggara', 0, 0);
+                $merger->Cell(4, 3.5, ':', 0, 0);
+                $merger->SetFont('Helvetica', '', 7.5);
+                $merger->Cell($colWidth - 30, 3.5, $headerOrganizer, 0, 1);
+
+                // Row 2: Waktu + Pimpinan Rapat
+                $merger->SetXY(12, 16);
+                $merger->SetFont('Helvetica', 'B', 7.5);
+                $merger->Cell(22, 3.5, 'Waktu', 0, 0);
+                $merger->Cell(4, 3.5, ':', 0, 0);
+                $merger->SetFont('Helvetica', '', 7.5);
+                $merger->Cell($colWidth - 26, 3.5, $headerTime, 0, 0);
+
+                $merger->SetFont('Helvetica', 'B', 7.5);
+                $merger->Cell(26, 3.5, 'Pimpinan Rapat', 0, 0);
+                $merger->Cell(4, 3.5, ':', 0, 0);
+                $merger->SetFont('Helvetica', '', 7.5);
+                $merger->Cell($colWidth - 30, 3.5, $headerChair, 0, 1);
+
+                // Row 3: Ruangan
+                $merger->SetXY(12, 20);
+                $merger->SetFont('Helvetica', 'B', 7.5);
+                $merger->Cell(22, 3.5, 'Ruangan', 0, 0);
+                $merger->Cell(4, 3.5, ':', 0, 0);
+                $merger->SetFont('Helvetica', '', 7.5);
+                $merger->Cell($colWidth - 26, 3.5, $headerRoom, 0, 1);
+
+                // Separator line
+                $merger->SetDrawColor(30, 30, 30);
+                $merger->SetLineWidth(0.4);
+                $merger->Line(12, 27, $pageWidth - 12, 27);
+
+                // -- Sub-header (section label) --
+                $subLabel = $subHeaders[$fileInfo['type']] ?? '';
+                $merger->SetFont('Helvetica', 'B', 11);
+                $merger->SetTextColor(0, 0, 0);
+                $merger->SetXY(12, 29);
+                $merger->Cell($pageWidth - 24, 5, $subLabel, 0, 1, 'L');
+
+                // -- Place imported page below header + sub-header, scaled to fit --
+                $availableHeight = $pageHeight - $headerHeight;
+                $scale = min($pageWidth / $size['width'], $availableHeight / $size['height']);
+                $scaledWidth = $size['width'] * $scale;
+                $scaledHeight = $size['height'] * $scale;
+                $xOffset = ($pageWidth - $scaledWidth) / 2;
+                $merger->useTemplate($tpl, $xOffset, $headerHeight, $scaledWidth, $scaledHeight);
             }
         }
 
         $filename = "Agenda - " . $agenda->title . ".pdf";
 
-        // Clean up temp file
-        @unlink($contentTmpPath);
+        // Clean up temp files
+        foreach ($tempPaths as $tmp) {
+            @unlink($tmp);
+        }
 
         return response($merger->Output("S", $filename), 200, [
             "Content-Type" => "application/pdf",

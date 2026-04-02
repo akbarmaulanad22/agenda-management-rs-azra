@@ -15,10 +15,11 @@ class AttendanceController extends Controller
 
         $agenda->load('room');
 
-        $signedEmployeeIds = $agenda->employees()
+        $signedEmployees = $agenda->employees()
             ->whereNotNull('agenda_employee.signature_image_path')
-            ->pluck('employees.id')
-            ->toArray();
+            ->get();
+
+        $signedEmployeeIds = $signedEmployees->pluck('id')->toArray();
 
         $allEmployees = Employee::orderBy('full_name')->get();
 
@@ -32,7 +33,18 @@ class AttendanceController extends Controller
             ];
         });
 
-        return view('attendance.show', compact('agenda', 'employeesJson'));
+        $attendeesJson = $signedEmployees->map(function ($e) {
+            return [
+                'id' => $e->id,
+                'name' => $e->full_name,
+                'position' => $e->job_position,
+                'organization' => $e->organization,
+                'signature_url' => asset('storage/' . $e->pivot->signature_image_path),
+                'signed_at' => $e->pivot->created_at?->format('H:i'),
+            ];
+        });
+
+        return view('attendance.show', compact('agenda', 'employeesJson', 'attendeesJson'));
     }
 
     public function sign(Request $request, Agenda $agenda, SignatureStorageService $signatureService)
@@ -66,8 +78,18 @@ class AttendanceController extends Controller
             ]);
         }
 
+        $employee = Employee::find($request->employee_id);
+
         return response()->json([
-            'message' => 'Absensi berhasil disimpan.'
+            'message' => 'Absensi berhasil disimpan.',
+            'attendee' => [
+                'id' => $employee->id,
+                'name' => $employee->full_name,
+                'position' => $employee->job_position,
+                'organization' => $employee->organization,
+                'signature_url' => asset('storage/' . $signaturePath),
+                'signed_at' => now()->format('H:i'),
+            ],
         ]);
     }
 }
