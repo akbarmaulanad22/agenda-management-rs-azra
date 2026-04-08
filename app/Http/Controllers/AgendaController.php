@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agenda;
+use App\Models\AgendaQuestionAnswer;
 use App\Models\BankSoal;
 use App\Models\Question;
 use App\Models\Room;
@@ -87,7 +88,31 @@ class AgendaController extends Controller
     {
         $agenda->load(["room", "employees", "notes", "images", "agendaQuestions", "bankSoal"]);
 
-        return view("admin.agendas.show", compact("agenda"));
+        $quizResults = collect();
+        if ($agenda->agendaQuestions->count() > 0) {
+            $totalQuestions = $agenda->agendaQuestions->count();
+            $quizResults = AgendaQuestionAnswer::where('agenda_id', $agenda->id)
+                ->select('employee_id')
+                ->selectRaw('SUM(is_correct) as correct_count')
+                ->selectRaw('COUNT(*) as answered_count')
+                ->selectRaw('MIN(created_at) as answered_at')
+                ->groupBy('employee_id')
+                ->with('employee')
+                ->get()
+                ->map(function ($row) use ($totalQuestions) {
+                    return [
+                        'employee' => $row->employee,
+                        'correct' => (int) $row->correct_count,
+                        'total' => $totalQuestions,
+                        'score' => $totalQuestions > 0 ? round(($row->correct_count / $totalQuestions) * 100) : 0,
+                        'answered_at' => $row->answered_at,
+                    ];
+                })
+                ->sortByDesc('score')
+                ->values();
+        }
+
+        return view("admin.agendas.show", compact("agenda", "quizResults"));
     }
 
     public function edit(Agenda $agenda)

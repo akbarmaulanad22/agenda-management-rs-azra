@@ -152,36 +152,76 @@
         @if($agenda->type !== 'rapat' && $agenda->agendaQuestions->count() > 0)
         <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden">
             <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-gray-900">Soal</h3>
-                    <p class="text-sm text-gray-400 mt-0.5">
-                        {{ $agenda->agendaQuestions->count() }} soal
-                        @if($agenda->bankSoal)
-                            &mdash; Template: {{ $agenda->bankSoal->title }}
-                        @endif
-                    </p>
-                </div>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-50 text-xs font-bold text-primary">
-                    {{ $agenda->agendaQuestions->count() }} Soal
-                </span>
-            </div>
-            @foreach($agenda->agendaQuestions as $index => $question)
-                <div class="px-8 py-6 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
-                    <h4 class="text-sm font-bold text-gray-700 mb-3">Soal {{ $index + 1 }}</h4>
-                    <p class="text-sm text-gray-800 font-medium mb-4">{{ $question->question_text }}</p>
-                    <div class="space-y-2">
-                        @foreach(['a', 'b', 'c', 'd', 'e'] as $opt)
-                            <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ $question->correct_option === $opt ? 'bg-primary-50 border border-primary/20' : 'bg-gray-50' }}">
-                                <span class="w-7 h-7 rounded-lg {{ $question->correct_option === $opt ? 'bg-primary text-white' : 'bg-white text-gray-500 border border-gray-200' }} flex items-center justify-center text-xs font-bold uppercase">{{ $opt }}</span>
-                                <span class="text-sm {{ $question->correct_option === $opt ? 'text-primary font-semibold' : 'text-gray-600' }}">{{ $question->{'option_' . $opt} }}</span>
-                                @if($question->correct_option === $opt)
-                                    <svg class="w-4 h-4 text-primary ml-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                @endif
-                            </div>
-                        @endforeach
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-violet-50 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900">Bank Soal</h3>
+                        <p class="text-sm text-gray-400 mt-0.5">
+                            @if($agenda->bankSoal)
+                                {{ $agenda->bankSoal->title }}
+                            @else
+                                Template telah dihapus
+                            @endif
+                            &mdash; {{ $agenda->agendaQuestions->count() }} soal
+                        </p>
                     </div>
                 </div>
-            @endforeach
+                @if($agenda->bankSoal)
+                    <a href="{{ route('admin.bank-soals.show', $agenda->bankSoal) }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-violet-50 text-violet-600 text-sm font-bold hover:bg-violet-100 active:scale-[0.98] transition-all duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Lihat Soal
+                    </a>
+                @endif
+            </div>
+
+            {{-- Quiz Results --}}
+            <div class="px-8 py-6">
+                <h4 class="text-sm font-bold text-gray-700 mb-3">Hasil Pengerjaan Soal</h4>
+                @if($quizResults->count() > 0)
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="pr-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider w-10">No</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Nama</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Jabatan</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Benar</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Nilai</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                @foreach($quizResults as $index => $result)
+                                    <tr class="hover:bg-gray-50/50 transition-colors">
+                                        <td class="pr-4 py-3 text-sm text-gray-400 font-medium">{{ $index + 1 }}</td>
+                                        <td class="px-4 py-3">
+                                            <div class="text-sm font-semibold text-gray-800">{{ $result['employee']->full_name }}</div>
+                                            <div class="text-xs text-gray-400">{{ $result['employee']->organization }}</div>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-500">{{ $result['employee']->job_position }}</td>
+                                        <td class="px-4 py-3 text-center text-sm font-medium text-gray-700">{{ $result['correct'] }}/{{ $result['total'] }}</td>
+                                        <td class="px-4 py-3 text-center">
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {{ $result['score'] >= 70 ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600' }}">
+                                                {{ $result['score'] }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{{ \Carbon\Carbon::parse($result['answered_at'])->format('d M Y, H:i') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center py-8">
+                        <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <p class="text-sm text-gray-400">Belum ada peserta yang mengerjakan soal</p>
+                    </div>
+                @endif
+            </div>
         </div>
         @endif
 

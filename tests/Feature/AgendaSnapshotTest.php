@@ -252,14 +252,11 @@ class AgendaSnapshotTest extends TestCase
         ]);
     }
 
-    public function test_show_displays_agenda_questions(): void
+    public function test_show_displays_bank_soal_summary(): void
     {
         $user = User::factory()->create();
-        $bankSoal = BankSoal::factory()->create();
-        Question::factory()->create([
-            'bank_soal_id' => $bankSoal->id,
-            'question_text' => 'Apa fungsi mitokondria?',
-        ]);
+        $bankSoal = BankSoal::factory()->create(['title' => 'Soal Biologi']);
+        Question::factory()->count(3)->create(['bank_soal_id' => $bankSoal->id]);
 
         $this->actingAs($user)->post(route('admin.agendas.store'), $this->validAgendaData([
             'type' => 'diklat',
@@ -270,7 +267,9 @@ class AgendaSnapshotTest extends TestCase
         $response = $this->actingAs($user)->get(route('admin.agendas.show', $agenda));
 
         $response->assertOk();
-        $response->assertSee('Apa fungsi mitokondria?');
+        $response->assertSee('Soal Biologi');
+        $response->assertSee('3 soal');
+        $response->assertSee('Lihat Soal');
     }
 
     public function test_index_shows_type_column(): void
