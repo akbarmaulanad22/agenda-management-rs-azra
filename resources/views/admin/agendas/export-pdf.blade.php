@@ -17,7 +17,7 @@
 
         .photo-grid { width: 100%; border-collapse: collapse; }
         .photo-grid td { border: none; padding: 6px; text-align: center; width: 33.33%; vertical-align: top; }
-        .photo-grid img { max-width: 100%; max-height: 200px; }
+        .photo-grid img { width: 150px; height: 150px; object-fit: cover; }
 
         .empty-notice { text-align: center; color: #888; font-style: italic; padding: 20px 0; }
     </style>

@@ -17,54 +17,30 @@
 <body class="bg-gray-50 min-h-screen font-sans">
     <div x-data="attendanceApp()" class="max-w-3xl mx-auto pb-8">
         {{-- Header --}}
-        <div class="bg-gradient-to-br from-primary to-primary-700 text-white px-6 pt-8 pb-5 rounded-b-3xl shadow-lg">
-            <a href="{{ route('home') }}"
-                class="inline-flex items-center gap-1.5 text-primary-100/80 text-xs font-medium hover:text-white transition mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-                Kembali
-            </a>
-            <h1 class="text-lg font-bold leading-snug">{{ $agenda->title }}</h1>
-            <div class="flex flex-wrap items-center gap-2 mt-3">
-                <span class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    {{ $agenda->event_date->translatedFormat('d M Y') }}
-                </span>
-                <span class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {{ $agenda->event_time }} WIB
-                </span>
-                <span class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    {{ $agenda->room->room_name ?? '-' }}
-                </span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 mt-3">
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2">
-                    <p class="text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-0.5">Penyelenggara</p>
-                    <p class="text-xs font-semibold text-white truncate">{{ $agenda->organizer ?? '-' }}</p>
+        <x-agenda-header :agenda="$agenda">
+            <x-slot:actions>
+                <div class="flex items-center gap-2">
+                    @if($agenda->agendaQuestions->count() > 0)
+                        <a href="{{ route('attendance.quiz', $agenda) }}"
+                            class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-[11px] font-medium px-3 py-1.5 rounded-full hover:bg-white/25 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Kerjakan Soal
+                        </a>
+                    @endif
+                    <a href="{{ route('agenda.input', $agenda) }}"
+                        class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-[11px] font-medium px-3 py-1.5 rounded-full hover:bg-white/25 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Input Agenda
+                    </a>
                 </div>
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2">
-                    <p class="text-[10px] uppercase tracking-wider text-white/50 font-semibold mb-0.5">Pimpinan Rapat</p>
-                    <p class="text-xs font-semibold text-white truncate">{{ $agenda->meeting_chair ?? '-' }}</p>
-                </div>
-            </div>
-        </div>
+            </x-slot:actions>
+        </x-agenda-header>
 
         {{-- Search to Attend Section --}}
         <div class="px-4 mt-5">
@@ -168,32 +144,32 @@
                 </div>
 
                 {{-- Attendee Table --}}
-                <div x-show="attendees.length > 0" class="overflow-x-auto">
-                    <table class="w-full text-sm">
+                <div x-show="attendees.length > 0" class="overflow-hidden">
+                    <table class="w-full text-[11px] table-fixed">
                         <thead>
                             <tr class="bg-gray-50/80">
-                                <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-10">No</th>
-                                <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama</th>
-                                <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Jabatan</th>
-                                <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Organisasi</th>
-                                <th class="text-center px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-20">Jam</th>
-                                <th class="text-center px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-28">Tanda Tangan</th>
+                                <th class="text-left px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider" style="width:24px">No</th>
+                                <th class="text-left px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Nama</th>
+                                <th class="text-left px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Jabatan</th>
+                                <th class="text-left px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Organisasi</th>
+                                <th class="text-center px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider" style="width:40px">Jam</th>
+                                <th class="text-center px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider" style="width:52px">TTD</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             <template x-for="(a, index) in attendees" :key="a.id">
                                 <tr class="hover:bg-gray-50/40 transition-colors">
-                                    <td class="px-5 py-3 text-gray-400 text-xs" x-text="index + 1"></td>
-                                    <td class="px-5 py-3">
-                                        <span class="font-semibold text-gray-900 text-sm" x-text="a.name"></span>
+                                    <td class="px-1.5 py-1.5 text-gray-400 text-[10px]" x-text="index + 1"></td>
+                                    <td class="px-1.5 py-1.5">
+                                        <span class="font-semibold text-gray-900 text-[11px] break-words" x-text="a.name"></span>
                                     </td>
-                                    <td class="px-5 py-3 text-gray-500 text-sm" x-text="a.position"></td>
-                                    <td class="px-5 py-3 text-gray-500 text-sm" x-text="a.organization"></td>
-                                    <td class="px-5 py-3 text-center">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-xs font-medium text-gray-600" x-text="a.signed_at"></span>
+                                    <td class="px-1.5 py-1.5 text-gray-500 text-[11px] break-words" x-text="a.position"></td>
+                                    <td class="px-1.5 py-1.5 text-gray-500 text-[11px] break-words" x-text="a.organization"></td>
+                                    <td class="px-1.5 py-1.5 text-center">
+                                        <span class="text-[10px] font-medium text-gray-600" x-text="a.signed_at"></span>
                                     </td>
-                                    <td class="px-5 py-3 text-center">
-                                        <img :src="a.signature_url" alt="Tanda Tangan" class="h-10 w-auto mx-auto rounded border border-gray-100 bg-white object-contain">
+                                    <td class="px-1.5 py-1.5 text-center">
+                                        <img :src="a.signature_url" alt="TTD" class="h-7 w-auto mx-auto rounded border border-gray-100 bg-white object-contain">
                                     </td>
                                 </tr>
                             </template>

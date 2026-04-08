@@ -12,7 +12,7 @@
 </head>
 
 <body class="bg-gray-100/60 min-h-screen font-sans">
-    <div x-data="agendaSearch()" class="max-w-6xl mx-auto pb-8">
+    <div x-data="agendaSearch" class="max-w-6xl mx-auto pb-8">
         {{-- Header --}}
         <div class="bg-gradient-to-br from-primary to-primary-700 text-white px-6 pt-8 pb-5 rounded-b-3xl shadow-lg">
             <div class="flex items-center gap-3 mb-1">
@@ -202,13 +202,13 @@
                 'organizer' => $a->organizer,
                 'room' => $a->room->room_name ?? '',
                 'unit' => $a->unit ?? '',
-                'description' => $a->description
+                'description' => $a->description ?? ''
             ];
         });
     @endphp
     <script>
-        function agendaSearch() {
-            return {
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('agendaSearch', () => ({
                 search: '',
                 agendas: @json($agendaItems),
 
@@ -228,15 +228,15 @@
                     if (!this.search) return true;
                     const q = this.search.toLowerCase();
                     return this.agendas.some(a =>
-                        a.title.toLowerCase().includes(q)
-                        || a.organizer.toLowerCase().includes(q)
-                        || a.room.toLowerCase().includes(q)
+                        (a.title || '').toLowerCase().includes(q)
+                        || (a.organizer || '').toLowerCase().includes(q)
+                        || (a.room || '').toLowerCase().includes(q)
                         || (a.unit || '').toLowerCase().includes(q)
                         || (a.description || '').toLowerCase().includes(q)
                     );
                 }
-            };
-        }
+            }));
+        });
     </script>
 </body>
 

@@ -42,7 +42,7 @@
                             @error('job_position') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label for="structural_role" class="block text-sm font-semibold text-gray-700 mb-2">Peran Struktural</label>
+                            <label for="structural_role" class="block text-sm font-semibold text-gray-700 mb-2">Unit</label>
                             <input type="text" name="structural_role" id="structural_role" value="{{ old('structural_role', $employee->structural_role) }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
                             @error('structural_role') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                         </div>

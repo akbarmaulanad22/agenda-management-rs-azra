@@ -24,6 +24,8 @@ class Agenda extends Model
         'room_id',
         'letter_file_path',
         'material_file_path',
+        'type',
+        'bank_soal_id',
     ];
 
     protected function casts(): array
@@ -53,5 +55,15 @@ class Agenda extends Model
     public function images(): HasMany
     {
         return $this->hasMany(AgendaImage::class);
+    }
+
+    public function agendaQuestions(): HasMany
+    {
+        return $this->hasMany(AgendaQuestion::class);
+    }
+
+    public function bankSoal(): BelongsTo
+    {
+        return $this->belongsTo(BankSoal::class);
     }
 }

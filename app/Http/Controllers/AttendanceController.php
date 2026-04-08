@@ -13,7 +13,7 @@ class AttendanceController extends Controller
     {
         abort_unless($agenda->status === 'active', 404);
 
-        $agenda->load('room');
+        $agenda->load(['room', 'agendaQuestions']);
 
         $signedEmployees = $agenda->employees()
             ->whereNotNull('agenda_employee.signature_image_path')

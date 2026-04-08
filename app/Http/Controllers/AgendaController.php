@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agenda;
+use App\Models\BankSoal;
+use App\Models\Question;
 use App\Models\Room;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -20,8 +22,9 @@ class AgendaController extends Controller
     public function create()
     {
         $rooms = Room::all();
+        $bankSoals = BankSoal::all();
 
-        return view("admin.agendas.create", compact("rooms"));
+        return view("admin.agendas.create", compact("rooms", "bankSoals"));
     }
 
     public function store(Request $request)
@@ -36,6 +39,8 @@ class AgendaController extends Controller
             "unit" => "nullable|string|max:255",
             "meeting_chair" => "required|string|max:255",
             "room_id" => "required|exists:rooms,id",
+            "type" => "required|in:diklat,pelatihan,rapat",
+            "bank_soal_id" => "nullable|required_if:type,diklat|required_if:type,pelatihan|exists:bank_soals,id",
             "letter_file" => "nullable|file|mimes:pdf|max:5012",
             "material_file" => "nullable|file|mimes:pdf|max:10240",
         ]);
@@ -44,7 +49,18 @@ class AgendaController extends Controller
             ->except(["letter_file", "material_file"])
             ->toArray();
 
+        if ($agendaData['type'] === 'rapat') {
+            $agendaData['bank_soal_id'] = null;
+        }
+
         $agenda = Agenda::create($agendaData);
+
+        if ($agenda->bank_soal_id) {
+            $questions = Question::where('bank_soal_id', $agenda->bank_soal_id)->get();
+            $agenda->agendaQuestions()->createMany(
+                $questions->map->only(['question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct_option'])->toArray()
+            );
+        }
 
         if ($request->hasFile("letter_file")) {
             $agenda->update([
@@ -69,7 +85,7 @@ class AgendaController extends Controller
 
     public function show(Agenda $agenda)
     {
-        $agenda->load(["room", "employees", "notes", "images"]);
+        $agenda->load(["room", "employees", "notes", "images", "agendaQuestions", "bankSoal"]);
 
         return view("admin.agendas.show", compact("agenda"));
     }
@@ -77,8 +93,9 @@ class AgendaController extends Controller
     public function edit(Agenda $agenda)
     {
         $rooms = Room::all();
+        $bankSoals = BankSoal::all();
 
-        return view("admin.agendas.edit", compact("agenda", "rooms"));
+        return view("admin.agendas.edit", compact("agenda", "rooms", "bankSoals"));
     }
 
     public function update(Request $request, Agenda $agenda)
@@ -93,6 +110,8 @@ class AgendaController extends Controller
             "unit" => "nullable|string|max:255",
             "meeting_chair" => "required|string|max:255",
             "room_id" => "required|exists:rooms,id",
+            "type" => "required|in:diklat,pelatihan,rapat",
+            "bank_soal_id" => "nullable|required_if:type,diklat|required_if:type,pelatihan|exists:bank_soals,id",
             "letter_file" => "nullable|file|mimes:pdf|max:10240",
             "material_file" => "nullable|file|mimes:pdf|max:10240",
         ]);
@@ -100,6 +119,10 @@ class AgendaController extends Controller
         $agendaData = collect($validated)
             ->except(["letter_file", "material_file"])
             ->toArray();
+
+        if ($agendaData['type'] === 'rapat') {
+            $agendaData['bank_soal_id'] = null;
+        }
 
         if ($request->hasFile("letter_file")) {
             if ($agenda->letter_file_path) {
@@ -120,6 +143,17 @@ class AgendaController extends Controller
         }
 
         $agenda->update($agendaData);
+
+        // Sync snapshot questions
+        if ($agenda->type === 'rapat') {
+            $agenda->agendaQuestions()->delete();
+        } elseif ($agenda->bank_soal_id) {
+            $agenda->agendaQuestions()->delete();
+            $questions = Question::where('bank_soal_id', $agenda->bank_soal_id)->get();
+            $agenda->agendaQuestions()->createMany(
+                $questions->map->only(['question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct_option'])->toArray()
+            );
+        }
 
         return redirect()
             ->route("admin.agendas.index")

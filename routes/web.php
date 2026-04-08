@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicAgendaController;
 use App\Http\Controllers\PublicAgendaInputController;
+use App\Http\Controllers\PublicQuizController;
 use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,11 +30,16 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('rooms', RoomController::class);
     Route::resource('agendas', AgendaController::class);
     Route::get('agendas/{agenda}/export-pdf', [AgendaController::class, 'exportPdf'])->name('agendas.export-pdf');
+    Route::resource('bank-soals', BankSoalController::class);
 });
 
 // Public attendance routes
 Route::get('/absen/{agenda}', [AttendanceController::class, 'show'])->name('attendance.show');
 Route::post('/absen/{agenda}/sign', [AttendanceController::class, 'sign'])->name('attendance.sign');
+
+// Public quiz routes
+Route::get('/absen/{agenda}/quiz', [PublicQuizController::class, 'show'])->name('attendance.quiz');
+Route::post('/absen/{agenda}/quiz', [PublicQuizController::class, 'store'])->name('attendance.quiz.store');
 
 // Public agenda input (crowdsourced notes + images)
 Route::get('/agenda/{agenda}/input', [PublicAgendaInputController::class, 'show'])->name('agenda.input');

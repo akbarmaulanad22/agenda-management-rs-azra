@@ -148,6 +148,43 @@
             </div>
         </div>
 
+        {{-- ===== SOAL SECTION (Diklat/Pelatihan only) ===== --}}
+        @if($agenda->type !== 'rapat' && $agenda->agendaQuestions->count() > 0)
+        <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-gray-900">Soal</h3>
+                    <p class="text-sm text-gray-400 mt-0.5">
+                        {{ $agenda->agendaQuestions->count() }} soal
+                        @if($agenda->bankSoal)
+                            &mdash; Template: {{ $agenda->bankSoal->title }}
+                        @endif
+                    </p>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-50 text-xs font-bold text-primary">
+                    {{ $agenda->agendaQuestions->count() }} Soal
+                </span>
+            </div>
+            @foreach($agenda->agendaQuestions as $index => $question)
+                <div class="px-8 py-6 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
+                    <h4 class="text-sm font-bold text-gray-700 mb-3">Soal {{ $index + 1 }}</h4>
+                    <p class="text-sm text-gray-800 font-medium mb-4">{{ $question->question_text }}</p>
+                    <div class="space-y-2">
+                        @foreach(['a', 'b', 'c', 'd', 'e'] as $opt)
+                            <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ $question->correct_option === $opt ? 'bg-primary-50 border border-primary/20' : 'bg-gray-50' }}">
+                                <span class="w-7 h-7 rounded-lg {{ $question->correct_option === $opt ? 'bg-primary text-white' : 'bg-white text-gray-500 border border-gray-200' }} flex items-center justify-center text-xs font-bold uppercase">{{ $opt }}</span>
+                                <span class="text-sm {{ $question->correct_option === $opt ? 'text-primary font-semibold' : 'text-gray-600' }}">{{ $question->{'option_' . $opt} }}</span>
+                                @if($question->correct_option === $opt)
+                                    <svg class="w-4 h-4 text-primary ml-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        @endif
+
         {{-- ===== EMPLOYEE LIST SECTION ===== --}}
         <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden">
             <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
@@ -218,51 +255,49 @@
 
         {{-- ===== MEETING MINUTES (NOTES) SECTION ===== --}}
         <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-100">
-                <h3 class="text-base font-bold text-gray-900">Notulensi Rapat</h3>
-                <p class="text-sm text-gray-400 mt-0.5">{{ $agenda->notes->count() }} catatan pembahasan</p>
+            <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-gray-900">Notulensi Rapat</h3>
+                    <p class="text-sm text-gray-400 mt-0.5">{{ $agenda->notes->count() }} catatan pembahasan</p>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-50 text-xs font-bold text-primary">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    {{ $agenda->notes->count() }} Catatan
+                </span>
             </div>
-            <div class="p-8">
-                @if($agenda->notes->count() > 0)
-                    <div class="relative pl-8 space-y-8">
-                        {{-- Timeline line --}}
-                        <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary/30 via-primary/10 to-transparent"></div>
-
-                        @foreach($agenda->notes as $note)
-                            <div class="relative">
-                                {{-- Timeline dot --}}
-                                <div class="absolute -left-8 top-1 w-6 h-6 rounded-full bg-primary-50 border-2 border-primary flex items-center justify-center">
-                                    <div class="w-2 h-2 rounded-full bg-primary"></div>
-                                </div>
-
-                                <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100 hover:shadow-md transition-shadow">
-                                    <div class="flex items-start justify-between gap-3 mb-3">
-                                        <h4 class="text-sm font-bold text-gray-900">{{ $note->topic }}</h4>
-                                        <span class="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">{{ $note->created_at->format('d M Y, H:i') }}</span>
-                                    </div>
-                                    <div class="mb-2">
-                                        <span class="text-[10px] font-semibold text-primary uppercase tracking-wider">Keputusan</span>
-                                        <p class="text-sm text-gray-700 mt-1">{{ $note->decision }}</p>
-                                    </div>
-                                    @if($note->remarks)
-                                        <div class="mt-3 pt-3 border-t border-gray-200/60">
-                                            <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Keterangan</span>
-                                            <p class="text-sm text-gray-500 mt-1">{{ $note->remarks }}</p>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
+            @if($agenda->notes->count() > 0)
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-100">
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider w-12">No</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Topik</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Keputusan</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Keterangan</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @foreach($agenda->notes as $index => $note)
+                                <tr class="hover:bg-gray-50/50 transition-colors">
+                                    <td class="px-6 py-3.5 text-sm text-gray-400 font-medium">{{ $index + 1 }}</td>
+                                    <td class="px-6 py-3.5 text-sm font-semibold text-gray-800">{{ $note->topic }}</td>
+                                    <td class="px-6 py-3.5 text-sm text-gray-500">{{ $note->decision }}</td>
+                                    <td class="px-6 py-3.5 text-sm text-gray-500">{{ $note->remarks ?? '—' }}</td>
+                                    <td class="px-6 py-3.5 text-sm text-gray-500 whitespace-nowrap">{{ $note->created_at->format('d M Y, H:i') }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="text-center py-12">
+                    <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
                     </div>
-                @else
-                    <div class="text-center py-8">
-                        <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
-                            <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
-                        </div>
-                        <p class="text-sm text-gray-400">Belum ada catatan notulensi</p>
-                    </div>
-                @endif
-            </div>
+                    <p class="text-sm text-gray-400">Belum ada catatan notulensi</p>
+                </div>
+            @endif
         </div>
 
         {{-- ===== DOCUMENTATION IMAGES SECTION ===== --}}

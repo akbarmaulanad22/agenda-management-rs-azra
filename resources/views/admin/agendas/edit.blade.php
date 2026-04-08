@@ -13,7 +13,7 @@
                 <h3 class="text-lg font-bold text-gray-900">Ubah Agenda</h3>
                 <p class="text-sm text-gray-400 mt-0.5">Perbarui informasi agenda rapat</p>
             </div>
-            <div class="p-8">
+            <div class="p-8" x-data="{ type: '{{ old('type', $agenda->type) }}' }">
                 <form action="{{ route('admin.agendas.update', $agenda) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                     @csrf
                     @method('PUT')
@@ -88,6 +88,28 @@
                                     @endforeach
                                 </select>
                                 @error('room_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label for="type" class="block text-sm font-semibold text-gray-700 mb-2">Tipe Agenda</label>
+                                <select name="type" id="type" x-model="type" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
+                                    <option value="rapat">Rapat</option>
+                                    <option value="diklat">Diklat</option>
+                                    <option value="pelatihan">Pelatihan</option>
+                                </select>
+                                @error('type') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div x-show="type === 'diklat' || type === 'pelatihan'" x-transition>
+                                <label for="bank_soal_id" class="block text-sm font-semibold text-gray-700 mb-2">Template Bank Soal</label>
+                                <select name="bank_soal_id" id="bank_soal_id" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                                    <option value="">-- Pilih Bank Soal --</option>
+                                    @foreach($bankSoals as $bankSoal)
+                                        <option value="{{ $bankSoal->id }}" {{ old('bank_soal_id', $agenda->bank_soal_id) == $bankSoal->id ? 'selected' : '' }}>{{ $bankSoal->title }}</option>
+                                    @endforeach
+                                </select>
+                                <p class="text-xs text-gray-400 mt-1">Soal akan disalin ulang dari template yang dipilih</p>
+                                @error('bank_soal_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                             </div>
                         </div>
                     </div>

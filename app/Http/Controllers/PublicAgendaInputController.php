@@ -39,16 +39,22 @@ class PublicAgendaInputController extends Controller
         abort_unless($agenda->status === 'active', 404);
 
         $request->validate([
-            'image' => 'required|image|mimes:jpg,jpeg,png|max:3072',
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png|max:3072',
         ]);
 
-        $path = $request->file('image')->store('agenda-images/' . $agenda->id, 'public');
+        $count = 0;
+        foreach ($request->file('images') as $file) {
+            $path = $file->store('agenda-images/' . $agenda->id, 'public');
+            $agenda->images()->create(['image_path' => $path]);
+            $count++;
+        }
 
-        $agenda->images()->create([
-            'image_path' => $path,
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'count' => $count]);
+        }
 
         return redirect()->route('agenda.input', $agenda)
-            ->with('success', 'Foto berhasil diunggah.');
+            ->with('success', $count . ' foto berhasil diunggah.');
     }
 }
