@@ -93,7 +93,7 @@ class AgendaController extends Controller
             $totalQuestions = $agenda->agendaQuestions->count();
             $quizResults = AgendaQuestionAnswer::where('agenda_id', $agenda->id)
                 ->select('employee_id')
-                ->selectRaw('SUM(is_correct) as correct_count')
+                ->selectRaw('SUM(is_correct::int) as correct_count')
                 ->selectRaw('COUNT(*) as answered_count')
                 ->selectRaw('MIN(created_at) as answered_at')
                 ->groupBy('employee_id')
