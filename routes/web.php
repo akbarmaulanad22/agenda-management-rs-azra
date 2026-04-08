@@ -6,6 +6,7 @@ use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicAgendaController;
+use App\Http\Controllers\UnitController;
 use App\Http\Controllers\PublicAgendaInputController;
 use App\Http\Controllers\PublicQuizController;
 use App\Http\Controllers\RoomController;
@@ -28,8 +29,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('employees', EmployeeController::class);
     Route::resource('rooms', RoomController::class);
+    Route::get('agendas/export-csv', [AgendaController::class, 'exportCsv'])->name('agendas.export-csv');
     Route::resource('agendas', AgendaController::class);
     Route::get('agendas/{agenda}/export-pdf', [AgendaController::class, 'exportPdf'])->name('agendas.export-pdf');
+    Route::resource('units', UnitController::class);
     Route::resource('bank-soals', BankSoalController::class);
 });
 
