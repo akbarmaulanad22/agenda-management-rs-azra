@@ -67,10 +67,16 @@
                                     @error('organizer') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
-                                    <label for="meeting_chair" class="block text-sm font-semibold text-gray-700 mb-2">Pimpinan Rapat</label>
-                                    <input type="text" name="meeting_chair" id="meeting_chair" value="{{ old('meeting_chair') }}" placeholder="Nama pimpinan rapat" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
-                                    @error('meeting_chair') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                                    <label for="unit" class="block text-sm font-semibold text-gray-700 mb-2">Unit</label>
+                                    <input type="text" name="unit" id="unit" value="{{ old('unit') }}" placeholder="Nama unit" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                                    @error('unit') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                 </div>
+                            </div>
+
+                            <div>
+                                <label for="meeting_chair" class="block text-sm font-semibold text-gray-700 mb-2">Pimpinan Rapat</label>
+                                <input type="text" name="meeting_chair" id="meeting_chair" value="{{ old('meeting_chair') }}" placeholder="Nama pimpinan rapat" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                                @error('meeting_chair') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                             </div>
 
                             <div>

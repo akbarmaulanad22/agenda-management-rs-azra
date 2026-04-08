@@ -6,7 +6,7 @@
     <style>
         @page { margin: 10mm 15mm 15mm 15mm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 11px; color: #000; line-height: 1.5; }
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: #000; line-height: 1.5; }
 
         table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
         table.data-table th, table.data-table td { border: 1px solid #000; padding: 6px 8px; font-size: 11px; vertical-align: top; }

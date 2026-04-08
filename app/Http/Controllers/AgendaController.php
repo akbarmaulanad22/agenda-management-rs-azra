@@ -33,6 +33,7 @@ class AgendaController extends Controller
             "event_time" => "required",
             "status" => "required|in:draft,active,completed",
             "organizer" => "required|string|max:255",
+            "unit" => "nullable|string|max:255",
             "meeting_chair" => "required|string|max:255",
             "room_id" => "required|exists:rooms,id",
             "letter_file" => "nullable|file|mimes:pdf|max:5012",
@@ -89,6 +90,7 @@ class AgendaController extends Controller
             "event_time" => "required",
             "status" => "required|in:draft,active,completed",
             "organizer" => "required|string|max:255",
+            "unit" => "nullable|string|max:255",
             "meeting_chair" => "required|string|max:255",
             "room_id" => "required|exists:rooms,id",
             "letter_file" => "nullable|file|mimes:pdf|max:10240",
@@ -218,6 +220,7 @@ class AgendaController extends Controller
         $headerTime = $agenda->event_time . ' WIB';
         $headerRoom = $agenda->room->room_name ?? '-';
         $headerOrganizer = $agenda->organizer;
+        $headerUnit = $agenda->unit ?? '-';
         $headerChair = $agenda->meeting_chair;
 
         // Sub-header labels per type
@@ -273,7 +276,7 @@ class AgendaController extends Controller
                 $merger->SetFont('Helvetica', '', 7.5);
                 $merger->Cell($colWidth - 30, 3.5, $headerOrganizer, 0, 1);
 
-                // Row 2: Waktu + Pimpinan Rapat
+                // Row 2: Waktu + Unit
                 $merger->SetXY(12, 16);
                 $merger->SetFont('Helvetica', 'B', 7.5);
                 $merger->Cell(22, 3.5, 'Waktu', 0, 0);
@@ -282,18 +285,24 @@ class AgendaController extends Controller
                 $merger->Cell($colWidth - 26, 3.5, $headerTime, 0, 0);
 
                 $merger->SetFont('Helvetica', 'B', 7.5);
-                $merger->Cell(26, 3.5, 'Pimpinan Rapat', 0, 0);
+                $merger->Cell(26, 3.5, 'Unit', 0, 0);
                 $merger->Cell(4, 3.5, ':', 0, 0);
                 $merger->SetFont('Helvetica', '', 7.5);
-                $merger->Cell($colWidth - 30, 3.5, $headerChair, 0, 1);
+                $merger->Cell($colWidth - 30, 3.5, $headerUnit, 0, 1);
 
-                // Row 3: Ruangan
+                // Row 3: Ruangan + Pimpinan Rapat
                 $merger->SetXY(12, 20);
                 $merger->SetFont('Helvetica', 'B', 7.5);
                 $merger->Cell(22, 3.5, 'Ruangan', 0, 0);
                 $merger->Cell(4, 3.5, ':', 0, 0);
                 $merger->SetFont('Helvetica', '', 7.5);
-                $merger->Cell($colWidth - 26, 3.5, $headerRoom, 0, 1);
+                $merger->Cell($colWidth - 26, 3.5, $headerRoom, 0, 0);
+
+                $merger->SetFont('Helvetica', 'B', 7.5);
+                $merger->Cell(26, 3.5, 'Pimpinan Rapat', 0, 0);
+                $merger->Cell(4, 3.5, ':', 0, 0);
+                $merger->SetFont('Helvetica', '', 7.5);
+                $merger->Cell($colWidth - 30, 3.5, $headerChair, 0, 1);
 
                 // Separator line
                 $merger->SetDrawColor(30, 30, 30);

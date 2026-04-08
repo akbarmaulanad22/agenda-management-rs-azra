@@ -19,6 +19,7 @@ class Agenda extends Model
         'event_time',
         'status',
         'organizer',
+        'unit',
         'meeting_chair',
         'room_id',
         'letter_file_path',
