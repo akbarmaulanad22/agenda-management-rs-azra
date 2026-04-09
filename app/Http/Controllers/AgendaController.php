@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Agenda;
 use App\Models\AgendaQuestionAnswer;
 use App\Models\BankSoal;
+use App\Models\Employee;
 use App\Models\Question;
 use App\Models\Room;
+use App\Models\Unit;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +17,7 @@ class AgendaController extends Controller
 {
     public function index()
     {
-        $agendas = Agenda::with("room")->latest()->paginate(10);
+        $agendas = Agenda::with(["room", "unit", "organizer", "meetingChair"])->latest()->paginate(10);
 
         return view("admin.agendas.index", compact("agendas"));
     }
@@ -24,8 +26,10 @@ class AgendaController extends Controller
     {
         $rooms = Room::all();
         $bankSoals = BankSoal::all();
+        $units = Unit::orderBy('name')->get();
+        $employees = Employee::orderBy('full_name')->get();
 
-        return view("admin.agendas.create", compact("rooms", "bankSoals"));
+        return view("admin.agendas.create", compact("rooms", "bankSoals", "units", "employees"));
     }
 
     public function store(Request $request)
@@ -36,9 +40,9 @@ class AgendaController extends Controller
             "event_date" => "required|date",
             "event_time" => "required",
             "status" => "required|in:draft,active,completed",
-            "organizer" => "required|string|max:255",
-            "unit" => "nullable|string|max:255",
-            "meeting_chair" => "required|string|max:255",
+            "organizer_id" => "required|exists:employees,id",
+            "meeting_chair_id" => "required|exists:employees,id",
+            "unit_id" => "required|exists:units,id",
             "room_id" => "required|exists:rooms,id",
             "type" => "required|in:diklat,pelatihan,rapat",
             "bank_soal_id" => "nullable|required_if:type,diklat|required_if:type,pelatihan|exists:bank_soals,id",
@@ -86,18 +90,18 @@ class AgendaController extends Controller
 
     public function show(Agenda $agenda)
     {
-        $agenda->load(["room", "employees", "notes", "images", "agendaQuestions", "bankSoal"]);
+        $agenda->load(["room", "unit", "organizer", "meetingChair", "employees.unit", "notes", "images", "agendaQuestions", "bankSoal"]);
 
         $quizResults = collect();
         if ($agenda->agendaQuestions->count() > 0) {
             $totalQuestions = $agenda->agendaQuestions->count();
             $quizResults = AgendaQuestionAnswer::where('agenda_id', $agenda->id)
                 ->select('employee_id')
-                ->selectRaw('SUM(is_correct::int) as correct_count')
+                ->selectRaw('SUM(CAST(is_correct AS INTEGER)) as correct_count')
                 ->selectRaw('COUNT(*) as answered_count')
                 ->selectRaw('MIN(created_at) as answered_at')
                 ->groupBy('employee_id')
-                ->with('employee')
+                ->with('employee.unit')
                 ->get()
                 ->map(function ($row) use ($totalQuestions) {
                     return [
@@ -119,8 +123,10 @@ class AgendaController extends Controller
     {
         $rooms = Room::all();
         $bankSoals = BankSoal::all();
+        $units = Unit::orderBy('name')->get();
+        $employees = Employee::orderBy('full_name')->get();
 
-        return view("admin.agendas.edit", compact("agenda", "rooms", "bankSoals"));
+        return view("admin.agendas.edit", compact("agenda", "rooms", "bankSoals", "units", "employees"));
     }
 
     public function update(Request $request, Agenda $agenda)
@@ -131,9 +137,9 @@ class AgendaController extends Controller
             "event_date" => "required|date",
             "event_time" => "required",
             "status" => "required|in:draft,active,completed",
-            "organizer" => "required|string|max:255",
-            "unit" => "nullable|string|max:255",
-            "meeting_chair" => "required|string|max:255",
+            "organizer_id" => "required|exists:employees,id",
+            "meeting_chair_id" => "required|exists:employees,id",
+            "unit_id" => "required|exists:units,id",
             "room_id" => "required|exists:rooms,id",
             "type" => "required|in:diklat,pelatihan,rapat",
             "bank_soal_id" => "nullable|required_if:type,diklat|required_if:type,pelatihan|exists:bank_soals,id",
@@ -185,9 +191,54 @@ class AgendaController extends Controller
             ->with("success", "Agenda berhasil diperbarui.");
     }
 
+    public function exportCsv()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="agendas.csv"',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+
+            // BOM for Excel UTF-8 compatibility
+            fwrite($file, "\xEF\xBB\xBF");
+
+            fputcsv($file, [
+                'Judul',
+                'Deskripsi',
+                'Tipe',
+                'Tanggal',
+                'Waktu',
+                'Penyelenggara',
+                'Unit',
+                'Pimpinan Rapat',
+                'Status',
+            ]);
+
+            foreach (Agenda::with(['unit', 'organizer', 'meetingChair'])->latest()->cursor() as $agenda) {
+                fputcsv($file, [
+                    $agenda->title,
+                    $agenda->description,
+                    $agenda->type,
+                    $agenda->event_date->format('Y-m-d'),
+                    $agenda->event_time,
+                    $agenda->organizer->full_name ?? '-',
+                    $agenda->unit->name ?? '-',
+                    $agenda->meetingChair->full_name ?? '-',
+                    $agenda->status,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function exportPdf(Agenda $agenda)
     {
-        $agenda->load(["room", "employees", "notes", "images"]);
+        $agenda->load(["room", "unit", "organizer", "meetingChair", "employees.unit", "notes", "images"]);
 
         // Convert signature images to base64 for embedding in PDF
         $signatureImages = [];
@@ -278,9 +329,9 @@ class AgendaController extends Controller
         $headerDate = $agenda->event_date->translatedFormat('l, d F Y');
         $headerTime = $agenda->event_time . ' WIB';
         $headerRoom = $agenda->room->room_name ?? '-';
-        $headerOrganizer = $agenda->organizer;
-        $headerUnit = $agenda->unit ?? '-';
-        $headerChair = $agenda->meeting_chair;
+        $headerOrganizer = $agenda->organizer->full_name ?? '-';
+        $headerUnit = $agenda->unit->name ?? '-';
+        $headerChair = $agenda->meetingChair->full_name ?? '-';
 
         // Sub-header labels per type
         $subHeaders = [

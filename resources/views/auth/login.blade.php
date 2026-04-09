@@ -23,40 +23,17 @@
                     </div>
 
                     <h1 class="text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-6">
-                        Sistem Absensi
-                        <span class="block mt-1">&amp; Agenda</span>
+                        Sistem
+                        <span class="block mt-1">Agenda</span>
                         <span class="block mt-1 text-[#81bd41]">Digital</span>
                     </h1>
 
                     <p class="text-white/75 text-base xl:text-lg leading-relaxed mb-8">
-                        Platform modern untuk mengelola master data stakeholder, pembuatan surat undangan otomatis, dan absensi digital mandiri.
+                        Platform modern untuk mengelola master data Agenda, dan absensi digital mandiri.
                     </p>
 
-                    <div class="flex items-center gap-4">
-                        <div class="flex -space-x-2">
-                            <div class="w-9 h-9 rounded-full bg-[#81bd41] border-2 border-white/30 flex items-center justify-center text-white text-xs font-bold">A</div>
-                            <div class="w-9 h-9 rounded-full bg-[#007774] border-2 border-white/30 flex items-center justify-center text-white text-xs font-bold">B</div>
-                            <div class="w-9 h-9 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xs font-bold">C</div>
-                        </div>
-                        <p class="text-white/60 text-sm">Digunakan oleh berbagai instansi</p>
-                    </div>
                 </div>
 
-                {{-- Floating stats --}}
-                <div class="mt-8 flex gap-4">
-                    <div class="backdrop-blur-lg bg-white/10 rounded-2xl px-5 py-3 border border-white/15">
-                        <div class="text-2xl font-bold text-white">100%</div>
-                        <div class="text-white/60 text-xs">Digital</div>
-                    </div>
-                    <div class="backdrop-blur-lg bg-white/10 rounded-2xl px-5 py-3 border border-white/15">
-                        <div class="text-2xl font-bold text-[#81bd41]">PDF</div>
-                        <div class="text-white/60 text-xs">Auto Generate</div>
-                    </div>
-                    <div class="backdrop-blur-lg bg-white/10 rounded-2xl px-5 py-3 border border-white/15">
-                        <div class="text-2xl font-bold text-white">QR</div>
-                        <div class="text-white/60 text-xs">Absensi</div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

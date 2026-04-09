@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Employee extends Model
@@ -13,11 +14,16 @@ class Employee extends Model
     protected $fillable = [
         'nip',
         'full_name',
-        'organization',
+        'unit_id',
         'job_position',
         'structural_role',
         'profession',
     ];
+
+    public function unit(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class);
+    }
 
     public function agendas(): BelongsToMany
     {

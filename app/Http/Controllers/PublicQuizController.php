@@ -16,13 +16,13 @@ class PublicQuizController extends Controller
 
         $agenda->load(['room', 'agendaQuestions']);
 
-        $employees = Employee::orderBy('full_name')->get();
+        $employees = Employee::with('unit')->orderBy('full_name')->get();
 
         $employeesJson = $employees->map(fn ($e) => [
             'id' => $e->id,
             'name' => $e->full_name,
             'position' => $e->job_position,
-            'organization' => $e->organization,
+            'organization' => $e->unit->name ?? '-',
         ]);
 
         $questionsJson = $agenda->agendaQuestions->map(fn ($q) => [

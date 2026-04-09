@@ -44,7 +44,7 @@
                 <div x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200"
                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" class="overflow-hidden">
                     <h1 class="text-white font-extrabold text-lg leading-tight tracking-tight">RS AZRA</h1>
-                    <p class="text-white/50 text-[10px] font-medium leading-tight">Digital Agenda & Smart Attendance</p>
+                    <p class="text-white/50 text-[10px] font-medium leading-tight">Digital Agenda & Attendance</p>
                 </div>
             </div>
 

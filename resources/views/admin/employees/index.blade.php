@@ -26,9 +26,9 @@
                     <tr class="border-b border-gray-100">
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">NIP</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Nama Lengkap</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Organisasi</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Jabatan</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Unit</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Profesi</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Jabatan</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -42,7 +42,7 @@
                                     <span class="text-sm font-semibold text-gray-800">{{ $employee->full_name }}</span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $employee->organization }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $employee->unit->name ?? '-' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $employee->job_position }}</td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600">{{ $employee->structural_role }}</span>

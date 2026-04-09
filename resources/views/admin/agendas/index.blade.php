@@ -13,10 +13,16 @@
             </div>
             <span class="text-sm font-semibold text-gray-500">{{ $agendas->total() }} agenda</span>
         </div>
-        <a href="{{ route('admin.agendas.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-primary text-white text-sm font-bold shadow-md shadow-primary/20 hover:bg-primary-700 hover:shadow-lg active:scale-[0.98] transition-all duration-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-            Buat Agenda
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('admin.agendas.export-csv') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white border border-gray-200 text-gray-700 text-sm font-bold shadow-sm hover:bg-gray-50 hover:shadow active:scale-[0.98] transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                Export CSV
+            </a>
+            <a href="{{ route('admin.agendas.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-primary text-white text-sm font-bold shadow-md shadow-primary/20 hover:bg-primary-700 hover:shadow-lg active:scale-[0.98] transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                Buat Agenda
+            </a>
+        </div>
     </div>
 
     <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden">
@@ -51,8 +57,8 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->event_date->translatedFormat('d M Y') }}</td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->room->room_name ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->organizer }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->unit ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->organizer->full_name ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->unit->name ?? '-' }}</td>
                             <td class="px-6 py-4">
                                 @if($agenda->status === 'draft')
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600">Draft</span>

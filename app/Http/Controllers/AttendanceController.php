@@ -21,24 +21,24 @@ class AttendanceController extends Controller
 
         $signedEmployeeIds = $signedEmployees->pluck('id')->toArray();
 
-        $allEmployees = Employee::orderBy('full_name')->get();
+        $allEmployees = Employee::with('unit')->orderBy('full_name')->get();
 
         $employeesJson = $allEmployees->map(function ($e) use ($signedEmployeeIds) {
             return [
                 'id' => $e->id,
                 'name' => $e->full_name,
                 'position' => $e->job_position,
-                'organization' => $e->organization,
+                'organization' => $e->unit->name ?? '-',
                 'signed_at' => in_array($e->id, $signedEmployeeIds),
             ];
         });
 
-        $attendeesJson = $signedEmployees->map(function ($e) {
+        $attendeesJson = $signedEmployees->load('unit')->map(function ($e) {
             return [
                 'id' => $e->id,
                 'name' => $e->full_name,
                 'position' => $e->job_position,
-                'organization' => $e->organization,
+                'organization' => $e->unit->name ?? '-',
                 'signature_url' => asset('storage/' . $e->pivot->signature_image_path),
                 'signed_at' => $e->pivot->created_at?->format('H:i'),
             ];
@@ -78,7 +78,7 @@ class AttendanceController extends Controller
             ]);
         }
 
-        $employee = Employee::find($request->employee_id);
+        $employee = Employee::with('unit')->find($request->employee_id);
 
         return response()->json([
             'message' => 'Absensi berhasil disimpan.',
@@ -86,7 +86,7 @@ class AttendanceController extends Controller
                 'id' => $employee->id,
                 'name' => $employee->full_name,
                 'position' => $employee->job_position,
-                'organization' => $employee->organization,
+                'organization' => $employee->unit->name ?? '-',
                 'signature_url' => asset('storage/' . $signaturePath),
                 'signed_at' => now()->format('H:i'),
             ],

@@ -30,19 +30,24 @@
                     </div>
 
                     <div>
-                        <label for="organization" class="block text-sm font-semibold text-gray-700 mb-2">Organisasi</label>
-                        <input type="text" name="organization" id="organization" value="{{ old('organization', $employee->organization) }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
-                        @error('organization') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                        <label for="unit_id" class="block text-sm font-semibold text-gray-700 mb-2">Unit</label>
+                        <select name="unit_id" id="unit_id" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
+                            <option value="">Pilih Organisasi</option>
+                            @foreach($units as $unit)
+                                <option value="{{ $unit->id }}" @selected(old('unit_id', $employee->unit_id) == $unit->id)>{{ $unit->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('unit_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="job_position" class="block text-sm font-semibold text-gray-700 mb-2">Jabatan Fungsional</label>
+                            <label for="job_position" class="block text-sm font-semibold text-gray-700 mb-2">Posisi Pekerjaan</label>
                             <input type="text" name="job_position" id="job_position" value="{{ old('job_position', $employee->job_position) }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
                             @error('job_position') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label for="structural_role" class="block text-sm font-semibold text-gray-700 mb-2">Unit</label>
+                            <label for="structural_role" class="block text-sm font-semibold text-gray-700 mb-2">Jabatan</label>
                             <input type="text" name="structural_role" id="structural_role" value="{{ old('structural_role', $employee->structural_role) }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
                             @error('structural_role') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                         </div>

@@ -12,7 +12,7 @@ class UnitFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->randomElement([
+            'name' => $this->faker->unique()->randomElement([
                 'ICU', 'IGD', 'Rawat Inap', 'Rawat Jalan', 'Farmasi',
                 'Radiologi', 'Laboratorium', 'Rehabilitasi Medik', 'Gizi',
                 'Rekam Medis', 'Humas', 'Keuangan', 'SDM', 'IT',

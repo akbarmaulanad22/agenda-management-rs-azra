@@ -3,20 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
     public function index()
     {
-        $employees = Employee::orderBy("full_name")->paginate(15);
+        $employees = Employee::with('unit')->orderBy("full_name")->paginate(15);
 
         return view("admin.employees.index", compact("employees"));
     }
 
     public function create()
     {
-        return view("admin.employees.create");
+        $units = Unit::orderBy('name')->get();
+
+        return view("admin.employees.create", compact("units"));
     }
 
     public function store(Request $request)
@@ -24,7 +27,7 @@ class EmployeeController extends Controller
         $validated = $request->validate([
             "nip" => "required|string|max:255|unique:employees,nip",
             "full_name" => "required|string|max:255",
-            "organization" => "required|string|max:255",
+            "unit_id" => "required|exists:units,id",
             "job_position" => "required|string|max:255",
             "structural_role" => "required|string|max:255",
             "profession" => "required|string|max:255",
@@ -39,7 +42,9 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee)
     {
-        return view("admin.employees.edit", compact("employee"));
+        $units = Unit::orderBy('name')->get();
+
+        return view("admin.employees.edit", compact("employee", "units"));
     }
 
     public function update(Request $request, Employee $employee)
@@ -48,7 +53,7 @@ class EmployeeController extends Controller
             "nip" =>
                 "required|string|max:255|unique:employees,nip," . $employee->id,
             "full_name" => "required|string|max:255",
-            "organization" => "required|string|max:255",
+            "unit_id" => "required|exists:units,id",
             "job_position" => "required|string|max:255",
             "structural_role" => "required|string|max:255",
             "profession" => "required|string|max:255",

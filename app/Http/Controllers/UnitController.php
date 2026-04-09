@@ -22,7 +22,7 @@ class UnitController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:units,name',
         ]);
 
         Unit::create($validated);
@@ -39,7 +39,7 @@ class UnitController extends Controller
     public function update(Request $request, Unit $unit)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:units,name,' . $unit->id,
         ]);
 
         $unit->update($validated);

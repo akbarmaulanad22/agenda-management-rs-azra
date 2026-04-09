@@ -163,31 +163,14 @@
         {{-- Step 3: Result --}}
         <div x-show="submitted" x-cloak class="px-4 mt-5">
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
-                <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                    :class="score >= 70 ? 'bg-green-50' : 'bg-amber-50'">
-                    <svg x-show="score >= 70" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-green-500" fill="none"
+                <div class="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-green-500" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <svg x-show="score < 70" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-amber-500" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900">Hasil Ujian</h3>
-                <p class="text-sm text-gray-500 mt-1" x-text="selectedEmployee?.name"></p>
-
-                <div class="mt-5 flex items-center justify-center gap-6">
-                    <div class="text-center">
-                        <div class="text-3xl font-bold" :class="score >= 70 ? 'text-green-600' : 'text-amber-600'" x-text="score"></div>
-                        <div class="text-xs text-gray-400 mt-1">Nilai</div>
-                    </div>
-                    <div class="w-px h-12 bg-gray-200"></div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-800" x-text="correctCount + '/' + totalCount"></div>
-                        <div class="text-xs text-gray-400 mt-1">Benar</div>
-                    </div>
-                </div>
+                <h3 class="text-lg font-bold text-gray-900">Jawaban Anda Telah Terkirim</h3>
+                <p class="text-sm text-gray-500 mt-2">Terima kasih telah mengerjakan soal pada agenda ini. Partisipasi Anda sangat kami hargai.</p>
 
                 <a href="{{ route('attendance.show', $agenda) }}"
                     class="inline-flex items-center gap-2 mt-6 px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-2xl hover:bg-primary-700 transition">

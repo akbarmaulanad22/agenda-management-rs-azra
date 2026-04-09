@@ -18,9 +18,9 @@ class Agenda extends Model
         'event_date',
         'event_time',
         'status',
-        'organizer',
-        'unit',
-        'meeting_chair',
+        'organizer_id',
+        'meeting_chair_id',
+        'unit_id',
         'room_id',
         'letter_file_path',
         'material_file_path',
@@ -38,6 +38,21 @@ class Agenda extends Model
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
+    }
+
+    public function unit(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class);
+    }
+
+    public function organizer(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'organizer_id');
+    }
+
+    public function meetingChair(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'meeting_chair_id');
     }
 
     public function employees(): BelongsToMany
