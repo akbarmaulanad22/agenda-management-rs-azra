@@ -4,6 +4,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EmployeeRecapController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicAgendaController;
 use App\Http\Controllers\UnitController;
@@ -28,6 +29,8 @@ Route::middleware('auth')->group(function () {
 // Admin routes
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('employees', EmployeeController::class);
+    Route::get('employee-recaps', [EmployeeRecapController::class, 'index'])->name('employee-recaps.index');
+    Route::get('employee-recaps/export-csv', [EmployeeRecapController::class, 'exportCsv'])->name('employee-recaps.export-csv');
     Route::resource('rooms', RoomController::class);
     Route::get('agendas/export-csv', [AgendaController::class, 'exportCsv'])->name('agendas.export-csv');
     Route::resource('agendas', AgendaController::class);

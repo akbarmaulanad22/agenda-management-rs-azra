@@ -11,6 +11,7 @@ use App\Models\Room;
 use App\Models\Unit;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
 class AgendaController extends Controller
@@ -38,8 +39,8 @@ class AgendaController extends Controller
             "title" => "required|string|max:255",
             "description" => "nullable|string",
             "event_date" => "required|date",
-            "event_time" => "required",
-            "event_end_time" => "nullable|date_format:H:i",
+            "event_time" => "required|date_format:H:i",
+            "event_end_time" => "nullable|date_format:H:i|after:event_time",
             "status" => "required|in:draft,active,completed",
             "organizer_id" => "required|exists:employees,id",
             "meeting_chair_id" => "required|exists:employees,id",
@@ -93,57 +94,10 @@ class AgendaController extends Controller
     {
         $agenda->load(["room", "unit", "organizer", "meetingChair", "employees.unit", "notes", "images", "agendaQuestions", "bankSoal"]);
 
-        $quizComparison = collect();
+        $quizComparison = $this->buildQuizComparison($agenda);
         $quizStats = null;
 
-        if ($agenda->agendaQuestions->count() > 0) {
-            $totalQuestions = $agenda->agendaQuestions->count();
-
-            $buildResults = function (string $quizType) use ($agenda, $totalQuestions) {
-                return AgendaQuestionAnswer::where('agenda_id', $agenda->id)
-                    ->where('quiz_type', $quizType)
-                    ->select('employee_id')
-                    ->selectRaw('SUM(CAST(is_correct AS INTEGER)) as correct_count')
-                    ->selectRaw('COUNT(*) as answered_count')
-                    ->selectRaw('MIN(created_at) as answered_at')
-                    ->groupBy('employee_id')
-                    ->with('employee.unit')
-                    ->get()
-                    ->keyBy('employee_id')
-                    ->map(function ($row) use ($totalQuestions) {
-                        return [
-                            'employee' => $row->employee,
-                            'correct' => (int) $row->correct_count,
-                            'total' => $totalQuestions,
-                            'score' => $totalQuestions > 0 ? round(($row->correct_count / $totalQuestions) * 100) : 0,
-                            'answered_at' => $row->answered_at,
-                        ];
-                    });
-            };
-
-            $pretestMap = $buildResults('pretest');
-            $posttestMap = $buildResults('posttest');
-
-            $allEmployeeIds = $pretestMap->keys()->merge($posttestMap->keys())->unique();
-
-            $quizComparison = $allEmployeeIds->map(function ($empId) use ($pretestMap, $posttestMap) {
-                $pre = $pretestMap->get($empId);
-                $post = $posttestMap->get($empId);
-                $employee = $pre ? $pre['employee'] : $post['employee'];
-
-                return [
-                    'employee' => $employee,
-                    'pre_correct' => $pre ? $pre['correct'] : null,
-                    'pre_total' => $pre ? $pre['total'] : null,
-                    'pre_score' => $pre ? $pre['score'] : null,
-                    'post_correct' => $post ? $post['correct'] : null,
-                    'post_total' => $post ? $post['total'] : null,
-                    'post_score' => $post ? $post['score'] : null,
-                    'improvement' => ($pre && $post) ? $post['score'] - $pre['score'] : null,
-                ];
-            })->sortBy('employee.full_name')->values();
-
-            // Summary stats
+        if ($quizComparison->isNotEmpty()) {
             $withPre = $quizComparison->filter(fn($c) => $c['pre_score'] !== null);
             $withPost = $quizComparison->filter(fn($c) => $c['post_score'] !== null);
             $withBoth = $quizComparison->filter(fn($c) => $c['improvement'] !== null);
@@ -176,8 +130,8 @@ class AgendaController extends Controller
             "title" => "required|string|max:255",
             "description" => "nullable|string",
             "event_date" => "required|date",
-            "event_time" => "required",
-            "event_end_time" => "nullable|date_format:H:i",
+            "event_time" => "required|date_format:H:i",
+            "event_end_time" => "nullable|date_format:H:i|after:event_time",
             "status" => "required|in:draft,active,completed",
             "organizer_id" => "required|exists:employees,id",
             "meeting_chair_id" => "required|exists:employees,id",
@@ -215,20 +169,24 @@ class AgendaController extends Controller
                 ->store("agenda-files/" . $agenda->id, "public");
         }
 
+        $oldType = $agenda->type;
         $agenda->update($agendaData);
 
-        // Sync type-specific data
-        if ($agenda->type === 'rapat') {
+        if ($agenda->type === 'rapat' && $oldType !== 'rapat') {
             $agenda->agendaQuestions()->delete();
-        } else {
+            AgendaQuestionAnswer::where('agenda_id', $agenda->id)->delete();
+        }
+
+        if ($agenda->type !== 'rapat' && $oldType === 'rapat') {
             $agenda->notes()->delete();
-            if ($agenda->bank_soal_id) {
-                $agenda->agendaQuestions()->delete();
-                $questions = Question::where('bank_soal_id', $agenda->bank_soal_id)->get();
-                $agenda->agendaQuestions()->createMany(
-                    $questions->map->only(['question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct_option'])->toArray()
-                );
-            }
+        }
+
+        if ($agenda->type !== 'rapat' && $agenda->bank_soal_id) {
+            $agenda->agendaQuestions()->delete();
+            $questions = Question::where('bank_soal_id', $agenda->bank_soal_id)->get();
+            $agenda->agendaQuestions()->createMany(
+                $questions->map->only(['question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct_option'])->toArray()
+            );
         }
 
         return redirect()
@@ -314,50 +272,7 @@ class AgendaController extends Controller
             }
         }
 
-        // Build quiz comparison data for diklat/pelatihan
-        $quizComparison = collect();
-        if ($agenda->allowsQuiz() && $agenda->agendaQuestions->count() > 0) {
-            $totalQuestions = $agenda->agendaQuestions->count();
-
-            $buildResults = function (string $quizType) use ($agenda, $totalQuestions) {
-                return AgendaQuestionAnswer::where('agenda_id', $agenda->id)
-                    ->where('quiz_type', $quizType)
-                    ->select('employee_id')
-                    ->selectRaw('SUM(CAST(is_correct AS INTEGER)) as correct_count')
-                    ->selectRaw('COUNT(*) as answered_count')
-                    ->groupBy('employee_id')
-                    ->with('employee.unit')
-                    ->get()
-                    ->keyBy('employee_id')
-                    ->map(function ($row) use ($totalQuestions) {
-                        return [
-                            'employee' => $row->employee,
-                            'correct' => (int) $row->correct_count,
-                            'total' => $totalQuestions,
-                            'score' => $totalQuestions > 0 ? round(($row->correct_count / $totalQuestions) * 100) : 0,
-                        ];
-                    });
-            };
-
-            $pretestMap = $buildResults('pretest');
-            $posttestMap = $buildResults('posttest');
-            $allEmployeeIds = $pretestMap->keys()->merge($posttestMap->keys())->unique();
-
-            $quizComparison = $allEmployeeIds->map(function ($empId) use ($pretestMap, $posttestMap) {
-                $pre = $pretestMap->get($empId);
-                $post = $posttestMap->get($empId);
-                return [
-                    'employee' => $pre ? $pre['employee'] : $post['employee'],
-                    'pre_correct' => $pre ? $pre['correct'] : null,
-                    'pre_total' => $pre ? $pre['total'] : null,
-                    'pre_score' => $pre ? $pre['score'] : null,
-                    'post_correct' => $post ? $post['correct'] : null,
-                    'post_total' => $post ? $post['total'] : null,
-                    'post_score' => $post ? $post['score'] : null,
-                    'improvement' => ($pre && $post) ? $post['score'] - $pre['score'] : null,
-                ];
-            })->sortBy('employee.full_name')->values();
-        }
+        $quizComparison = $this->buildQuizComparison($agenda);
 
         // Generate separate PDFs for each content section
         $contentSections = [
@@ -576,5 +491,56 @@ class AgendaController extends Controller
         return redirect()
             ->route("admin.agendas.index")
             ->with("success", "Agenda berhasil dihapus.");
+    }
+
+    private function buildQuizComparison(Agenda $agenda): Collection
+    {
+        if ($agenda->agendaQuestions->count() === 0) {
+            return collect();
+        }
+
+        $totalQuestions = $agenda->agendaQuestions->count();
+
+        $buildResults = function (string $quizType) use ($agenda, $totalQuestions) {
+            return AgendaQuestionAnswer::where('agenda_id', $agenda->id)
+                ->where('quiz_type', $quizType)
+                ->select('employee_id')
+                ->selectRaw('SUM(CAST(is_correct AS INTEGER)) as correct_count')
+                ->selectRaw('COUNT(*) as answered_count')
+                ->selectRaw('MIN(created_at) as answered_at')
+                ->groupBy('employee_id')
+                ->with('employee.unit')
+                ->get()
+                ->keyBy('employee_id')
+                ->map(function ($row) use ($totalQuestions) {
+                    return [
+                        'employee' => $row->employee,
+                        'correct' => (int) $row->correct_count,
+                        'total' => $totalQuestions,
+                        'score' => $totalQuestions > 0 ? round(($row->correct_count / $totalQuestions) * 100) : 0,
+                        'answered_at' => $row->answered_at,
+                    ];
+                });
+        };
+
+        $pretestMap = $buildResults('pretest');
+        $posttestMap = $buildResults('posttest');
+        $allEmployeeIds = $pretestMap->keys()->merge($posttestMap->keys())->unique();
+
+        return $allEmployeeIds->map(function ($empId) use ($pretestMap, $posttestMap) {
+            $pre = $pretestMap->get($empId);
+            $post = $posttestMap->get($empId);
+
+            return [
+                'employee' => $pre ? $pre['employee'] : $post['employee'],
+                'pre_correct' => $pre ? $pre['correct'] : null,
+                'pre_total' => $pre ? $pre['total'] : null,
+                'pre_score' => $pre ? $pre['score'] : null,
+                'post_correct' => $post ? $post['correct'] : null,
+                'post_total' => $post ? $post['total'] : null,
+                'post_score' => $post ? $post['score'] : null,
+                'improvement' => ($pre && $post) ? $post['score'] - $pre['score'] : null,
+            ];
+        })->sortBy('employee.full_name')->values();
     }
 }

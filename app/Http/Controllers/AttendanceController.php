@@ -6,6 +6,7 @@ use App\Models\Agenda;
 use App\Models\AgendaQuestionAnswer;
 use App\Models\Employee;
 use App\Services\SignatureStorageService;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
@@ -148,6 +149,12 @@ class AttendanceController extends Controller
 
         $employeeId = $request->employee_id;
 
+        $hasAttendance = $agenda->employees()
+            ->wherePivot('employee_id', $employeeId)
+            ->wherePivotNotNull('signature_image_path')
+            ->exists();
+        abort_unless($hasAttendance, 403);
+
         // Check if pretest already answered
         $existing = AgendaQuestionAnswer::where('agenda_id', $agenda->id)
             ->where('employee_id', $employeeId)
@@ -184,7 +191,14 @@ class AttendanceController extends Controller
             ];
         }
 
-        AgendaQuestionAnswer::insert($rows);
+        try {
+            AgendaQuestionAnswer::insert($rows);
+        } catch (QueryException $e) {
+            if (str_contains($e->getMessage(), 'unique') || str_contains($e->getMessage(), 'Unique')) {
+                return response()->json(['message' => 'Anda sudah mengerjakan pretest.'], 422);
+            }
+            throw $e;
+        }
 
         return response()->json([
             'message' => 'Pretest berhasil disimpan.',

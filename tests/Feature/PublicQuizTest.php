@@ -35,6 +35,10 @@ class PublicQuizTest extends TestCase
      */
     private function submitPretest(Agenda $agenda, Employee $employee): void
     {
+        $agenda->employees()->syncWithoutDetaching([
+            $employee->id => ['signature_image_path' => 'signatures/test.png'],
+        ]);
+
         $answers = [];
         foreach ($agenda->agendaQuestions as $q) {
             $answers[$q->id] = 'a';
@@ -195,6 +199,7 @@ class PublicQuizTest extends TestCase
     {
         $agenda = $this->createActiveAgendaWithQuestions(1);
         $employee = Employee::factory()->create();
+        $agenda->employees()->attach($employee->id, ['signature_image_path' => 'signatures/test.png']);
         $question = $agenda->agendaQuestions->first();
 
         // First pretest submission
@@ -218,6 +223,7 @@ class PublicQuizTest extends TestCase
     {
         $agenda = $this->createActiveAgendaWithQuestions(1);
         $employee = Employee::factory()->create();
+        $agenda->employees()->attach($employee->id, ['signature_image_path' => 'signatures/test.png']);
         $question = $agenda->agendaQuestions->first();
 
         $response = $this->postJson(route('attendance.pretest.store', $agenda), [

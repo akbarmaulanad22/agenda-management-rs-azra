@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Agenda;
 use App\Models\AgendaQuestionAnswer;
 use App\Models\Employee;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class PublicQuizController extends Controller
@@ -121,7 +122,14 @@ class PublicQuizController extends Controller
             ];
         }
 
-        AgendaQuestionAnswer::insert($rows);
+        try {
+            AgendaQuestionAnswer::insert($rows);
+        } catch (QueryException $e) {
+            if (str_contains($e->getMessage(), 'unique') || str_contains($e->getMessage(), 'Unique')) {
+                return response()->json(['message' => 'Anda sudah mengerjakan posttest.'], 422);
+            }
+            throw $e;
+        }
 
         return response()->json([
             'message' => 'Posttest berhasil disimpan.',

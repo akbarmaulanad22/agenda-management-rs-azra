@@ -1,6 +1,9 @@
 {{-- Reusable quiz results table partial --}}
 {{-- @param Collection $results - quiz results collection --}}
 {{-- @param string $colorClass - 'blue' or 'amber' for theming --}}
+@php
+    $failClass = $colorClass === 'blue' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600';
+@endphp
 <div class="overflow-x-auto">
     <table class="w-full">
         <thead>
@@ -24,7 +27,7 @@
                     <td class="px-4 py-3 text-sm text-gray-500">{{ $result['employee']->job_position }}</td>
                     <td class="px-4 py-3 text-center text-sm font-medium text-gray-700">{{ $result['correct'] }}/{{ $result['total'] }}</td>
                     <td class="px-4 py-3 text-center">
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {{ $result['score'] >= 70 ? 'bg-green-50 text-green-600' : 'bg-' . $colorClass . '-50 text-' . $colorClass . '-600' }}">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {{ $result['score'] >= 70 ? 'bg-green-50 text-green-600' : $failClass }}">
                             {{ $result['score'] }}
                         </span>
                     </td>
