@@ -22,13 +22,15 @@ class EmployeeRecapController extends Controller
             ->fromSub($this->buildAggregateRecapQuery($request), 'employee_recaps')
             ->selectRaw('COUNT(*) as employee_count')
             ->selectRaw('COALESCE(SUM(attendance_count), 0) as attendance_count')
-            ->selectRaw('COALESCE(SUM(attendance_hours), 0) as attendance_hours')
+            ->selectRaw('COALESCE(SUM(rapat_hours), 0) as rapat_hours')
+            ->selectRaw('COALESCE(SUM(training_hours), 0) as training_hours')
             ->first();
 
         $summary = [
             'employee_count' => (int) ($summaryRow->employee_count ?? 0),
             'attendance_count' => (int) ($summaryRow->attendance_count ?? 0),
-            'attendance_hours' => round((float) ($summaryRow->attendance_hours ?? 0), 2),
+            'rapat_hours' => round((float) ($summaryRow->rapat_hours ?? 0), 2),
+            'training_hours' => round((float) ($summaryRow->training_hours ?? 0), 2),
         ];
 
         return view('admin.employee-recaps.index', compact('employees', 'summary', 'units'));
@@ -49,7 +51,8 @@ class EmployeeRecapController extends Controller
                 'Unit',
                 'Jabatan',
                 'Total Ikut Agenda',
-                'Total Jam',
+                'Jam Rapat',
+                'Jam Diklat/Pelatihan',
             ]);
 
             foreach ($this->buildOrderedAggregateRecapQuery($request)->cursor() as $row) {
@@ -59,7 +62,8 @@ class EmployeeRecapController extends Controller
                     $row->unit_name ?? '-',
                     $row->job_position,
                     (int) $row->attendance_count,
-                    number_format((float) $row->attendance_hours, 2, '.', ''),
+                    number_format((float) $row->rapat_hours, 2, '.', ''),
+                    number_format((float) $row->training_hours, 2, '.', ''),
                 ]);
             }
 
@@ -101,7 +105,8 @@ class EmployeeRecapController extends Controller
                 'units.name as unit_name',
             ])
             ->selectRaw('COUNT(DISTINCT agendas.id) as attendance_count')
-            ->selectRaw("COALESCE(SUM({$durationHoursSql}), 0) as attendance_hours")
+            ->selectRaw("COALESCE(SUM(CASE WHEN agendas.type = 'rapat' THEN {$durationHoursSql} ELSE 0 END), 0) as rapat_hours")
+            ->selectRaw("COALESCE(SUM(CASE WHEN agendas.type IN ('diklat', 'pelatihan') THEN {$durationHoursSql} ELSE 0 END), 0) as training_hours")
             ->when($search !== '', function (QueryBuilder $query) use ($search, $searchOperator) {
                 $query->where(function (QueryBuilder $query) use ($search, $searchOperator) {
                     $query->where('employees.full_name', $searchOperator, "%{$search}%")
@@ -120,10 +125,7 @@ class EmployeeRecapController extends Controller
                 'employees.profession',
                 'employees.job_position',
                 'units.name'
-            )
-            ->when($request->filled('date_from') || $request->filled('date_to'), function (QueryBuilder $query) {
-                $query->havingRaw('COUNT(DISTINCT agendas.id) > 0');
-            });
+            );
     }
 
     private function applyAggregateAgendaFilters(JoinClause $join, Request $request): void

@@ -78,8 +78,9 @@ class EmployeeRecapTest extends TestCase
         $csv = $response->streamedContent();
 
         $this->assertStringContainsString('Budi Filter', $csv);
+        $this->assertStringContainsString('Jam Rapat', $csv);
+        $this->assertStringContainsString('Jam Diklat/Pelatihan', $csv);
         $this->assertStringContainsString('1.00', $csv);
-        $this->assertStringNotContainsString('Cici Lain', $csv);
     }
 
     private function createAgenda(
