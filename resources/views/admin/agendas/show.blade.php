@@ -451,7 +451,7 @@
                                         @if($employee->pivot->signature_image_path)
                                             <button
                                                 @click="signatureName = '{{ addslashes($employee->full_name) }}'; signatureUrl = '{{ Storage::url($employee->pivot->signature_image_path) }}'; showSignatureModal = true"
-                                                class="inline-block rounded-xl overflow-hidden border-2 border-primary-100 hover:border-primary-300 transition-colors cursor-pointer group"
+                                                class="inline-block overflow-hidden hover:border-primary-300 transition-colors cursor-pointer group"
                                                 title="Lihat tanda tangan {{ $employee->full_name }}">
                                                 <img src="{{ Storage::url($employee->pivot->signature_image_path) }}"
                                                     alt="TTD {{ $employee->full_name }}"
@@ -656,4 +656,3 @@
         </template>
     </div>
 </x-app-layout>
-
