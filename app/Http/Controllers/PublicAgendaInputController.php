@@ -21,6 +21,7 @@ class PublicAgendaInputController extends Controller
     public function storeNote(Request $request, Agenda $agenda)
     {
         abort_unless($agenda->status === 'active', 404);
+        abort_unless($agenda->allowsNotes(), 403);
 
         $validated = $request->validate([
             'topic' => 'required|string|max:255',

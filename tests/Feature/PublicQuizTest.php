@@ -30,6 +30,22 @@ class PublicQuizTest extends TestCase
         return $agenda;
     }
 
+    /**
+     * Helper: submit pretest for an employee so posttest can be done.
+     */
+    private function submitPretest(Agenda $agenda, Employee $employee): void
+    {
+        $answers = [];
+        foreach ($agenda->agendaQuestions as $q) {
+            $answers[$q->id] = 'a';
+        }
+
+        $this->postJson(route('attendance.pretest.store', $agenda), [
+            'employee_id' => $employee->id,
+            'answers' => $answers,
+        ])->assertOk();
+    }
+
     public function test_quiz_page_loads_for_agenda_with_questions(): void
     {
         $agenda = $this->createActiveAgendaWithQuestions();
@@ -65,12 +81,15 @@ class PublicQuizTest extends TestCase
         $response->assertNotFound();
     }
 
-    public function test_employee_can_submit_quiz_answers(): void
+    public function test_employee_can_submit_posttest_after_pretest(): void
     {
         $agenda = $this->createActiveAgendaWithQuestions(2);
         $employee = Employee::factory()->create();
-        $questions = $agenda->agendaQuestions;
 
+        // Must do pretest first
+        $this->submitPretest($agenda, $employee);
+
+        $questions = $agenda->agendaQuestions;
         $answers = [];
         foreach ($questions as $q) {
             $answers[$q->id] = 'a'; // correct_option is 'a'
@@ -87,21 +106,41 @@ class PublicQuizTest extends TestCase
             'total' => 2,
         ]);
 
-        $this->assertDatabaseCount('agenda_question_answers', 2);
+        // 2 pretest + 2 posttest = 4
+        $this->assertDatabaseCount('agenda_question_answers', 4);
         $this->assertDatabaseHas('agenda_question_answers', [
             'agenda_id' => $agenda->id,
             'employee_id' => $employee->id,
             'selected_option' => 'a',
             'is_correct' => true,
+            'quiz_type' => 'posttest',
         ]);
+    }
+
+    public function test_posttest_cannot_be_submitted_without_pretest(): void
+    {
+        $agenda = $this->createActiveAgendaWithQuestions(1);
+        $employee = Employee::factory()->create();
+        $question = $agenda->agendaQuestions->first();
+
+        $response = $this->postJson(route('attendance.quiz.store', $agenda), [
+            'employee_id' => $employee->id,
+            'answers' => [$question->id => 'a'],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'Anda harus mengerjakan pretest terlebih dahulu.']);
     }
 
     public function test_wrong_answers_are_tracked(): void
     {
         $agenda = $this->createActiveAgendaWithQuestions(2);
         $employee = Employee::factory()->create();
-        $questions = $agenda->agendaQuestions;
 
+        // Must do pretest first
+        $this->submitPretest($agenda, $employee);
+
+        $questions = $agenda->agendaQuestions;
         $answers = [];
         foreach ($questions as $q) {
             $answers[$q->id] = 'b'; // correct is 'a', so this is wrong
@@ -121,30 +160,78 @@ class PublicQuizTest extends TestCase
         $this->assertDatabaseHas('agenda_question_answers', [
             'employee_id' => $employee->id,
             'is_correct' => false,
+            'quiz_type' => 'posttest',
         ]);
     }
 
-    public function test_employee_cannot_submit_twice(): void
+    public function test_employee_cannot_submit_posttest_twice(): void
     {
         $agenda = $this->createActiveAgendaWithQuestions(1);
         $employee = Employee::factory()->create();
         $question = $agenda->agendaQuestions->first();
 
-        // First submission
+        // Do pretest first
+        $this->submitPretest($agenda, $employee);
+
+        // First posttest submission
         $this->postJson(route('attendance.quiz.store', $agenda), [
             'employee_id' => $employee->id,
             'answers' => [$question->id => 'a'],
         ])->assertOk();
 
-        // Second submission
+        // Second posttest submission
         $response = $this->postJson(route('attendance.quiz.store', $agenda), [
             'employee_id' => $employee->id,
             'answers' => [$question->id => 'b'],
         ]);
 
         $response->assertStatus(422);
-        $response->assertJson(['message' => 'Anda sudah mengerjakan soal ini.']);
+        $response->assertJson(['message' => 'Anda sudah mengerjakan posttest.']);
+        // 1 pretest + 1 posttest = 2
+        $this->assertDatabaseCount('agenda_question_answers', 2);
+    }
+
+    public function test_employee_cannot_submit_pretest_twice(): void
+    {
+        $agenda = $this->createActiveAgendaWithQuestions(1);
+        $employee = Employee::factory()->create();
+        $question = $agenda->agendaQuestions->first();
+
+        // First pretest submission
+        $this->postJson(route('attendance.pretest.store', $agenda), [
+            'employee_id' => $employee->id,
+            'answers' => [$question->id => 'a'],
+        ])->assertOk();
+
+        // Second pretest submission
+        $response = $this->postJson(route('attendance.pretest.store', $agenda), [
+            'employee_id' => $employee->id,
+            'answers' => [$question->id => 'b'],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'Anda sudah mengerjakan pretest.']);
         $this->assertDatabaseCount('agenda_question_answers', 1);
+    }
+
+    public function test_pretest_submission_stores_correct_quiz_type(): void
+    {
+        $agenda = $this->createActiveAgendaWithQuestions(1);
+        $employee = Employee::factory()->create();
+        $question = $agenda->agendaQuestions->first();
+
+        $response = $this->postJson(route('attendance.pretest.store', $agenda), [
+            'employee_id' => $employee->id,
+            'answers' => [$question->id => 'a'],
+        ]);
+
+        $response->assertOk();
+        $this->assertDatabaseHas('agenda_question_answers', [
+            'agenda_id' => $agenda->id,
+            'employee_id' => $employee->id,
+            'quiz_type' => 'pretest',
+            'is_correct' => true,
+        ]);
     }
 
     public function test_submit_requires_valid_employee(): void
@@ -174,17 +261,17 @@ class PublicQuizTest extends TestCase
         $response->assertUnprocessable();
     }
 
-    public function test_attendance_page_shows_quiz_link_for_diklat(): void
+    public function test_attendance_page_shows_posttest_link_for_diklat(): void
     {
         $agenda = $this->createActiveAgendaWithQuestions();
 
         $response = $this->get(route('attendance.show', $agenda));
 
         $response->assertOk();
-        $response->assertSee('Kerjakan Soal');
+        $response->assertSee('Posttest');
     }
 
-    public function test_attendance_page_hides_quiz_link_for_rapat(): void
+    public function test_attendance_page_hides_posttest_link_for_rapat(): void
     {
         $agenda = Agenda::factory()->create([
             'status' => 'active',
@@ -194,7 +281,7 @@ class PublicQuizTest extends TestCase
         $response = $this->get(route('attendance.show', $agenda));
 
         $response->assertOk();
-        $response->assertDontSee('Kerjakan Soal');
+        $response->assertDontSee('Posttest');
     }
 
     public function test_deleting_agenda_cascades_to_answers(): void
@@ -209,6 +296,7 @@ class PublicQuizTest extends TestCase
             'agenda_question_id' => $question->id,
             'selected_option' => 'a',
             'is_correct' => true,
+            'quiz_type' => 'pretest',
         ]);
 
         $agenda->delete();

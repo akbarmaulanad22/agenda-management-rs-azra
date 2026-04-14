@@ -76,7 +76,7 @@
                                     <td class="px-2 sm:px-5 py-2 sm:py-3.5">
                                         <div class="truncate text-[11px] sm:text-sm font-semibold text-gray-800 group-hover:text-primary transition-colors">{{ $agenda->title }}</div>
                                         @if($agenda->description)
-                                            <p class="text-xs text-gray-400 mt-0.5">{{ $agenda->description }}</p>
+                                            <p class="text-xs text-gray-400 mt-0.5 whitespace-pre-wrap">{{ $agenda->description }}</p>
                                         @endif
                                     </td>
 
@@ -93,7 +93,7 @@
 
                                     {{-- Unit --}}
                                     <td class="px-1 sm:px-4 py-2 sm:py-3.5">
-                                        <div class="truncate text-[11px] sm:text-sm text-gray-500">{{ $agenda->unit ?? '-' }}</div>
+                                        <div class="truncate text-[11px] sm:text-sm text-gray-500">{{ $agenda->unit->name ?? '-' }}</div>
                                     </td>
 
                                     {{-- Hadir --}}
@@ -147,7 +147,7 @@
                                         </div>
                                         <div>
                                             <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Unit</span>
-                                            <p class="text-xs font-semibold text-gray-700 mt-0.5">{{ $agenda->unit ?? '-' }}</p>
+                                            <p class="text-xs font-semibold text-gray-700 mt-0.5">{{ $agenda->unit->name ?? '-' }}</p>
                                         </div>
                                         <div>
                                             <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Hadir</span>
@@ -199,9 +199,9 @@
             return [
                 'id' => $a->id,
                 'title' => $a->title,
-                'organizer' => $a->organizer,
+                'organizer' => $a->organizer->full_name,
                 'room' => $a->room->room_name ?? '',
-                'unit' => $a->unit ?? '',
+                'unit' => $a->unit->name ?? '',
                 'description' => $a->description ?? ''
             ];
         });

@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Input Notulensi - {{ $agenda->title }}</title>
+    <title>{{ $agenda->allowsNotes() ? 'Input Notulensi' : 'Dokumentasi Foto' }} - {{ $agenda->title }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -38,14 +38,16 @@
             </div>
         @endif
 
-        <div x-data="{ activeTab: localStorage.getItem('agendaTab') || 'notes' }" x-effect="localStorage.setItem('agendaTab', activeTab)">
+        <div x-data="{ activeTab: localStorage.getItem('agendaTab') || '{{ $agenda->allowsNotes() ? 'notes' : 'photos' }}' }" x-effect="localStorage.setItem('agendaTab', activeTab)">
 
         {{-- Tabs --}}
         <div class="px-4 mt-5">
             <div class="flex bg-white rounded-2xl p-1 border border-gray-200 shadow-sm">
+                @if($agenda->allowsNotes())
                 <button @click="activeTab = 'notes'" :class="activeTab === 'notes' ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200">
                     Notulensi
                 </button>
+                @endif
                 <button @click="activeTab = 'photos'" :class="activeTab === 'photos' ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200">
                     Foto
                 </button>
@@ -53,6 +55,7 @@
         </div>
 
         {{-- Notes Tab --}}
+        @if($agenda->allowsNotes())
         <div x-show="activeTab === 'notes'" x-transition class="px-4 mt-5 space-y-4">
             {{-- Add Note Form --}}
             <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
@@ -111,6 +114,7 @@
                 </div>
             @endif
         </div>
+        @endif
 
         {{-- Photos Tab --}}
         <div x-show="activeTab === 'photos'" x-transition class="px-4 mt-5 space-y-4">
@@ -190,7 +194,7 @@
 <script>
 function photoUploader() {
     return {
-        activeTab: 'notes',
+        activeTab: '{{ $agenda->allowsNotes() ? "notes" : "photos" }}',
         imagePreviews: [],
         uploading: false,
 

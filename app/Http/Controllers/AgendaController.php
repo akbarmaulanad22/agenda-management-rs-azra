@@ -92,31 +92,71 @@ class AgendaController extends Controller
     {
         $agenda->load(["room", "unit", "organizer", "meetingChair", "employees.unit", "notes", "images", "agendaQuestions", "bankSoal"]);
 
-        $quizResults = collect();
+        $quizComparison = collect();
+        $quizStats = null;
+
         if ($agenda->agendaQuestions->count() > 0) {
             $totalQuestions = $agenda->agendaQuestions->count();
-            $quizResults = AgendaQuestionAnswer::where('agenda_id', $agenda->id)
-                ->select('employee_id')
-                ->selectRaw('SUM(CAST(is_correct AS INTEGER)) as correct_count')
-                ->selectRaw('COUNT(*) as answered_count')
-                ->selectRaw('MIN(created_at) as answered_at')
-                ->groupBy('employee_id')
-                ->with('employee.unit')
-                ->get()
-                ->map(function ($row) use ($totalQuestions) {
-                    return [
-                        'employee' => $row->employee,
-                        'correct' => (int) $row->correct_count,
-                        'total' => $totalQuestions,
-                        'score' => $totalQuestions > 0 ? round(($row->correct_count / $totalQuestions) * 100) : 0,
-                        'answered_at' => $row->answered_at,
-                    ];
-                })
-                ->sortByDesc('score')
-                ->values();
+
+            $buildResults = function (string $quizType) use ($agenda, $totalQuestions) {
+                return AgendaQuestionAnswer::where('agenda_id', $agenda->id)
+                    ->where('quiz_type', $quizType)
+                    ->select('employee_id')
+                    ->selectRaw('SUM(CAST(is_correct AS INTEGER)) as correct_count')
+                    ->selectRaw('COUNT(*) as answered_count')
+                    ->selectRaw('MIN(created_at) as answered_at')
+                    ->groupBy('employee_id')
+                    ->with('employee.unit')
+                    ->get()
+                    ->keyBy('employee_id')
+                    ->map(function ($row) use ($totalQuestions) {
+                        return [
+                            'employee' => $row->employee,
+                            'correct' => (int) $row->correct_count,
+                            'total' => $totalQuestions,
+                            'score' => $totalQuestions > 0 ? round(($row->correct_count / $totalQuestions) * 100) : 0,
+                            'answered_at' => $row->answered_at,
+                        ];
+                    });
+            };
+
+            $pretestMap = $buildResults('pretest');
+            $posttestMap = $buildResults('posttest');
+
+            $allEmployeeIds = $pretestMap->keys()->merge($posttestMap->keys())->unique();
+
+            $quizComparison = $allEmployeeIds->map(function ($empId) use ($pretestMap, $posttestMap) {
+                $pre = $pretestMap->get($empId);
+                $post = $posttestMap->get($empId);
+                $employee = $pre ? $pre['employee'] : $post['employee'];
+
+                return [
+                    'employee' => $employee,
+                    'pre_correct' => $pre ? $pre['correct'] : null,
+                    'pre_total' => $pre ? $pre['total'] : null,
+                    'pre_score' => $pre ? $pre['score'] : null,
+                    'post_correct' => $post ? $post['correct'] : null,
+                    'post_total' => $post ? $post['total'] : null,
+                    'post_score' => $post ? $post['score'] : null,
+                    'improvement' => ($pre && $post) ? $post['score'] - $pre['score'] : null,
+                ];
+            })->sortBy('employee.full_name')->values();
+
+            // Summary stats
+            $withPre = $quizComparison->filter(fn($c) => $c['pre_score'] !== null);
+            $withPost = $quizComparison->filter(fn($c) => $c['post_score'] !== null);
+            $withBoth = $quizComparison->filter(fn($c) => $c['improvement'] !== null);
+
+            $quizStats = [
+                'pretest_count' => $withPre->count(),
+                'posttest_count' => $withPost->count(),
+                'avg_pretest' => $withPre->count() > 0 ? round($withPre->avg('pre_score')) : 0,
+                'avg_posttest' => $withPost->count() > 0 ? round($withPost->avg('post_score')) : 0,
+                'avg_improvement' => $withBoth->count() > 0 ? round($withBoth->avg('improvement')) : null,
+            ];
         }
 
-        return view("admin.agendas.show", compact("agenda", "quizResults"));
+        return view("admin.agendas.show", compact("agenda", "quizComparison", "quizStats"));
     }
 
     public function edit(Agenda $agenda)
@@ -175,15 +215,18 @@ class AgendaController extends Controller
 
         $agenda->update($agendaData);
 
-        // Sync snapshot questions
+        // Sync type-specific data
         if ($agenda->type === 'rapat') {
             $agenda->agendaQuestions()->delete();
-        } elseif ($agenda->bank_soal_id) {
-            $agenda->agendaQuestions()->delete();
-            $questions = Question::where('bank_soal_id', $agenda->bank_soal_id)->get();
-            $agenda->agendaQuestions()->createMany(
-                $questions->map->only(['question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct_option'])->toArray()
-            );
+        } else {
+            $agenda->notes()->delete();
+            if ($agenda->bank_soal_id) {
+                $agenda->agendaQuestions()->delete();
+                $questions = Question::where('bank_soal_id', $agenda->bank_soal_id)->get();
+                $agenda->agendaQuestions()->createMany(
+                    $questions->map->only(['question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct_option'])->toArray()
+                );
+            }
         }
 
         return redirect()
@@ -238,7 +281,7 @@ class AgendaController extends Controller
 
     public function exportPdf(Agenda $agenda)
     {
-        $agenda->load(["room", "unit", "organizer", "meetingChair", "employees.unit", "notes", "images"]);
+        $agenda->load(["room", "unit", "organizer", "meetingChair", "employees.unit", "notes", "images", "agendaQuestions"]);
 
         // Convert signature images to base64 for embedding in PDF
         $signatureImages = [];
@@ -269,19 +312,72 @@ class AgendaController extends Controller
             }
         }
 
+        // Build quiz comparison data for diklat/pelatihan
+        $quizComparison = collect();
+        if ($agenda->allowsQuiz() && $agenda->agendaQuestions->count() > 0) {
+            $totalQuestions = $agenda->agendaQuestions->count();
+
+            $buildResults = function (string $quizType) use ($agenda, $totalQuestions) {
+                return AgendaQuestionAnswer::where('agenda_id', $agenda->id)
+                    ->where('quiz_type', $quizType)
+                    ->select('employee_id')
+                    ->selectRaw('SUM(CAST(is_correct AS INTEGER)) as correct_count')
+                    ->selectRaw('COUNT(*) as answered_count')
+                    ->groupBy('employee_id')
+                    ->with('employee.unit')
+                    ->get()
+                    ->keyBy('employee_id')
+                    ->map(function ($row) use ($totalQuestions) {
+                        return [
+                            'employee' => $row->employee,
+                            'correct' => (int) $row->correct_count,
+                            'total' => $totalQuestions,
+                            'score' => $totalQuestions > 0 ? round(($row->correct_count / $totalQuestions) * 100) : 0,
+                        ];
+                    });
+            };
+
+            $pretestMap = $buildResults('pretest');
+            $posttestMap = $buildResults('posttest');
+            $allEmployeeIds = $pretestMap->keys()->merge($posttestMap->keys())->unique();
+
+            $quizComparison = $allEmployeeIds->map(function ($empId) use ($pretestMap, $posttestMap) {
+                $pre = $pretestMap->get($empId);
+                $post = $posttestMap->get($empId);
+                return [
+                    'employee' => $pre ? $pre['employee'] : $post['employee'],
+                    'pre_correct' => $pre ? $pre['correct'] : null,
+                    'pre_total' => $pre ? $pre['total'] : null,
+                    'pre_score' => $pre ? $pre['score'] : null,
+                    'post_correct' => $post ? $post['correct'] : null,
+                    'post_total' => $post ? $post['total'] : null,
+                    'post_score' => $post ? $post['score'] : null,
+                    'improvement' => ($pre && $post) ? $post['score'] - $pre['score'] : null,
+                ];
+            })->sortBy('employee.full_name')->values();
+        }
+
         // Generate separate PDFs for each content section
         $contentSections = [
             'attendance' => 'Daftar Kehadiran',
-            'notes'      => 'Notulensi Rapat',
-            'photos'     => 'Dokumentasi Foto',
         ];
+
+        if ($agenda->allowsQuiz() && $agenda->agendaQuestions->count() > 0) {
+            $contentSections['quiz'] = 'Hasil Pretest & Posttest';
+        }
+
+        if ($agenda->allowsNotes()) {
+            $contentSections['notes'] = 'Notulensi Rapat';
+        }
+
+        $contentSections['photos'] = 'Dokumentasi Foto';
 
         $tempPaths = [];
         foreach ($contentSections as $sectionKey => $sectionLabel) {
             $section = $sectionKey;
             $sectionPdf = Pdf::loadView(
                 "admin.agendas.export-pdf",
-                compact("agenda", "signatureImages", "agendaImages", "section"),
+                compact("agenda", "signatureImages", "agendaImages", "section", "quizComparison"),
             )->setPaper("a4", "portrait");
 
             $tmpPath = tempnam(sys_get_temp_dir(), "agenda_{$sectionKey}_") . ".pdf";
@@ -338,6 +434,7 @@ class AgendaController extends Controller
             'letter'     => 'Surat Undangan',
             'material'   => 'Materi Rapat',
             'attendance' => 'Daftar Kehadiran',
+            'quiz'       => 'Hasil Pretest & Posttest',
             'notes'      => 'Notulensi Rapat',
             'photos'     => 'Dokumentasi Foto',
         ];

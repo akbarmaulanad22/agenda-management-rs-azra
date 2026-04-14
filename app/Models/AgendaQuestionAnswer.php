@@ -13,6 +13,7 @@ class AgendaQuestionAnswer extends Model
         'agenda_question_id',
         'selected_option',
         'is_correct',
+        'quiz_type',
     ];
 
     protected function casts(): array

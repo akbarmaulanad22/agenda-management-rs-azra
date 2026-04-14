@@ -35,17 +35,28 @@ class PublicQuizController extends Controller
             'option_e' => $q->option_e,
         ]);
 
-        // Employee IDs that already completed the quiz
-        $completedEmployeeIds = AgendaQuestionAnswer::where('agenda_id', $agenda->id)
+        // Employee IDs that already completed pretest
+        $pretestCompletedIds = AgendaQuestionAnswer::where('agenda_id', $agenda->id)
+            ->where('quiz_type', 'pretest')
             ->select('employee_id')
             ->distinct()
-            ->pluck('employee_id');
+            ->pluck('employee_id')
+            ->toArray();
+
+        // Employee IDs that already completed posttest
+        $posttestCompletedIds = AgendaQuestionAnswer::where('agenda_id', $agenda->id)
+            ->where('quiz_type', 'posttest')
+            ->select('employee_id')
+            ->distinct()
+            ->pluck('employee_id')
+            ->toArray();
 
         return view('attendance.quiz', compact(
             'agenda',
             'employeesJson',
             'questionsJson',
-            'completedEmployeeIds',
+            'pretestCompletedIds',
+            'posttestCompletedIds',
         ));
     }
 
@@ -62,14 +73,27 @@ class PublicQuizController extends Controller
 
         $employeeId = $request->employee_id;
 
-        // Check if already answered
+        // Must have completed pretest first
+        $pretestDone = AgendaQuestionAnswer::where('agenda_id', $agenda->id)
+            ->where('employee_id', $employeeId)
+            ->where('quiz_type', 'pretest')
+            ->exists();
+
+        if (!$pretestDone) {
+            return response()->json([
+                'message' => 'Anda harus mengerjakan pretest terlebih dahulu.',
+            ], 422);
+        }
+
+        // Check if posttest already answered
         $existing = AgendaQuestionAnswer::where('agenda_id', $agenda->id)
             ->where('employee_id', $employeeId)
+            ->where('quiz_type', 'posttest')
             ->exists();
 
         if ($existing) {
             return response()->json([
-                'message' => 'Anda sudah mengerjakan soal ini.',
+                'message' => 'Anda sudah mengerjakan posttest.',
             ], 422);
         }
 
@@ -91,6 +115,7 @@ class PublicQuizController extends Controller
                 'agenda_question_id' => $question->id,
                 'selected_option' => $selectedOption,
                 'is_correct' => $isCorrect,
+                'quiz_type' => 'posttest',
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -99,7 +124,7 @@ class PublicQuizController extends Controller
         AgendaQuestionAnswer::insert($rows);
 
         return response()->json([
-            'message' => 'Jawaban berhasil disimpan.',
+            'message' => 'Posttest berhasil disimpan.',
             'correct' => $correct,
             'total' => $total,
         ]);

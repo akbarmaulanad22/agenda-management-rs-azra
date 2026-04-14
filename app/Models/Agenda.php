@@ -81,4 +81,14 @@ class Agenda extends Model
     {
         return $this->belongsTo(BankSoal::class);
     }
+
+    public function allowsNotes(): bool
+    {
+        return $this->type === 'rapat';
+    }
+
+    public function allowsQuiz(): bool
+    {
+        return in_array($this->type, ['diklat', 'pelatihan']);
+    }
 }

@@ -84,6 +84,41 @@
             <p class="empty-notice">Belum ada notulensi.</p>
         @endif
 
+    @elseif($section === 'quiz')
+        {{-- ===== HASIL PRETEST & POSTTEST ===== --}}
+        @if($quizComparison->count() > 0)
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="num">No</th>
+                        <th>Nama</th>
+                        <th>Jabatan</th>
+                        <th>Pretest Benar</th>
+                        <th>Pretest Nilai</th>
+                        <th>Posttest Benar</th>
+                        <th>Posttest Nilai</th>
+                        <th>Perubahan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($quizComparison as $i => $row)
+                        <tr>
+                            <td class="num">{{ $i + 1 }}</td>
+                            <td>{{ $row['employee']->full_name }}</td>
+                            <td>{{ $row['employee']->job_position }}</td>
+                            <td>{{ $row['pre_correct'] !== null ? $row['pre_correct'].'/'.$row['pre_total'] : '-' }}</td>
+                            <td>{{ $row['pre_score'] !== null ? $row['pre_score'] : '-' }}</td>
+                            <td>{{ $row['post_correct'] !== null ? $row['post_correct'].'/'.$row['post_total'] : '-' }}</td>
+                            <td>{{ $row['post_score'] !== null ? $row['post_score'] : '-' }}</td>
+                            <td>{{ $row['improvement'] !== null ? ($row['improvement'] > 0 ? '+'.$row['improvement'] : $row['improvement']) : '-' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <p class="empty-notice">Belum ada peserta yang mengerjakan soal.</p>
+        @endif
+
     @elseif($section === 'photos')
         {{-- ===== DOKUMENTASI FOTO ===== --}}
         @if($agenda->images->count())

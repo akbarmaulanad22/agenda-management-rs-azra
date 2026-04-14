@@ -31,12 +31,14 @@
 
                     <div>
                         <label for="unit_id" class="block text-sm font-semibold text-gray-700 mb-2">Unit</label>
-                        <select name="unit_id" id="unit_id" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
-                            <option value="">Pilih Organisasi</option>
-                            @foreach($units as $unit)
-                                <option value="{{ $unit->id }}" @selected(old('unit_id', $employee->unit_id) == $unit->id)>{{ $unit->name }}</option>
-                            @endforeach
-                        </select>
+                        <x-searchable-select
+                            name="unit_id"
+                            search-url="{{ route('admin.units.search') }}"
+                            :selected-id="old('unit_id', $employee->unit_id)"
+                            :selected-label="old('unit_id') ? null : $employee->unit?->name"
+                            placeholder="Cari unit..."
+                            required
+                        />
                         @error('unit_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                     </div>
 

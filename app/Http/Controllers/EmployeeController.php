@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
-use App\Models\Unit;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
@@ -17,9 +16,7 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        $units = Unit::orderBy('name')->get();
-
-        return view("admin.employees.create", compact("units"));
+        return view("admin.employees.create");
     }
 
     public function store(Request $request)
@@ -42,9 +39,9 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee)
     {
-        $units = Unit::orderBy('name')->get();
+        $employee->load('unit');
 
-        return view("admin.employees.edit", compact("employee", "units"));
+        return view("admin.employees.edit", compact("employee"));
     }
 
     public function update(Request $request, Employee $employee)

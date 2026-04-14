@@ -20,14 +20,14 @@
         <x-agenda-header :agenda="$agenda">
             <x-slot:actions>
                 <div class="flex items-center gap-2">
-                    @if($agenda->agendaQuestions->count() > 0)
+                    @if($agenda->allowsQuiz() && $agenda->agendaQuestions->count() > 0)
                         <a href="{{ route('attendance.quiz', $agenda) }}"
                             class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-[11px] font-medium px-3 py-1.5 rounded-full hover:bg-white/25 transition">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            Kerjakan Soal
+                            Posttest
                         </a>
                     @endif
                     <a href="{{ route('agenda.input', $agenda) }}"
@@ -43,7 +43,7 @@
         </x-agenda-header>
 
         {{-- Search to Attend Section --}}
-        <div class="px-4 mt-5">
+        <div x-show="currentStep === 'attendance'" class="px-4 mt-5">
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                 <div class="flex items-center gap-2 mb-3">
                     <div class="w-8 h-8 rounded-xl bg-primary-50 flex items-center justify-center">
@@ -125,8 +125,113 @@
             </div>
         </div>
 
+        {{-- ===== PRETEST SECTION (shown after signing for diklat/pelatihan) ===== --}}
+        <div x-show="currentStep === 'pretest'" x-cloak class="px-4 mt-5">
+            {{-- Employee info bar --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4 flex items-center justify-between">
+                <div class="min-w-0">
+                    <div class="font-bold text-gray-900 text-sm" x-text="selectedEmployee?.name"></div>
+                    <div class="text-xs text-gray-500" x-text="selectedEmployee?.position + ' - ' + selectedEmployee?.organization"></div>
+                </div>
+                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Pretest
+                </span>
+            </div>
+
+            {{-- Pretest Info Card --}}
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-4 mb-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-blue-900">Pretest — Sebelum Pelatihan</h3>
+                        <p class="text-xs text-blue-600 mt-0.5">Silakan jawab soal di bawah ini untuk mengukur pemahaman awal Anda. Soal yang sama akan diberikan kembali di akhir pelatihan (posttest).</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Questions --}}
+            <div class="space-y-4">
+                <template x-for="(q, index) in questions" :key="q.id">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                        <div class="flex items-start gap-3 mb-4">
+                            <span class="shrink-0 w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center text-xs font-bold text-blue-600"
+                                x-text="index + 1"></span>
+                            <p class="text-sm text-gray-800 font-medium leading-relaxed" x-text="q.question_text"></p>
+                        </div>
+                        <div class="space-y-2 ml-10">
+                            <template x-for="opt in ['a','b','c','d','e']" :key="opt">
+                                <label x-show="q['option_' + opt]"
+                                    class="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-200"
+                                    :class="pretestAnswers[q.id] === opt
+                                        ? 'border-blue-400 bg-blue-50/50 ring-1 ring-blue-200'
+                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'">
+                                    <input type="radio" :name="'pretest_q_' + q.id" :value="opt"
+                                        x-model="pretestAnswers[q.id]"
+                                        class="mt-0.5 text-blue-500 focus:ring-blue-500">
+                                    <div class="flex items-start gap-2 min-w-0">
+                                        <span class="shrink-0 text-xs font-bold text-gray-400 uppercase mt-0.5" x-text="opt + '.'"></span>
+                                        <span class="text-sm text-gray-700" x-text="q['option_' + opt]"></span>
+                                    </div>
+                                </label>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            {{-- Submit button --}}
+            <div class="mt-6">
+                <button @click="submitPretest()" :disabled="pretestSubmitting || !allPretestAnswered"
+                    class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-semibold rounded-2xl hover:from-blue-600 hover:to-indigo-700 transition disabled:opacity-50 active:scale-[0.99] shadow-lg shadow-blue-500/20">
+                    <span x-show="!pretestSubmitting">Kirim Pretest</span>
+                    <span x-show="pretestSubmitting">Mengirim...</span>
+                </button>
+                <p class="text-center text-xs mt-2" :class="allPretestAnswered ? 'text-gray-300' : 'text-amber-500'">
+                    <span x-show="!allPretestAnswered" x-text="pretestAnsweredCount + ' dari ' + questions.length + ' soal dijawab'"></span>
+                    <span x-show="allPretestAnswered">Semua soal sudah dijawab</span>
+                </p>
+            </div>
+
+            {{-- Skip pretest button --}}
+            <div class="mt-3 text-center">
+                <button @click="skipPretest()" class="text-xs text-gray-400 hover:text-gray-600 transition">
+                    Lewati pretest &rarr;
+                </button>
+            </div>
+        </div>
+
+        {{-- ===== PRETEST RESULT ===== --}}
+        <div x-show="currentStep === 'pretest-done'" x-cloak class="px-4 mt-5">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
+                <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Pretest Selesai!</h3>
+                <p class="text-sm text-gray-500 mt-2">Absensi dan pretest Anda telah tercatat. Kerjakan posttest setelah pelatihan selesai.</p>
+                <div class="mt-4">
+                    <button @click="backToAttendance()"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-2xl hover:bg-primary-700 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Kembali
+                    </button>
+                </div>
+            </div>
+        </div>
+
         {{-- Attendee List Section --}}
-        <div class="px-4 mt-5">
+        <div x-show="currentStep === 'attendance'" class="px-4 mt-5">
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 {{-- Section Header --}}
                 <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -245,7 +350,7 @@
                 stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
-            Absensi berhasil disimpan!
+            <span x-text="toastMessage">Absensi berhasil disimpan!</span>
         </div>
 
         {{-- Error Toast --}}
@@ -262,22 +367,39 @@
     <script>
         function attendanceApp() {
             return {
+                currentStep: 'attendance', // 'attendance' | 'pretest' | 'pretest-done'
                 search: '',
                 employees: @json($employeesJson),
                 attendees: @json($attendeesJson),
+                questions: @json($questionsJson),
+                pretestCompletedIds: @json($pretestCompletedIds),
                 showModal: false,
                 selectedEmployee: null,
                 signaturePad: null,
                 submitting: false,
                 showToast: false,
+                toastMessage: '',
                 showError: false,
                 errorMessage: '',
                 agendaId: {{ $agenda->id }},
+                hasQuiz: {{ $agenda->allowsQuiz() && $agenda->agendaQuestions->count() > 0 ? 'true' : 'false' }},
+
+                // Pretest state
+                pretestAnswers: {},
+                pretestSubmitting: false,
 
                 get filteredEmployees() {
                     if (this.search.length < 2) return [];
                     const q = this.search.toLowerCase();
                     return this.employees.filter(p => p.name.toLowerCase().includes(q));
+                },
+
+                get pretestAnsweredCount() {
+                    return Object.keys(this.pretestAnswers).filter(k => this.pretestAnswers[k]).length;
+                },
+
+                get allPretestAnswered() {
+                    return this.pretestAnsweredCount === this.questions.length;
                 },
 
                 openSignModal(employee) {
@@ -300,7 +422,6 @@
 
                 closeModal() {
                     this.showModal = false;
-                    this.selectedEmployee = null;
                     if (this.signaturePad) {
                         this.signaturePad.clear();
                         this.signaturePad = null;
@@ -347,8 +468,15 @@
 
                             this.closeModal();
                             this.search = '';
-                            this.showToast = true;
-                            setTimeout(() => this.showToast = false, 3000);
+
+                            // If agenda has quiz and pretest not yet done, go to pretest
+                            if (this.hasQuiz && data.show_pretest) {
+                                this.initPretest();
+                                this.currentStep = 'pretest';
+                                this.showSuccessToast('Absensi berhasil! Silakan kerjakan pretest.');
+                            } else {
+                                this.showSuccessToast('Absensi berhasil disimpan!');
+                            }
                         } else {
                             this.showErrorToast(data.message || 'Terjadi kesalahan.');
                         }
@@ -357,6 +485,64 @@
                     } finally {
                         this.submitting = false;
                     }
+                },
+
+                initPretest() {
+                    this.pretestAnswers = {};
+                    this.questions.forEach(q => {
+                        this.pretestAnswers[q.id] = '';
+                    });
+                },
+
+                async submitPretest() {
+                    if (!this.allPretestAnswered || this.pretestSubmitting) return;
+
+                    this.pretestSubmitting = true;
+
+                    try {
+                        const response = await fetch(`/absen/${this.agendaId}/pretest`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                employee_id: this.selectedEmployee.id,
+                                answers: this.pretestAnswers,
+                            }),
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            this.pretestCompletedIds.push(this.selectedEmployee.id);
+                            this.currentStep = 'pretest-done';
+                            this.showSuccessToast('Pretest berhasil disimpan!');
+                        } else {
+                            this.showErrorToast(data.message || 'Terjadi kesalahan.');
+                        }
+                    } catch (e) {
+                        this.showErrorToast('Gagal menghubungi server.');
+                    } finally {
+                        this.pretestSubmitting = false;
+                    }
+                },
+
+                skipPretest() {
+                    this.backToAttendance();
+                },
+
+                backToAttendance() {
+                    this.currentStep = 'attendance';
+                    this.selectedEmployee = null;
+                    this.pretestAnswers = {};
+                },
+
+                showSuccessToast(msg) {
+                    this.toastMessage = msg;
+                    this.showToast = true;
+                    setTimeout(() => this.showToast = false, 3000);
                 },
 
                 showErrorToast(msg) {

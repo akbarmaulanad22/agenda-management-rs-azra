@@ -32,6 +32,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('agendas/export-csv', [AgendaController::class, 'exportCsv'])->name('agendas.export-csv');
     Route::resource('agendas', AgendaController::class);
     Route::get('agendas/{agenda}/export-pdf', [AgendaController::class, 'exportPdf'])->name('agendas.export-pdf');
+    Route::get('units/search', [UnitController::class, 'search'])->name('units.search');
     Route::resource('units', UnitController::class);
     Route::resource('bank-soals', BankSoalController::class);
 });
@@ -39,8 +40,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 // Public attendance routes
 Route::get('/absen/{agenda}', [AttendanceController::class, 'show'])->name('attendance.show');
 Route::post('/absen/{agenda}/sign', [AttendanceController::class, 'sign'])->name('attendance.sign');
+Route::post('/absen/{agenda}/pretest', [AttendanceController::class, 'storePretest'])->name('attendance.pretest.store');
 
-// Public quiz routes
+// Public quiz routes (posttest)
 Route::get('/absen/{agenda}/quiz', [PublicQuizController::class, 'show'])->name('attendance.quiz');
 Route::post('/absen/{agenda}/quiz', [PublicQuizController::class, 'store'])->name('attendance.quiz.store');
 

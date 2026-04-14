@@ -7,6 +7,32 @@ use Illuminate\Http\Request;
 
 class UnitController extends Controller
 {
+    public function search(Request $request)
+    {
+        if ($request->filled('id')) {
+            $unit = Unit::find($request->id);
+
+            return response()->json([
+                'items' => $unit ? [['id' => $unit->id, 'name' => $unit->name]] : [],
+                'has_more' => false,
+            ]);
+        }
+
+        $query = Unit::orderBy('name');
+
+        if ($request->filled('q')) {
+            $query->where('name', 'ilike', '%' . $request->q . '%');
+        }
+
+        $units = $query->take(11)->get();
+        $hasMore = $units->count() > 10;
+
+        return response()->json([
+            'items' => $units->take(10)->map(fn ($u) => ['id' => $u->id, 'name' => $u->name]),
+            'has_more' => $hasMore,
+        ]);
+    }
+
     public function index()
     {
         $units = Unit::latest()->paginate(15);
