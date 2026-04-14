@@ -82,7 +82,7 @@
 
                                     {{-- Waktu --}}
                                     <td class="px-1 sm:px-4 py-2 sm:py-3.5 text-[11px] sm:text-sm text-gray-600">
-                                        <span class="font-medium">{{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }}</span>
+                                        <span class="font-medium">{{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }}@if($agenda->event_end_time)–{{ \Carbon\Carbon::parse($agenda->event_end_time)->format('H:i') }}@endif</span>
                                         <span class="hidden sm:inline text-gray-400 text-xs ml-0.5">WIB</span>
                                     </td>
 
@@ -139,7 +139,7 @@
                                     <div class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2.5">
                                         <div>
                                             <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Waktu</span>
-                                            <p class="text-xs font-semibold text-gray-700 mt-0.5">{{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }} WIB</p>
+                                            <p class="text-xs font-semibold text-gray-700 mt-0.5">{{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }}@if($agenda->event_end_time) – {{ \Carbon\Carbon::parse($agenda->event_end_time)->format('H:i') }}@endif WIB</p>
                                         </div>
                                         <div>
                                             <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Ruangan</span>

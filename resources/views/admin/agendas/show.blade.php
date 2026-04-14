@@ -100,7 +100,9 @@
                             </svg>
                             <span class="text-[11px] font-semibold text-gray-400 uppercase">Waktu</span>
                         </div>
-                        <p class="text-sm font-bold text-gray-800">{{ $agenda->event_time }} WIB</p>
+                        <p class="text-sm font-bold text-gray-800">
+                            {{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }}@if($agenda->event_end_time) – {{ \Carbon\Carbon::parse($agenda->event_end_time)->format('H:i') }}@endif WIB
+                        </p>
                     </div>
                     <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
                         <div class="flex items-center gap-2 mb-1.5">
@@ -262,10 +264,10 @@
                                         <th class="pr-3 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider w-10">No</th>
                                         <th class="px-3 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Nama</th>
                                         <th class="px-3 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Jabatan</th>
-                                        <th class="px-2 py-3 text-center text-xs font-semibold text-blue-500 uppercase tracking-wider">Pretest Benar</th>
-                                        <th class="px-2 py-3 text-center text-xs font-semibold text-blue-500 uppercase tracking-wider">Pretest Nilai</th>
-                                        <th class="px-2 py-3 text-center text-xs font-semibold text-amber-500 uppercase tracking-wider">Posttest Benar</th>
-                                        <th class="px-2 py-3 text-center text-xs font-semibold text-amber-500 uppercase tracking-wider">Posttest Nilai</th>
+                                        <th class="px-2 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Pretest Benar</th>
+                                        <th class="px-2 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Pretest Nilai</th>
+                                        <th class="px-2 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Posttest Benar</th>
+                                        <th class="px-2 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Posttest Nilai</th>
                                         <th class="px-3 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Perubahan</th>
                                     </tr>
                                 </thead>
@@ -292,7 +294,7 @@
                                             <td class="px-2 py-3 text-center">
                                                 @if($row['pre_score'] !== null)
                                                     <span
-                                                        class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold {{ $row['pre_score'] >= 70 ? 'bg-blue-50 text-blue-600' : 'bg-blue-50/50 text-blue-400' }}">{{ $row['pre_score'] }}</span>
+                                                        class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium text-gray-700">{{ $row['pre_score'] }}</span>
                                                 @else
                                                     <span class="text-xs text-gray-300">&mdash;</span>
                                                 @endif
@@ -310,7 +312,7 @@
                                             <td class="px-2 py-3 text-center">
                                                 @if($row['post_score'] !== null)
                                                     <span
-                                                        class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold {{ $row['post_score'] >= 70 ? 'bg-amber-50 text-amber-600' : 'bg-amber-50/50 text-amber-400' }}">{{ $row['post_score'] }}</span>
+                                                        class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium text-gray-700">{{ $row['post_score'] }}</span>
                                                 @else
                                                     <span class="text-xs text-gray-300">&mdash;</span>
                                                 @endif

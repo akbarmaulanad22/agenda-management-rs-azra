@@ -39,6 +39,7 @@ class AgendaController extends Controller
             "description" => "nullable|string",
             "event_date" => "required|date",
             "event_time" => "required",
+            "event_end_time" => "nullable|date_format:H:i",
             "status" => "required|in:draft,active,completed",
             "organizer_id" => "required|exists:employees,id",
             "meeting_chair_id" => "required|exists:employees,id",
@@ -176,6 +177,7 @@ class AgendaController extends Controller
             "description" => "nullable|string",
             "event_date" => "required|date",
             "event_time" => "required",
+            "event_end_time" => "nullable|date_format:H:i",
             "status" => "required|in:draft,active,completed",
             "organizer_id" => "required|exists:employees,id",
             "meeting_chair_id" => "required|exists:employees,id",
@@ -423,7 +425,7 @@ class AgendaController extends Controller
         // Prepare header info
         $headerTitle = $agenda->title;
         $headerDate = $agenda->event_date->translatedFormat('l, d F Y');
-        $headerTime = $agenda->event_time . ' WIB';
+        $headerTime = $agenda->event_time . ($agenda->event_end_time ? ' - ' . $agenda->event_end_time : '') . ' WIB';
         $headerRoom = $agenda->room->room_name ?? '-';
         $headerOrganizer = $agenda->organizer->full_name ?? '-';
         $headerUnit = $agenda->unit->name ?? '-';

@@ -38,15 +38,33 @@
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                                 <div>
                                     <label for="event_date" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Acara</label>
                                     <input type="date" name="event_date" id="event_date" value="{{ old('event_date') }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
                                     @error('event_date') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
+                                    <label for="status" class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                                    <select name="status" id="status" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
+                                        <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                                        <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
+                                    </select>
+                                    @error('status') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
                                     <label for="event_time" class="block text-sm font-semibold text-gray-700 mb-2">Pukul Mulai</label>
                                     <input type="time" name="event_time" id="event_time" value="{{ old('event_time') }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
                                     @error('event_time') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label for="event_end_time" class="block text-sm font-semibold text-gray-700 mb-2">Pukul Selesai</label>
+                                    <input type="time" name="event_end_time" id="event_end_time" value="{{ old('event_end_time') }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                                    @error('event_end_time') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                 </div>
                             </div>
 

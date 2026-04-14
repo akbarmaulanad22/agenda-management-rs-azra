@@ -23,7 +23,7 @@
             <tr>
                 <td class="text-white/60 font-medium py-0.5 pr-3 whitespace-nowrap align-top">Waktu</td>
                 <td class="text-white/60 py-0.5 pr-1 align-top">:</td>
-                <td class="text-white font-semibold py-0.5 break-words">{{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }} WIB</td>
+                <td class="text-white font-semibold py-0.5 break-words">{{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }}@if($agenda->event_end_time) – {{ \Carbon\Carbon::parse($agenda->event_end_time)->format('H:i') }}@endif WIB</td>
             </tr>
             <tr>
                 <td class="text-white/60 font-medium py-0.5 pr-3 whitespace-nowrap align-top">Ruangan</td>

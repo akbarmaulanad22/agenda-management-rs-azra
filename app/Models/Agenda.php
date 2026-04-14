@@ -17,6 +17,7 @@ class Agenda extends Model
         'description',
         'event_date',
         'event_time',
+        'event_end_time',
         'status',
         'organizer_id',
         'meeting_chair_id',
