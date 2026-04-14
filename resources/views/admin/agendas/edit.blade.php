@@ -68,7 +68,7 @@
                             </div>
 
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
                                 <div x-data="{
                                     open: false, search: '', selectedId: '{{ old('organizer_id', $agenda->organizer_id ?? '') }}',
                                     items: {{ Js::from($employees) }},
@@ -87,47 +87,6 @@
                                         </template>
                                     </div>
                                     @error('organizer_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                                </div>
-                                <div x-data="{
-                                    open: false,
-                                    search: '',
-                                    selectedId: '{{ old('unit_id', $agenda->unit_id ?? '') }}',
-                                    units: {{ Js::from($units) }},
-                                    get filtered() {
-                                        if (!this.search) return this.units;
-                                        return this.units.filter(u => u.name.toLowerCase().includes(this.search.toLowerCase()));
-                                    },
-                                    select(unit) {
-                                        this.selectedId = unit.id;
-                                        this.search = unit.name;
-                                        this.open = false;
-                                    },
-                                    onEnter() {
-                                        if (this.filtered.length === 1) {
-                                            this.select(this.filtered[0]);
-                                        }
-                                    },
-                                    onBlur() {
-                                        setTimeout(() => {
-                                            if (!this.selectedId) this.search = '';
-                                        }, 200);
-                                    },
-                                    init() {
-                                        if (this.selectedId) {
-                                            const found = this.units.find(u => u.id == this.selectedId);
-                                            if (found) this.search = found.name;
-                                        }
-                                    }
-                                }" @click.outside="open = false" class="relative">
-                                    <label for="unit_search" class="block text-sm font-semibold text-gray-700 mb-2">Unit</label>
-                                    <input type="hidden" name="unit_id" :value="selectedId">
-                                    <input type="text" id="unit_search" x-model="search" @focus="open = true" @click="open = true" @input="open = true; selectedId = ''" @blur="onBlur()" @keydown.enter.prevent="onEnter()" placeholder="Cari unit..." autocomplete="off" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
-                                    <div x-show="open && filtered.length > 0" x-transition class="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-2xl shadow-lg max-h-48 overflow-y-auto">
-                                        <template x-for="unit in filtered" :key="unit.id">
-                                            <button type="button" @click="select(unit)" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary transition-colors first:rounded-t-2xl last:rounded-b-2xl" x-text="unit.name"></button>
-                                        </template>
-                                    </div>
-                                    @error('unit_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                 </div>
                             </div>
 

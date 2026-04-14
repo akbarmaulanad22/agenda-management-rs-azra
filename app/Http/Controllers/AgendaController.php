@@ -8,7 +8,6 @@ use App\Models\BankSoal;
 use App\Models\Employee;
 use App\Models\Question;
 use App\Models\Room;
-use App\Models\Unit;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -18,7 +17,7 @@ class AgendaController extends Controller
 {
     public function index()
     {
-        $agendas = Agenda::with(["room", "unit", "organizer", "meetingChair"])->latest()->paginate(10);
+        $agendas = Agenda::with(["room", "organizer.unit", "meetingChair"])->latest()->paginate(10);
 
         return view("admin.agendas.index", compact("agendas"));
     }
@@ -27,10 +26,9 @@ class AgendaController extends Controller
     {
         $rooms = Room::all();
         $bankSoals = BankSoal::all();
-        $units = Unit::orderBy('name')->get();
         $employees = Employee::orderBy('full_name')->get();
 
-        return view("admin.agendas.create", compact("rooms", "bankSoals", "units", "employees"));
+        return view("admin.agendas.create", compact("rooms", "bankSoals", "employees"));
     }
 
     public function store(Request $request)
@@ -44,7 +42,6 @@ class AgendaController extends Controller
             "status" => "required|in:draft,active,completed",
             "organizer_id" => "required|exists:employees,id",
             "meeting_chair_id" => "required|exists:employees,id",
-            "unit_id" => "required|exists:units,id",
             "room_id" => "required|exists:rooms,id",
             "type" => "required|in:diklat,pelatihan,rapat",
             "bank_soal_id" => "nullable|required_if:type,diklat|required_if:type,pelatihan|exists:bank_soals,id",
@@ -92,7 +89,7 @@ class AgendaController extends Controller
 
     public function show(Agenda $agenda)
     {
-        $agenda->load(["room", "unit", "organizer", "meetingChair", "employees.unit", "notes", "images", "agendaQuestions", "bankSoal"]);
+        $agenda->load(["room", "organizer.unit", "meetingChair", "employees.unit", "notes", "images", "agendaQuestions", "bankSoal"]);
 
         $quizComparison = $this->buildQuizComparison($agenda);
         $quizStats = null;
@@ -118,10 +115,9 @@ class AgendaController extends Controller
     {
         $rooms = Room::all();
         $bankSoals = BankSoal::all();
-        $units = Unit::orderBy('name')->get();
         $employees = Employee::orderBy('full_name')->get();
 
-        return view("admin.agendas.edit", compact("agenda", "rooms", "bankSoals", "units", "employees"));
+        return view("admin.agendas.edit", compact("agenda", "rooms", "bankSoals", "employees"));
     }
 
     public function update(Request $request, Agenda $agenda)
@@ -135,7 +131,6 @@ class AgendaController extends Controller
             "status" => "required|in:draft,active,completed",
             "organizer_id" => "required|exists:employees,id",
             "meeting_chair_id" => "required|exists:employees,id",
-            "unit_id" => "required|exists:units,id",
             "room_id" => "required|exists:rooms,id",
             "type" => "required|in:diklat,pelatihan,rapat",
             "bank_soal_id" => "nullable|required_if:type,diklat|required_if:type,pelatihan|exists:bank_soals,id",
@@ -219,16 +214,16 @@ class AgendaController extends Controller
                 'Status',
             ]);
 
-            foreach (Agenda::with(['unit', 'organizer', 'meetingChair'])->latest()->cursor() as $agenda) {
+            foreach (Agenda::with(['organizer.unit', 'meetingChair'])->latest()->cursor() as $agenda) {
                 fputcsv($file, [
                     $agenda->title,
                     $agenda->description,
                     $agenda->type,
                     $agenda->event_date->format('Y-m-d'),
                     $agenda->event_time,
-                    $agenda->organizer->full_name ?? '-',
-                    $agenda->unit->name ?? '-',
-                    $agenda->meetingChair->full_name ?? '-',
+                    $agenda->organizer?->full_name ?? '-',
+                    $agenda->organizer?->unit?->name ?? '-',
+                    $agenda->meetingChair?->full_name ?? '-',
                     $agenda->status,
                 ]);
             }
@@ -241,7 +236,7 @@ class AgendaController extends Controller
 
     public function exportPdf(Agenda $agenda)
     {
-        $agenda->load(["room", "unit", "organizer", "meetingChair", "employees.unit", "notes", "images", "agendaQuestions"]);
+        $agenda->load(["room", "organizer.unit", "meetingChair", "employees.unit", "notes", "images", "agendaQuestions"]);
 
         // Convert signature images to base64 for embedding in PDF
         $signatureImages = [];
@@ -342,9 +337,9 @@ class AgendaController extends Controller
         $headerDate = $agenda->event_date->translatedFormat('l, d F Y');
         $headerTime = $agenda->event_time . ($agenda->event_end_time ? ' - ' . $agenda->event_end_time : '') . ' WIB';
         $headerRoom = $agenda->room->room_name ?? '-';
-        $headerOrganizer = $agenda->organizer->full_name ?? '-';
-        $headerUnit = $agenda->unit->name ?? '-';
-        $headerChair = $agenda->meetingChair->full_name ?? '-';
+        $headerOrganizer = $agenda->organizer?->full_name ?? '-';
+        $headerUnit = $agenda->organizer?->unit?->name ?? '-';
+        $headerChair = $agenda->meetingChair?->full_name ?? '-';
 
         // Sub-header labels per type
         $subHeaders = [

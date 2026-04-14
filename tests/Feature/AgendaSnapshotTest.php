@@ -8,7 +8,6 @@ use App\Models\BankSoal;
 use App\Models\Employee;
 use App\Models\Question;
 use App\Models\Room;
-use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,7 +19,6 @@ class AgendaSnapshotTest extends TestCase
     private function validAgendaData(array $overrides = []): array
     {
         $room = Room::factory()->create();
-        $unit = Unit::factory()->create();
         $organizer = Employee::factory()->create();
         $chair = Employee::factory()->create();
 
@@ -31,7 +29,6 @@ class AgendaSnapshotTest extends TestCase
             'status' => 'draft',
             'organizer_id' => $organizer->id,
             'meeting_chair_id' => $chair->id,
-            'unit_id' => $unit->id,
             'room_id' => $room->id,
             'type' => 'rapat',
         ], $overrides);
@@ -137,7 +134,6 @@ class AgendaSnapshotTest extends TestCase
             'status' => 'draft',
             'organizer_id' => Employee::factory()->create()->id,
             'meeting_chair_id' => Employee::factory()->create()->id,
-            'unit_id' => Unit::factory()->create()->id,
             'room_id' => $room->id,
             'type' => 'diklat',
             'bank_soal_id' => $bankSoal->id,
@@ -155,7 +151,6 @@ class AgendaSnapshotTest extends TestCase
             'status' => 'draft',
             'organizer_id' => Employee::factory()->create()->id,
             'meeting_chair_id' => Employee::factory()->create()->id,
-            'unit_id' => Unit::factory()->create()->id,
             'room_id' => $room->id,
             'type' => 'rapat',
         ]);
@@ -181,7 +176,6 @@ class AgendaSnapshotTest extends TestCase
             'status' => 'draft',
             'organizer_id' => Employee::factory()->create()->id,
             'meeting_chair_id' => Employee::factory()->create()->id,
-            'unit_id' => Unit::factory()->create()->id,
             'room_id' => $room->id,
             'type' => 'diklat',
             'bank_soal_id' => $bankSoalA->id,
@@ -197,7 +191,6 @@ class AgendaSnapshotTest extends TestCase
             'status' => 'draft',
             'organizer_id' => Employee::factory()->create()->id,
             'meeting_chair_id' => Employee::factory()->create()->id,
-            'unit_id' => Unit::factory()->create()->id,
             'room_id' => $room->id,
             'type' => 'diklat',
             'bank_soal_id' => $bankSoalB->id,

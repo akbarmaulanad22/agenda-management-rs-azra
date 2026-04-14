@@ -34,7 +34,6 @@ class AttendanceTest extends TestCase
             'status' => 'active',
             'organizer_id' => $organizer->id,
             'meeting_chair_id' => $organizer->id,
-            'unit_id' => $unit->id,
             'room_id' => $room->id,
         ]);
 

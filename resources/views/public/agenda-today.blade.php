@@ -93,7 +93,7 @@
 
                                     {{-- Unit --}}
                                     <td class="px-1 sm:px-4 py-2 sm:py-3.5">
-                                        <div class="truncate text-[11px] sm:text-sm text-gray-500">{{ $agenda->unit->name ?? '-' }}</div>
+                                        <div class="truncate text-[11px] sm:text-sm text-gray-500">{{ $agenda->organizer?->unit?->name ?? '-' }}</div>
                                     </td>
 
                                     {{-- Hadir --}}
@@ -147,7 +147,7 @@
                                         </div>
                                         <div>
                                             <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Unit</span>
-                                            <p class="text-xs font-semibold text-gray-700 mt-0.5">{{ $agenda->unit->name ?? '-' }}</p>
+                                            <p class="text-xs font-semibold text-gray-700 mt-0.5">{{ $agenda->organizer?->unit?->name ?? '-' }}</p>
                                         </div>
                                         <div>
                                             <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Hadir</span>
@@ -199,9 +199,9 @@
             return [
                 'id' => $a->id,
                 'title' => $a->title,
-                'organizer' => $a->organizer->full_name,
+                'organizer' => $a->organizer?->full_name ?? '',
                 'room' => $a->room->room_name ?? '',
-                'unit' => $a->unit->name ?? '',
+                'unit' => $a->organizer?->unit?->name ?? '',
                 'description' => $a->description ?? ''
             ];
         });

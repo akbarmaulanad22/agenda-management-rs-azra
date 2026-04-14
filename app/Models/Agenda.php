@@ -21,7 +21,6 @@ class Agenda extends Model
         'status',
         'organizer_id',
         'meeting_chair_id',
-        'unit_id',
         'room_id',
         'letter_file_path',
         'material_file_path',
@@ -39,11 +38,6 @@ class Agenda extends Model
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
-    }
-
-    public function unit(): BelongsTo
-    {
-        return $this->belongsTo(Unit::class);
     }
 
     public function organizer(): BelongsTo

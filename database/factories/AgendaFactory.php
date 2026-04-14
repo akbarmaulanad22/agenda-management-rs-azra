@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\Agenda;
 use App\Models\Employee;
 use App\Models\Room;
-use App\Models\Unit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AgendaFactory extends Factory
@@ -22,7 +21,6 @@ class AgendaFactory extends Factory
             'status' => 'draft',
             'organizer_id' => Employee::factory(),
             'meeting_chair_id' => Employee::factory(),
-            'unit_id' => Unit::factory(),
             'room_id' => Room::factory(),
             'type' => 'rapat',
         ];

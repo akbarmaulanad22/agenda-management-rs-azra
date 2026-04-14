@@ -57,8 +57,8 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->event_date->translatedFormat('d M Y') }}</td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->room->room_name ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->organizer->full_name ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->unit->name ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->organizer?->full_name ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->organizer?->unit?->name ?? '-' }}</td>
                             <td class="px-6 py-4">
                                 @if($agenda->status === 'draft')
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600">Draft</span>

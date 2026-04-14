@@ -25,9 +25,9 @@ class EmployeeRecapTest extends TestCase
             'full_name' => 'Andi Rekap',
         ]);
 
-        $agendaOne = $this->createAgenda($unit->id, $room->id, $organizer->id, '2026-04-10', '08:00', '10:00');
-        $agendaTwo = $this->createAgenda($unit->id, $room->id, $organizer->id, '2026-04-11', '13:00', '14:30');
-        $agendaUnsigned = $this->createAgenda($unit->id, $room->id, $organizer->id, '2026-04-12', '09:00', '11:00');
+        $agendaOne = $this->createAgenda($room->id, $organizer->id, '2026-04-10', '08:00', '10:00');
+        $agendaTwo = $this->createAgenda($room->id, $organizer->id, '2026-04-11', '13:00', '14:30');
+        $agendaUnsigned = $this->createAgenda($room->id, $organizer->id, '2026-04-12', '09:00', '11:00');
 
         $agendaOne->employees()->attach($employee->id, ['signature_image_path' => 'signatures/a.png']);
         $agendaTwo->employees()->attach($employee->id, ['signature_image_path' => 'signatures/b.png']);
@@ -60,9 +60,9 @@ class EmployeeRecapTest extends TestCase
             'nip' => '100000000000000002',
         ]);
 
-        $oldAgenda = $this->createAgenda($unitA->id, $room->id, $organizer->id, '2026-04-10', '08:00', '10:00');
-        $filteredAgenda = $this->createAgenda($unitA->id, $room->id, $organizer->id, '2026-04-13', '09:00', '10:00');
-        $otherUnitAgenda = $this->createAgenda($unitB->id, $room->id, $organizer->id, '2026-04-13', '09:00', '12:00');
+        $oldAgenda = $this->createAgenda($room->id, $organizer->id, '2026-04-10', '08:00', '10:00');
+        $filteredAgenda = $this->createAgenda($room->id, $organizer->id, '2026-04-13', '09:00', '10:00');
+        $otherUnitAgenda = $this->createAgenda($room->id, $organizer->id, '2026-04-13', '09:00', '12:00');
 
         $oldAgenda->employees()->attach($employeeA->id, ['signature_image_path' => 'signatures/old.png']);
         $filteredAgenda->employees()->attach($employeeA->id, ['signature_image_path' => 'signatures/filter.png']);
@@ -84,7 +84,6 @@ class EmployeeRecapTest extends TestCase
     }
 
     private function createAgenda(
-        int $unitId,
         int $roomId,
         int $organizerId,
         string $date,
@@ -92,7 +91,6 @@ class EmployeeRecapTest extends TestCase
         string $endTime
     ): Agenda {
         return Agenda::factory()->create([
-            'unit_id' => $unitId,
             'room_id' => $roomId,
             'organizer_id' => $organizerId,
             'meeting_chair_id' => $organizerId,

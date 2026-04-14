@@ -11,7 +11,6 @@ use App\Models\BankSoal;
 use App\Models\Employee;
 use App\Models\Question;
 use App\Models\Room;
-use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -23,7 +22,6 @@ class AgendaTypeChangeTest extends TestCase
     private function validAgendaData(array $overrides = []): array
     {
         $room = Room::factory()->create();
-        $unit = Unit::factory()->create();
         $organizer = Employee::factory()->create();
         $chair = Employee::factory()->create();
 
@@ -34,7 +32,6 @@ class AgendaTypeChangeTest extends TestCase
             'status' => 'active',
             'organizer_id' => $organizer->id,
             'meeting_chair_id' => $chair->id,
-            'unit_id' => $unit->id,
             'room_id' => $room->id,
             'type' => 'rapat',
         ], $overrides);
@@ -97,7 +94,6 @@ class AgendaTypeChangeTest extends TestCase
             'status' => $agenda->status,
             'organizer_id' => $agenda->organizer_id,
             'meeting_chair_id' => $agenda->meeting_chair_id,
-            'unit_id' => $agenda->unit_id,
             'room_id' => $agenda->room_id,
             'type' => $agenda->type,
             'bank_soal_id' => $agenda->bank_soal_id,

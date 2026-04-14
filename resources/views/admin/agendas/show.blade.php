@@ -124,7 +124,7 @@
                             </svg>
                             <span class="text-[11px] font-semibold text-gray-400 uppercase">Penyelenggara</span>
                         </div>
-                        <p class="text-sm font-bold text-gray-800">{{ $agenda->organizer->full_name ?? '-' }}</p>
+                        <p class="text-sm font-bold text-gray-800">{{ $agenda->organizer?->full_name ?? '-' }}</p>
                     </div>
                     <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
                         <div class="flex items-center gap-2 mb-1.5">
@@ -135,7 +135,7 @@
                             </svg>
                             <span class="text-[11px] font-semibold text-gray-400 uppercase">Unit</span>
                         </div>
-                        <p class="text-sm font-bold text-gray-800">{{ $agenda->unit->name ?? '-' }}</p>
+                        <p class="text-sm font-bold text-gray-800">{{ $agenda->organizer?->unit?->name ?? '-' }}</p>
                     </div>
                     <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
                         <div class="flex items-center gap-2 mb-1.5">
@@ -656,3 +656,4 @@
         </template>
     </div>
 </x-app-layout>
+
