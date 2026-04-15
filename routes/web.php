@@ -31,6 +31,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('employees', EmployeeController::class);
     Route::get('employee-recaps', [EmployeeRecapController::class, 'index'])->name('employee-recaps.index');
     Route::get('employee-recaps/export-csv', [EmployeeRecapController::class, 'exportCsv'])->name('employee-recaps.export-csv');
+    Route::get('employee-recaps/{employee}/agendas', [EmployeeRecapController::class, 'agendas'])->name('employee-recaps.agendas.index');
+    Route::get('employee-recaps/{employee}/agendas/export-csv', [EmployeeRecapController::class, 'exportAgendasCsv'])->name('employee-recaps.agendas.export-csv');
     Route::resource('rooms', RoomController::class);
     Route::get('agendas/export-csv', [AgendaController::class, 'exportCsv'])->name('agendas.export-csv');
     Route::resource('agendas', AgendaController::class);

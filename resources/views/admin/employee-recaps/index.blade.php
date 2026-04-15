@@ -94,6 +94,7 @@
                         <th class="px-6 py-4 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Ikut Agenda</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Jam Rapat</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Jam Diklat/Pelatihan</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -106,7 +107,9 @@
                                         {{ strtoupper(substr($employee->full_name, 0, 1)) }}
                                     </div>
                                     <div>
-                                        <p class="text-sm font-semibold text-gray-800">{{ $employee->full_name }}</p>
+                                        <a href="{{ route('admin.employee-recaps.agendas.index', $employee->id) }}" class="text-sm font-semibold text-gray-800 hover:text-primary transition-colors">
+                                            {{ $employee->full_name }}
+                                        </a>
                                         <p class="text-xs text-gray-400">{{ $employee->profession }}</p>
                                     </div>
                                 </div>
@@ -124,10 +127,18 @@
                             <td class="px-6 py-4 text-right text-sm font-semibold text-gray-800">
                                 {{ number_format($employee->training_hours, 2, ',', '.') }} jam
                             </td>
+                            <td class="px-6 py-4 text-right">
+                                <a
+                                    href="{{ route('admin.employee-recaps.agendas.index', $employee->id) }}"
+                                    class="p-2 rounded-xl hover:bg-blue-50 text-gray-400 hover:text-blue-500 transition-colors"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </a>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center">
+                            <td colspan="8" class="px-6 py-12 text-center">
                                 <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
                                     <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.503 3.503 12 4.125 12h2.25c.622 0 1.125.503 1.125 1.125V20.25H3v-7.125zM9.75 8.625c0-.622.503-1.125 1.125-1.125h2.25c.622 0 1.125.503 1.125 1.125v11.625H9.75V8.625zM16.5 4.125C16.5 3.503 17.003 3 17.625 3h2.25C20.497 3 21 3.503 21 4.125V20.25h-4.5V4.125z"/></svg>
                                 </div>

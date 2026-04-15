@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
 use App\Models\Unit;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\JoinClause;
@@ -73,6 +74,71 @@ class EmployeeRecapController extends Controller
         ]);
     }
 
+    public function agendas(Employee $employee, Request $request)
+    {
+        $employee->load('unit');
+
+        $agendas = $this->buildOrderedAggregateAgendaQuery($employee, $request)
+            ->cursorPaginate(15, ['*'], 'agenda_cursor')
+            ->withQueryString();
+
+        $summaryRow = DB::query()
+            ->fromSub($this->buildAggregateAgendaQuery($employee, $request), 'employee_agendas')
+            ->selectRaw('COUNT(*) as agenda_count')
+            ->selectRaw('MIN(event_date) as first_event_date')
+            ->selectRaw('MAX(event_date) as last_event_date')
+            ->first();
+
+        $summary = [
+            'agenda_count' => (int) ($summaryRow->agenda_count ?? 0),
+            'first_event_date' => $summaryRow->first_event_date,
+            'last_event_date' => $summaryRow->last_event_date,
+        ];
+
+        return view('admin.employee-recaps.agendas', compact('employee', 'agendas', 'summary'));
+    }
+
+    public function exportAgendasCsv(Employee $employee, Request $request)
+    {
+        $filename = 'agenda-diikuti-' . str($employee->full_name)->slug() . '-' . now()->format('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function () use ($employee, $request) {
+            $file = fopen('php://output', 'w');
+
+            fwrite($file, "\xEF\xBB\xBF");
+
+            fputcsv($file, [
+                'Judul Agenda',
+                'Deskripsi',
+                'Tanggal',
+                'Jam Mulai',
+                'Jam Selesai',
+                'Penyelenggara',
+                'Unit',
+                'Pimpinan Rapat',
+                'Ruangan',
+            ]);
+
+            foreach ($this->buildOrderedAggregateAgendaQuery($employee, $request)->cursor() as $row) {
+                fputcsv($file, [
+                    $row->title,
+                    $this->sanitizeCsvText($row->description),
+                    $row->event_date,
+                    $this->formatTime($row->event_time),
+                    $this->formatTime($row->event_end_time),
+                    $row->organizer_name ?? '-',
+                    $row->unit_name ?? '-',
+                    $row->meeting_chair_name ?? '-',
+                    $row->room_name ?? '-',
+                ]);
+            }
+
+            fclose($file);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
     private function buildOrderedAggregateRecapQuery(Request $request): QueryBuilder
     {
         return $this->buildAggregateRecapQuery($request)
@@ -128,6 +194,70 @@ class EmployeeRecapController extends Controller
             );
     }
 
+    private function buildOrderedAggregateAgendaQuery(Employee $employee, Request $request): QueryBuilder
+    {
+        return $this->buildAggregateAgendaQuery($employee, $request)
+            ->orderByDesc('event_date')
+            ->orderByDesc('event_time')
+            ->orderByDesc('agenda_id');
+    }
+
+    private function buildAggregateAgendaQuery(Employee $employee, Request $request): QueryBuilder
+    {
+        $search = trim((string) $request->input('search'));
+        $searchOperator = $this->searchOperator();
+
+        return DB::table('agenda_employee')
+            ->join('agendas', 'agendas.id', '=', 'agenda_employee.agenda_id')
+            ->leftJoin('employees as organizers', 'organizers.id', '=', 'agendas.organizer_id')
+            ->leftJoin('units', 'units.id', '=', 'organizers.unit_id')
+            ->leftJoin('employees as meeting_chairs', 'meeting_chairs.id', '=', 'agendas.meeting_chair_id')
+            ->leftJoin('rooms', 'rooms.id', '=', 'agendas.room_id')
+            ->selectRaw('MAX(agenda_employee.id) as agenda_employee_id')
+            ->select([
+                'agendas.id as agenda_id',
+                'agendas.title',
+                'agendas.description',
+                'agendas.event_date',
+                'agendas.event_time',
+                'agendas.event_end_time',
+                'organizers.full_name as organizer_name',
+                'units.name as unit_name',
+                'meeting_chairs.full_name as meeting_chair_name',
+                'rooms.room_name',
+            ])
+            ->where('agenda_employee.employee_id', $employee->id)
+            ->whereNotNull('agenda_employee.signature_image_path')
+            ->when($search !== '', function (QueryBuilder $query) use ($search, $searchOperator) {
+                $query->where(function (QueryBuilder $query) use ($search, $searchOperator) {
+                    $query->where('agendas.title', $searchOperator, "%{$search}%")
+                        ->orWhere('agendas.description', $searchOperator, "%{$search}%")
+                        ->orWhere('organizers.full_name', $searchOperator, "%{$search}%")
+                        ->orWhere('meeting_chairs.full_name', $searchOperator, "%{$search}%")
+                        ->orWhere('units.name', $searchOperator, "%{$search}%")
+                        ->orWhere('rooms.room_name', $searchOperator, "%{$search}%");
+                });
+            })
+            ->when($request->filled('date_from'), function (QueryBuilder $query) use ($request) {
+                $query->where('agendas.event_date', '>=', $request->input('date_from'));
+            })
+            ->when($request->filled('date_to'), function (QueryBuilder $query) use ($request) {
+                $query->where('agendas.event_date', '<=', $request->input('date_to'));
+            })
+            ->groupBy(
+                'agendas.id',
+                'agendas.title',
+                'agendas.description',
+                'agendas.event_date',
+                'agendas.event_time',
+                'agendas.event_end_time',
+                'organizers.full_name',
+                'units.name',
+                'meeting_chairs.full_name',
+                'rooms.room_name'
+            );
+    }
+
     private function applyAggregateAgendaFilters(JoinClause $join, Request $request): void
     {
         $join
@@ -152,4 +282,25 @@ class EmployeeRecapController extends Controller
     {
         return DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
     }
+
+    private function formatTime(?string $time): string
+    {
+        if ($time === null || $time === '') {
+            return '-';
+        }
+
+        return substr($time, 0, 5);
+    }
+
+    private function sanitizeCsvText(?string $value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        $value = preg_replace("/\\r\\n|\\r|\\n/", ' ', $value);
+
+        return preg_replace('/[ \\t]+/', ' ', trim($value)) ?? '';
+    }
 }
+

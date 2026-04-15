@@ -217,7 +217,7 @@ class AgendaController extends Controller
             foreach (Agenda::with(['organizer.unit', 'meetingChair'])->latest()->cursor() as $agenda) {
                 fputcsv($file, [
                     $agenda->title,
-                    $agenda->description,
+                    $this->sanitizeCsvText($agenda->description),
                     $agenda->type,
                     $agenda->event_date->format('Y-m-d'),
                     $agenda->event_time,
@@ -486,6 +486,17 @@ class AgendaController extends Controller
         return redirect()
             ->route("admin.agendas.index")
             ->with("success", "Agenda berhasil dihapus.");
+    }
+
+    private function sanitizeCsvText(?string $value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        $value = preg_replace("/\\r\\n|\\r|\\n/", ' ', $value);
+
+        return preg_replace('/[ \\t]+/', ' ', trim($value)) ?? '';
     }
 
     private function buildQuizComparison(Agenda $agenda): Collection
