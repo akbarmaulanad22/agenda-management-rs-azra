@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UnitController extends Controller
 {
@@ -18,18 +19,22 @@ class UnitController extends Controller
             ]);
         }
 
-        $query = Unit::orderBy('name');
+        $search = trim((string) $request->input('q'));
+        $operator = $this->searchOperator();
 
-        if ($request->filled('q')) {
-            $query->where('name', 'ilike', '%' . $request->q . '%');
+        $query = Unit::query()->orderBy('name');
+
+        if ($search !== '') {
+            $query->where('name', $operator, "%{$search}%");
         }
 
-        $units = $query->take(11)->get();
-        $hasMore = $units->count() > 10;
+        $units = $query->simplePaginate(10);
 
         return response()->json([
-            'items' => $units->take(10)->map(fn ($u) => ['id' => $u->id, 'name' => $u->name]),
-            'has_more' => $hasMore,
+            'items' => collect($units->items())
+                ->map(fn (Unit $unit) => ['id' => $unit->id, 'name' => $unit->name])
+                ->values(),
+            'has_more' => $units->hasMorePages(),
         ]);
     }
 
@@ -80,5 +85,10 @@ class UnitController extends Controller
 
         return redirect()->route('admin.units.index')
             ->with('success', 'Unit berhasil dihapus.');
+    }
+
+    private function searchOperator(): string
+    {
+        return DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
     }
 }

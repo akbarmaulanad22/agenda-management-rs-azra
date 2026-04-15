@@ -28,17 +28,21 @@ Route::middleware('auth')->group(function () {
 
 // Admin routes
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+    Route::get('employees/search', [EmployeeController::class, 'search'])->name('employees.search');
     Route::resource('employees', EmployeeController::class);
     Route::get('employee-recaps', [EmployeeRecapController::class, 'index'])->name('employee-recaps.index');
     Route::get('employee-recaps/export-csv', [EmployeeRecapController::class, 'exportCsv'])->name('employee-recaps.export-csv');
     Route::get('employee-recaps/{employee}/agendas', [EmployeeRecapController::class, 'agendas'])->name('employee-recaps.agendas.index');
     Route::get('employee-recaps/{employee}/agendas/export-csv', [EmployeeRecapController::class, 'exportAgendasCsv'])->name('employee-recaps.agendas.export-csv');
+    Route::get('rooms/search', [RoomController::class, 'search'])->name('rooms.search');
     Route::resource('rooms', RoomController::class);
     Route::get('agendas/export-csv', [AgendaController::class, 'exportCsv'])->name('agendas.export-csv');
+    Route::get('agendas/types/search', [AgendaController::class, 'searchTypes'])->name('agendas.types.search');
     Route::resource('agendas', AgendaController::class);
     Route::get('agendas/{agenda}/export-pdf', [AgendaController::class, 'exportPdf'])->name('agendas.export-pdf');
     Route::get('units/search', [UnitController::class, 'search'])->name('units.search');
     Route::resource('units', UnitController::class);
+    Route::get('bank-soals/search', [BankSoalController::class, 'search'])->name('bank-soals.search');
     Route::resource('bank-soals', BankSoalController::class);
 });
 

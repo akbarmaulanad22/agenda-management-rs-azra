@@ -4,9 +4,48 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
+    public function search(Request $request)
+    {
+        if ($request->filled('id')) {
+            $employee = Employee::find($request->id);
+
+            return response()->json([
+                'items' => $employee ? [[
+                    'id' => $employee->id,
+                    'name' => $employee->full_name,
+                ]] : [],
+                'has_more' => false,
+            ]);
+        }
+
+        $search = trim((string) $request->input('q'));
+        $operator = $this->searchOperator();
+
+        $employees = Employee::query()
+            ->orderBy('full_name')
+            ->when($search !== '', function ($query) use ($search, $operator) {
+                $query->where(function ($query) use ($search, $operator) {
+                    $query->where('full_name', $operator, "%{$search}%")
+                        ->orWhere('nip', $operator, "%{$search}%");
+                });
+            })
+            ->simplePaginate(10);
+
+        return response()->json([
+            'items' => collect($employees->items())
+                ->map(fn (Employee $employee) => [
+                    'id' => $employee->id,
+                    'name' => $employee->full_name,
+                ])
+                ->values(),
+            'has_more' => $employees->hasMorePages(),
+        ]);
+    }
+
     public function index()
     {
         $employees = Employee::with('unit')->orderBy("full_name")->paginate(15);
@@ -70,5 +109,10 @@ class EmployeeController extends Controller
         return redirect()
             ->route("admin.employees.index")
             ->with("success", "Pegawai berhasil dihapus.");
+    }
+
+    private function searchOperator(): string
+    {
+        return DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
     }
 }

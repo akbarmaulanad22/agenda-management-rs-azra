@@ -11,13 +11,23 @@
     x-data="{
         open: false,
         search: '',
-        selectedId: '{{ $selectedId ?? '' }}',
-        selectedLabel: '{{ $selectedLabel ?? '' }}',
-        searchUrl: '{{ $searchUrl }}',
+        name: @js($name),
+        selectedId: @js($selectedId ?? ''),
+        selectedLabel: @js($selectedLabel ?? ''),
+        searchUrl: @js($searchUrl),
+        requiredMessage: @js($required ? 'Pilih salah satu opsi' : ''),
         items: [],
         hasMore: false,
         loading: false,
         debounceTimer: null,
+
+        notifyChange() {
+            this.$dispatch('searchable-select-change', {
+                name: this.name,
+                value: this.selectedId,
+                label: this.selectedLabel,
+            });
+        },
 
         async fetchItems(query = '') {
             this.loading = true;
@@ -38,6 +48,7 @@
                 if (data.items.length) {
                     this.search = data.items[0].name;
                     this.selectedLabel = data.items[0].name;
+                    this.notifyChange();
                 }
             } catch {}
         },
@@ -45,16 +56,20 @@
         select(item) {
             this.selectedId = item.id;
             this.search = item.name;
+            this.selectedLabel = item.name;
             this.open = false;
             this.$refs.searchInput.setCustomValidity('');
+            this.notifyChange();
         },
 
         onInput() {
             this.selectedId = '';
+            this.selectedLabel = '';
             this.open = true;
-            this.$refs.searchInput.setCustomValidity('{{ $required ? 'Pilih salah satu opsi' : '' }}');
+            this.$refs.searchInput.setCustomValidity(this.requiredMessage);
             clearTimeout(this.debounceTimer);
             this.debounceTimer = setTimeout(() => this.fetchItems(this.search), 300);
+            this.notifyChange();
         },
 
         onFocus() {
@@ -80,16 +95,17 @@
         init() {
             if (this.selectedId && this.selectedLabel) {
                 this.search = this.selectedLabel;
+                this.notifyChange();
             } else if (this.selectedId) {
                 this.resolveLabel();
             }
 
             @if($required)
             this.$watch('selectedId', (val) => {
-                this.$refs.searchInput.setCustomValidity(val ? '' : 'Pilih salah satu opsi');
+                this.$refs.searchInput.setCustomValidity(val ? '' : this.requiredMessage);
             });
             if (!this.selectedId) {
-                this.$nextTick(() => this.$refs.searchInput.setCustomValidity('Pilih salah satu opsi'));
+                this.$nextTick(() => this.$refs.searchInput.setCustomValidity(this.requiredMessage));
             }
             @endif
         }

@@ -4,9 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RoomController extends Controller
 {
+    public function search(Request $request)
+    {
+        if ($request->filled('id')) {
+            $room = Room::find($request->id);
+
+            return response()->json([
+                'items' => $room ? [[
+                    'id' => $room->id,
+                    'name' => $room->room_name,
+                ]] : [],
+                'has_more' => false,
+            ]);
+        }
+
+        $search = trim((string) $request->input('q'));
+        $operator = $this->searchOperator();
+
+        $rooms = Room::query()
+            ->orderBy('room_name')
+            ->when($search !== '', function ($query) use ($search, $operator) {
+                $query->where('room_name', $operator, "%{$search}%");
+            })
+            ->simplePaginate(10);
+
+        return response()->json([
+            'items' => collect($rooms->items())
+                ->map(fn (Room $room) => [
+                    'id' => $room->id,
+                    'name' => $room->room_name,
+                ])
+                ->values(),
+            'has_more' => $rooms->hasMorePages(),
+        ]);
+    }
+
     public function index()
     {
         $rooms = Room::latest()->paginate(15);
@@ -56,5 +92,10 @@ class RoomController extends Controller
 
         return redirect()->route('admin.rooms.index')
             ->with('success', 'Ruangan berhasil dihapus.');
+    }
+
+    private function searchOperator(): string
+    {
+        return DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
     }
 }

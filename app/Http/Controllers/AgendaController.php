@@ -4,10 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agenda;
 use App\Models\AgendaQuestionAnswer;
-use App\Models\BankSoal;
-use App\Models\Employee;
 use App\Models\Question;
-use App\Models\Room;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -24,11 +21,47 @@ class AgendaController extends Controller
 
     public function create()
     {
-        $rooms = Room::all();
-        $bankSoals = BankSoal::all();
-        $employees = Employee::orderBy('full_name')->get();
+        return view("admin.agendas.create");
+    }
 
-        return view("admin.agendas.create", compact("rooms", "bankSoals", "employees"));
+    public function searchTypes(Request $request)
+    {
+        $types = collect([
+            ['id' => 'rapat', 'name' => 'Rapat'],
+            ['id' => 'diklat', 'name' => 'Diklat'],
+            ['id' => 'pelatihan', 'name' => 'Pelatihan'],
+        ]);
+
+        if ($request->filled('id')) {
+            $type = $types->firstWhere('id', (string) $request->id);
+
+            return response()->json([
+                'items' => $type ? [$type] : [],
+                'has_more' => false,
+            ]);
+        }
+
+        $search = strtolower(trim((string) $request->input('q')));
+
+        $filtered = $types
+            ->filter(function (array $type) use ($search) {
+                if ($search === '') {
+                    return true;
+                }
+
+                return str_contains(strtolower($type['id']), $search)
+                    || str_contains(strtolower($type['name']), $search);
+            })
+            ->values();
+
+        $perPage = 10;
+        $page = max(1, (int) $request->input('page', 1));
+        $items = $filtered->forPage($page, $perPage)->values();
+
+        return response()->json([
+            'items' => $items,
+            'has_more' => $filtered->count() > ($page * $perPage),
+        ]);
     }
 
     public function store(Request $request)
@@ -113,11 +146,7 @@ class AgendaController extends Controller
 
     public function edit(Agenda $agenda)
     {
-        $rooms = Room::all();
-        $bankSoals = BankSoal::all();
-        $employees = Employee::orderBy('full_name')->get();
-
-        return view("admin.agendas.edit", compact("agenda", "rooms", "bankSoals", "employees"));
+        return view("admin.agendas.edit", compact("agenda"));
     }
 
     public function update(Request $request, Agenda $agenda)
@@ -550,3 +579,4 @@ class AgendaController extends Controller
         })->sortBy('employee.full_name')->values();
     }
 }
+

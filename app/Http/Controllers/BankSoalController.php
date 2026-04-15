@@ -4,9 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Models\BankSoal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BankSoalController extends Controller
 {
+    public function search(Request $request)
+    {
+        if ($request->filled('id')) {
+            $bankSoal = BankSoal::find($request->id);
+
+            return response()->json([
+                'items' => $bankSoal ? [[
+                    'id' => $bankSoal->id,
+                    'name' => $bankSoal->title,
+                ]] : [],
+                'has_more' => false,
+            ]);
+        }
+
+        $search = trim((string) $request->input('q'));
+        $operator = $this->searchOperator();
+
+        $bankSoals = BankSoal::query()
+            ->orderBy('title')
+            ->when($search !== '', function ($query) use ($search, $operator) {
+                $query->where('title', $operator, "%{$search}%");
+            })
+            ->simplePaginate(10);
+
+        return response()->json([
+            'items' => collect($bankSoals->items())
+                ->map(fn (BankSoal $bankSoal) => [
+                    'id' => $bankSoal->id,
+                    'name' => $bankSoal->title,
+                ])
+                ->values(),
+            'has_more' => $bankSoals->hasMorePages(),
+        ]);
+    }
+
     public function index()
     {
         $bankSoals = BankSoal::withCount('questions')->latest()->paginate(15);
@@ -95,5 +131,10 @@ class BankSoalController extends Controller
         return redirect()
             ->route('admin.bank-soals.index')
             ->with('success', 'Bank soal berhasil dihapus.');
+    }
+
+    private function searchOperator(): string
+    {
+        return DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
     }
 }

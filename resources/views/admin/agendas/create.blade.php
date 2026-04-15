@@ -13,7 +13,11 @@
                 <h3 class="text-lg font-bold text-gray-900">Buat Agenda Baru</h3>
                 <p class="text-sm text-gray-400 mt-0.5">Lengkapi informasi agenda rapat</p>
             </div>
-            <div class="p-8" x-data="{ type: '{{ old('type', 'rapat') }}' }">
+            <div
+                class="p-8"
+                x-data="{ type: '{{ old('type', 'rapat') }}' }"
+                @searchable-select-change.window="if ($event.detail.name === 'type') type = $event.detail.value || ''"
+            >
                 <form action="{{ route('admin.agendas.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                     @csrf
 
@@ -79,107 +83,61 @@
                             </div>
 
                             <div>
-                                <div x-data="{
-                                    open: false, search: '', selectedId: '{{ old('organizer_id', '') }}',
-                                    items: {{ Js::from($employees) }},
-                                    get filtered() { return this.search ? this.items.filter(e => e.full_name.toLowerCase().includes(this.search.toLowerCase())) : this.items; },
-                                    select(e) { this.selectedId = e.id; this.search = e.full_name; this.open = false; },
-                                    onEnter() { if (this.filtered.length === 1) this.select(this.filtered[0]); },
-                                    onBlur() { setTimeout(() => { if (!this.selectedId) this.search = ''; }, 200); },
-                                    init() { if (this.selectedId) { const f = this.items.find(e => e.id == this.selectedId); if (f) this.search = f.full_name; } }
-                                }" @click.outside="open = false" class="relative">
-                                    <label for="organizer_search" class="block text-sm font-semibold text-gray-700 mb-2">Penyelenggara</label>
-                                    <input type="hidden" name="organizer_id" :value="selectedId">
-                                    <input type="text" id="organizer_search" x-model="search" @focus="open = true" @click="open = true" @input="open = true; selectedId = ''" @blur="onBlur()" @keydown.enter.prevent="onEnter()" placeholder="Cari pegawai..." autocomplete="off" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
-                                    <div x-show="open && filtered.length > 0" x-transition class="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-2xl shadow-lg max-h-48 overflow-y-auto">
-                                        <template x-for="emp in filtered" :key="emp.id">
-                                            <button type="button" @click="select(emp)" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary transition-colors first:rounded-t-2xl last:rounded-b-2xl" x-text="emp.full_name"></button>
-                                        </template>
-                                    </div>
-                                    @error('organizer_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                                </div>
+                                <label for="organizer_id" class="block text-sm font-semibold text-gray-700 mb-2">Penyelenggara</label>
+                                <x-searchable-select
+                                    name="organizer_id"
+                                    search-url="{{ route('admin.employees.search') }}"
+                                    :selected-id="old('organizer_id')"
+                                    placeholder="Cari pegawai..."
+                                    required
+                                />
+                                @error('organizer_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                             </div>
 
-                            <div x-data="{
-                                open: false, search: '', selectedId: '{{ old('meeting_chair_id', '') }}',
-                                items: {{ Js::from($employees) }},
-                                get filtered() { return this.search ? this.items.filter(e => e.full_name.toLowerCase().includes(this.search.toLowerCase())) : this.items; },
-                                select(e) { this.selectedId = e.id; this.search = e.full_name; this.open = false; },
-                                onEnter() { if (this.filtered.length === 1) this.select(this.filtered[0]); },
-                                onBlur() { setTimeout(() => { if (!this.selectedId) this.search = ''; }, 200); },
-                                init() { if (this.selectedId) { const f = this.items.find(e => e.id == this.selectedId); if (f) this.search = f.full_name; } }
-                            }" @click.outside="open = false" class="relative">
-                                <label for="chair_search" class="block text-sm font-semibold text-gray-700 mb-2">Pimpinan Rapat</label>
-                                <input type="hidden" name="meeting_chair_id" :value="selectedId">
-                                <input type="text" id="chair_search" x-model="search" @focus="open = true" @click="open = true" @input="open = true; selectedId = ''" @blur="onBlur()" @keydown.enter.prevent="onEnter()" placeholder="Cari pegawai..." autocomplete="off" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
-                                <div x-show="open && filtered.length > 0" x-transition class="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-2xl shadow-lg max-h-48 overflow-y-auto">
-                                    <template x-for="emp in filtered" :key="emp.id">
-                                        <button type="button" @click="select(emp)" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary transition-colors first:rounded-t-2xl last:rounded-b-2xl" x-text="emp.full_name"></button>
-                                    </template>
-                                </div>
+                            <div>
+                                <label for="meeting_chair_id" class="block text-sm font-semibold text-gray-700 mb-2">Pimpinan Rapat</label>
+                                <x-searchable-select
+                                    name="meeting_chair_id"
+                                    search-url="{{ route('admin.employees.search') }}"
+                                    :selected-id="old('meeting_chair_id')"
+                                    placeholder="Cari pegawai..."
+                                    required
+                                />
                                 @error('meeting_chair_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                             </div>
 
-                            <div x-data="{
-                                open: false,
-                                search: '',
-                                selectedId: '{{ old('room_id', '') }}',
-                                rooms: {{ Js::from($rooms) }},
-                                get filtered() {
-                                    if (!this.search) return this.rooms;
-                                    return this.rooms.filter(r => r.room_name.toLowerCase().includes(this.search.toLowerCase()));
-                                },
-                                select(room) {
-                                    this.selectedId = room.id;
-                                    this.search = room.room_name;
-                                    this.open = false;
-                                },
-                                onEnter() {
-                                    if (this.filtered.length === 1) {
-                                        this.select(this.filtered[0]);
-                                    }
-                                },
-                                onBlur() {
-                                    setTimeout(() => {
-                                        if (!this.selectedId) this.search = '';
-                                    }, 200);
-                                },
-                                init() {
-                                    if (this.selectedId) {
-                                        const found = this.rooms.find(r => r.id == this.selectedId);
-                                        if (found) this.search = found.room_name;
-                                    }
-                                }
-                            }" @click.outside="open = false" class="relative">
-                                <label for="room_search" class="block text-sm font-semibold text-gray-700 mb-2">Ruangan</label>
-                                <input type="hidden" name="room_id" :value="selectedId">
-                                <input type="text" id="room_search" x-model="search" @focus="open = true" @click="open = true" @input="open = true; selectedId = ''" @blur="onBlur()" @keydown.enter.prevent="onEnter()" placeholder="Cari ruangan..." autocomplete="off" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
-                                <div x-show="open && filtered.length > 0" x-transition class="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-2xl shadow-lg max-h-48 overflow-y-auto">
-                                    <template x-for="room in filtered" :key="room.id">
-                                        <button type="button" @click="select(room)" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary transition-colors first:rounded-t-2xl last:rounded-b-2xl" x-text="room.room_name"></button>
-                                    </template>
-                                </div>
+                            <div>
+                                <label for="room_id" class="block text-sm font-semibold text-gray-700 mb-2">Ruangan</label>
+                                <x-searchable-select
+                                    name="room_id"
+                                    search-url="{{ route('admin.rooms.search') }}"
+                                    :selected-id="old('room_id')"
+                                    placeholder="Cari ruangan..."
+                                    required
+                                />
                                 @error('room_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
                                 <label for="type" class="block text-sm font-semibold text-gray-700 mb-2">Tipe Agenda</label>
-                                <select name="type" id="type" x-model="type" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
-                                    <option value="rapat">Rapat</option>
-                                    <option value="diklat">Diklat</option>
-                                    <option value="pelatihan">Pelatihan</option>
-                                </select>
+                                <x-searchable-select
+                                    name="type"
+                                    search-url="{{ route('admin.agendas.types.search') }}"
+                                    :selected-id="old('type')"
+                                    placeholder="Cari tipe agenda..."
+                                    required
+                                />
                                 @error('type') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                             </div>
 
                             <div x-show="type === 'diklat' || type === 'pelatihan'" x-transition>
                                 <label for="bank_soal_id" class="block text-sm font-semibold text-gray-700 mb-2">Template Bank Soal</label>
-                                <select name="bank_soal_id" id="bank_soal_id" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
-                                    <option value="">-- Pilih Bank Soal --</option>
-                                    @foreach($bankSoals as $bankSoal)
-                                        <option value="{{ $bankSoal->id }}" {{ old('bank_soal_id') == $bankSoal->id ? 'selected' : '' }}>{{ $bankSoal->title }}</option>
-                                    @endforeach
-                                </select>
+                                <x-searchable-select
+                                    name="bank_soal_id"
+                                    search-url="{{ route('admin.bank-soals.search') }}"
+                                    :selected-id="old('bank_soal_id')"
+                                    placeholder="Cari template bank soal..."
+                                />
                                 <p class="text-xs text-gray-400 mt-1">Soal akan disalin ke agenda ini sebagai snapshot</p>
                                 @error('bank_soal_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                             </div>

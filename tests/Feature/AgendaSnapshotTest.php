@@ -291,7 +291,7 @@ class AgendaSnapshotTest extends TestCase
         $response->assertSee('Diklat');
     }
 
-    public function test_create_page_loads_bank_soals(): void
+    public function test_create_page_uses_searchable_select_endpoints(): void
     {
         $user = User::factory()->create();
         BankSoal::factory()->create(['title' => 'Soal Matematika']);
@@ -299,6 +299,62 @@ class AgendaSnapshotTest extends TestCase
         $response = $this->actingAs($user)->get(route('admin.agendas.create'));
 
         $response->assertOk();
-        $response->assertSee('Soal Matematika');
+        $response->assertSee(str_replace('/', '\\/', route('admin.employees.search')), false);
+        $response->assertSee(str_replace('/', '\\/', route('admin.rooms.search')), false);
+        $response->assertSee(str_replace('/', '\\/', route('admin.agendas.types.search')), false);
+        $response->assertSee(str_replace('/', '\\/', route('admin.bank-soals.search')), false);
+        $response->assertDontSee('Soal Matematika');
+    }
+
+    public function test_employee_search_endpoint_returns_paginated_results(): void
+    {
+        $user = User::factory()->create();
+
+        Employee::factory()->count(12)->create();
+
+        $response = $this->actingAs($user)->getJson(route('admin.employees.search'));
+
+        $response->assertOk()
+            ->assertJsonCount(10, 'items')
+            ->assertJsonPath('has_more', true);
+    }
+
+    public function test_room_search_endpoint_returns_paginated_results(): void
+    {
+        $user = User::factory()->create();
+
+        Room::factory()->count(12)->create();
+
+        $response = $this->actingAs($user)->getJson(route('admin.rooms.search'));
+
+        $response->assertOk()
+            ->assertJsonCount(10, 'items')
+            ->assertJsonPath('has_more', true);
+    }
+
+    public function test_bank_soal_search_endpoint_returns_paginated_results(): void
+    {
+        $user = User::factory()->create();
+
+        BankSoal::factory()->count(12)->create();
+
+        $response = $this->actingAs($user)->getJson(route('admin.bank-soals.search'));
+
+        $response->assertOk()
+            ->assertJsonCount(10, 'items')
+            ->assertJsonPath('has_more', true);
+    }
+
+    public function test_agenda_type_search_endpoint_returns_backend_results(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->getJson(route('admin.agendas.types.search', ['q' => 'dik']));
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'items')
+            ->assertJsonPath('items.0.id', 'diklat')
+            ->assertJsonPath('items.0.name', 'Diklat')
+            ->assertJsonPath('has_more', false);
     }
 }
