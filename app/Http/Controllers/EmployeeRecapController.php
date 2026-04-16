@@ -72,7 +72,7 @@ class EmployeeRecapController extends Controller
                     fputcsv($file, [
                         $row->nip,
                         $row->full_name,
-                        $row->unit_name ?? "-",
+                        $row->unit_name,
                         $row->job_position,
                         (int) $row->attendance_count,
                         number_format((float) $row->training_hours, 2, ".", ""),
@@ -157,9 +157,9 @@ class EmployeeRecapController extends Controller
                         $row->event_date,
                         $this->formatTime($row->event_time),
                         $this->formatTime($row->event_end_time),
-                        $row->unit_name ?? "-",
-                        $row->event_leader_name ?? "-",
-                        $row->room_name ?? "-",
+                        $row->unit_name,
+                        $row->event_leader_name,
+                        $row->room_name,
                     ]);
                 }
 
@@ -183,11 +183,12 @@ class EmployeeRecapController extends Controller
     private function buildAggregateRecapQuery(Request $request): QueryBuilder
     {
         $search = trim((string) $request->input("search"));
+        $escapedSearch = $this->escapeLikeWildcards($search);
         $durationHoursSql = $this->durationHoursExpression();
         $searchOperator = $this->searchOperator();
 
         return DB::table("employees")
-            ->leftJoin("units", "units.id", "=", "employees.unit_id")
+            ->join("units", "units.id", "=", "employees.unit_id")
             ->leftJoin("agenda_employee", function (JoinClause $join) {
                 $join
                     ->on("agenda_employee.employee_id", "=", "employees.id")
@@ -213,30 +214,30 @@ class EmployeeRecapController extends Controller
                 "COALESCE(SUM(CASE WHEN agendas.type IN ('diklat', 'pelatihan') THEN {$durationHoursSql} ELSE 0 END), 0) as training_hours",
             )
             ->when($search !== "", function (QueryBuilder $query) use (
-                $search,
+                $escapedSearch,
                 $searchOperator,
             ) {
                 $query->where(function (QueryBuilder $query) use (
-                    $search,
+                    $escapedSearch,
                     $searchOperator,
                 ) {
                     $query
                         ->where(
                             "employees.full_name",
                             $searchOperator,
-                            "%{$search}%",
+                            "%{$escapedSearch}%",
                         )
                         ->orWhere(
                             "employees.nip",
                             $searchOperator,
-                            "%{$search}%",
+                            "%{$escapedSearch}%",
                         )
                         ->orWhere(
                             "employees.job_position",
                             $searchOperator,
-                            "%{$search}%",
+                            "%{$escapedSearch}%",
                         )
-                        ->orWhere("units.name", $searchOperator, "%{$search}%");
+                        ->orWhere("units.name", $searchOperator, "%{$escapedSearch}%");
                 });
             })
             ->when($request->filled("unit_id"), function (
@@ -272,18 +273,19 @@ class EmployeeRecapController extends Controller
         Request $request,
     ): QueryBuilder {
         $search = trim((string) $request->input("search"));
+        $escapedSearch = $this->escapeLikeWildcards($search);
         $searchOperator = $this->searchOperator();
 
         return DB::table("agenda_employee")
             ->join("agendas", "agendas.id", "=", "agenda_employee.agenda_id")
-            ->leftJoin("units", "units.id", "=", "agendas.unit_id")
-            ->leftJoin(
+            ->join("units", "units.id", "=", "agendas.unit_id")
+            ->join(
                 "employees as event_leader",
                 "event_leader.id",
                 "=",
                 "agendas.event_leader_id",
             )
-            ->leftJoin("rooms", "rooms.id", "=", "agendas.room_id")
+            ->join("rooms", "rooms.id", "=", "agendas.room_id")
             ->selectRaw("MAX(agenda_employee.id) as agenda_employee_id")
             ->select([
                 "agendas.id as agenda_id",
@@ -299,30 +301,30 @@ class EmployeeRecapController extends Controller
             ->where("agenda_employee.employee_id", $employee->id)
             ->whereNotNull("agenda_employee.signature_image_path")
             ->when($search !== "", function (QueryBuilder $query) use (
-                $search,
+                $escapedSearch,
                 $searchOperator,
             ) {
                 $query->where(function (QueryBuilder $query) use (
-                    $search,
+                    $escapedSearch,
                     $searchOperator,
                 ) {
                     $query
-                        ->where("agendas.title", $searchOperator, "%{$search}%")
+                        ->where("agendas.title", $searchOperator, "%{$escapedSearch}%")
                         ->orWhere(
                             "agendas.description",
                             $searchOperator,
-                            "%{$search}%",
+                            "%{$escapedSearch}%",
                         )
                         ->orWhere(
                             "event_leader.full_name",
                             $searchOperator,
-                            "%{$search}%",
+                            "%{$escapedSearch}%",
                         )
-                        ->orWhere("units.name", $searchOperator, "%{$search}%")
+                        ->orWhere("units.name", $searchOperator, "%{$escapedSearch}%")
                         ->orWhere(
                             "rooms.room_name",
                             $searchOperator,
-                            "%{$search}%",
+                            "%{$escapedSearch}%",
                         );
                 });
             })
@@ -397,6 +399,15 @@ class EmployeeRecapController extends Controller
     private function searchOperator(): string
     {
         return DB::connection()->getDriverName() === "pgsql" ? "ilike" : "like";
+    }
+
+    private function escapeLikeWildcards(string $value): string
+    {
+        return str_replace(
+            ["\\", "%", "_"],
+            ["\\\\", "\\%", "\\_"],
+            $value,
+        );
     }
 
     private function formatTime(?string $time): string

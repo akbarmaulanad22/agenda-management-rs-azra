@@ -19,6 +19,7 @@
         items: [],
         hasMore: false,
         loading: false,
+        fetched: false,
         debounceTimer: null,
 
         notifyChange() {
@@ -36,6 +37,7 @@
                 const { data } = await axios.get(this.searchUrl, { params });
                 this.items = data.items;
                 this.hasMore = data.has_more;
+                this.fetched = true;
             } finally {
                 this.loading = false;
             }
@@ -134,7 +136,7 @@
     </div>
 
     <div
-        x-show="open && (items.length > 0 || loading || (search && !loading))"
+        x-show="open && (loading || fetched)"
         x-transition:enter="transition ease-out duration-150"
         x-transition:enter-start="opacity-0 -translate-y-1"
         x-transition:enter-end="opacity-100 translate-y-0"
@@ -170,7 +172,7 @@
                 </div>
 
                 <div
-                    x-show="search && items.length === 0"
+                    x-show="items.length === 0"
                     class="px-4 py-2.5 text-sm text-gray-400 text-center"
                 >
                     Tidak ditemukan
