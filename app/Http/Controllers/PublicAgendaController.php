@@ -8,8 +8,7 @@ class PublicAgendaController extends Controller
 {
     public function index()
     {
-        $agendas = Agenda::with(["room", "organizer.unit"])
-            ->where("status", "active")
+        $agendas = Agenda::with(["room", "unit"])
             ->whereDate("event_date", today())
             ->withCount([
                 "employees as signed_count" => function ($query) {

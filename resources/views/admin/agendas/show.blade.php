@@ -20,19 +20,6 @@
                     <div>
                         <div class="flex items-center gap-3 mb-2">
                             <h2 class="text-xl font-extrabold text-gray-900">{{ $agenda->title }}</h2>
-                            @if($agenda->status === 'draft')
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600">Draft</span>
-                            @elseif($agenda->status === 'active')
-                                <span
-                                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-primary-50 text-primary">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                                    Aktif
-                                </span>
-                            @else
-                                <span
-                                    class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-secondary-50 text-secondary-700">Selesai</span>
-                            @endif
                         </div>
                         @if($agenda->description)
                             <span
@@ -40,7 +27,6 @@
                         @endif
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
-                        @if($agenda->status === 'active')
                             <a href="{{ route('attendance.show', $agenda) }}" target="_blank"
                                 class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-primary text-white text-sm font-bold shadow-md shadow-primary/20 hover:bg-primary-700 active:scale-[0.98] transition-all duration-200">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -57,7 +43,6 @@
                                 </svg>
                                 Link Input Publik
                             </a>
-                        @endif
                         <a href="{{ route('admin.agendas.export-pdf', $agenda) }}"
                             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-amber-500 text-white text-sm font-bold shadow-md shadow-amber-500/20 hover:bg-amber-600 active:scale-[0.98] transition-all duration-200">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -78,7 +63,7 @@
                 </div>
 
                 {{-- Info Grid --}}
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
                         <div class="flex items-center gap-2 mb-1.5">
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5"
@@ -120,22 +105,11 @@
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                            </svg>
-                            <span class="text-[11px] font-semibold text-gray-400 uppercase">Penyelenggara</span>
-                        </div>
-                        <p class="text-sm font-bold text-gray-800">{{ $agenda->organizer?->full_name ?? '-' }}</p>
-                    </div>
-                    <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
-                        <div class="flex items-center gap-2 mb-1.5">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
                             </svg>
                             <span class="text-[11px] font-semibold text-gray-400 uppercase">Unit</span>
                         </div>
-                        <p class="text-sm font-bold text-gray-800">{{ $agenda->organizer?->unit?->name ?? '-' }}</p>
+                        <p class="text-sm font-bold text-gray-800">{{ $agenda->unit?->name ?? '-' }}</p>
                     </div>
                     <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
                         <div class="flex items-center gap-2 mb-1.5">
@@ -146,7 +120,7 @@
                             </svg>
                             <span class="text-[11px] font-semibold text-gray-400 uppercase">Pimpinan Rapat</span>
                         </div>
-                        <p class="text-sm font-bold text-gray-800">{{ $agenda->meetingChair->full_name ?? '-' }}</p>
+                        <p class="text-sm font-bold text-gray-800">{{ $agenda->eventLeader?->full_name ?? '-' }}</p>
                     </div>
                 </div>
             </div>

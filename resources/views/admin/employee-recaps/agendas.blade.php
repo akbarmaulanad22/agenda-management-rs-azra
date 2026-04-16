@@ -125,9 +125,8 @@
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Deskripsi</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Waktu</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Penyelenggara</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Unit</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Pimpinan Rapat</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Pimpinan Acara</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Ruangan</th>
                             <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</th>
                         </tr>
@@ -150,9 +149,8 @@
                                         - {{ substr($agenda->event_end_time, 0, 5) }}
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->organizer_name ?? '-' }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->unit_name ?? '-' }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->meeting_chair_name ?? '-' }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->event_leader_name ?? '-' }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->room_name ?? '-' }}</td>
                                 <td class="px-6 py-4 text-right">
                                     <a

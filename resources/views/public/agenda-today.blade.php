@@ -93,7 +93,7 @@
 
                                     {{-- Unit --}}
                                     <td class="px-1 sm:px-4 py-2 sm:py-3.5">
-                                        <div class="truncate text-[11px] sm:text-sm text-gray-500">{{ $agenda->organizer?->unit?->name ?? '-' }}</div>
+                                        <div class="truncate text-[11px] sm:text-sm text-gray-500">{{ $agenda->unit?->name ?? '-' }}</div>
                                     </td>
 
                                     {{-- Hadir --}}

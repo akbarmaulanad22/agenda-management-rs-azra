@@ -34,9 +34,7 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tipe</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Ruangan</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Penyelenggara</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Unit</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -57,20 +55,7 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->event_date->translatedFormat('d M Y') }}</td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->room->room_name ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->organizer?->full_name ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->organizer?->unit?->name ?? '-' }}</td>
-                            <td class="px-6 py-4">
-                                @if($agenda->status === 'draft')
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600">Draft</span>
-                                @elseif($agenda->status === 'active')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-primary-50 text-primary">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                                        Aktif
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-secondary-50 text-secondary-700">Selesai</span>
-                                @endif
-                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->unit?->name ?? '-' }}</td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1">
                                     <a href="{{ route('admin.agendas.show', $agenda) }}" class="p-2 rounded-xl hover:bg-blue-50 text-gray-400 hover:text-blue-500 transition-colors" title="Detail">

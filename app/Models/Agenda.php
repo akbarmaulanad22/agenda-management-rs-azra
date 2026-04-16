@@ -13,25 +13,24 @@ class Agenda extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
-        'description',
-        'event_date',
-        'event_time',
-        'event_end_time',
-        'status',
-        'organizer_id',
-        'meeting_chair_id',
-        'room_id',
-        'letter_file_path',
-        'material_file_path',
-        'type',
-        'bank_soal_id',
+        "title",
+        "description",
+        "unit_id",
+        "event_date",
+        "event_time",
+        "event_end_time",
+        "event_leader_id",
+        "room_id",
+        "letter_file_path",
+        "material_file_path",
+        "type",
+        "bank_soal_id",
     ];
 
     protected function casts(): array
     {
         return [
-            'event_date' => 'date',
+            "event_date" => "date",
         ];
     }
 
@@ -40,20 +39,28 @@ class Agenda extends Model
         return $this->belongsTo(Room::class);
     }
 
-    public function organizer(): BelongsTo
+    public function unit(): BelongsTo
     {
-        return $this->belongsTo(Employee::class, 'organizer_id');
+        return $this->belongsTo(Unit::class);
     }
 
-    public function meetingChair(): BelongsTo
+    public function eventLeader(): BelongsTo
     {
-        return $this->belongsTo(Employee::class, 'meeting_chair_id');
+        return $this->belongsTo(Employee::class, "event_leader_id");
+    }
+
+    public function presenters(): BelongsToMany
+    {
+        return $this->belongsToMany(Employee::class, "agenda_presenters")
+            ->withPivot("sort_order")
+            ->withTimestamps()
+            ->orderBy("agenda_presenters.sort_order");
     }
 
     public function employees(): BelongsToMany
     {
-        return $this->belongsToMany(Employee::class, 'agenda_employee')
-            ->withPivot('signature_image_path')
+        return $this->belongsToMany(Employee::class, "agenda_employee")
+            ->withPivot("signature_image_path")
             ->withTimestamps();
     }
 
@@ -79,11 +86,11 @@ class Agenda extends Model
 
     public function allowsNotes(): bool
     {
-        return $this->type === 'rapat';
+        return $this->type === "rapat";
     }
 
     public function allowsQuiz(): bool
     {
-        return in_array($this->type, ['diklat', 'pelatihan']);
+        return in_array($this->type, ["diklat", "pelatihan"]);
     }
 }

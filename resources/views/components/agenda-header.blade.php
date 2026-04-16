@@ -33,17 +33,12 @@
             <tr>
                 <td class="text-white/60 font-medium py-0.5 pr-3 whitespace-nowrap align-top">Unit</td>
                 <td class="text-white/60 py-0.5 pr-1 align-top">:</td>
-                <td class="text-white font-semibold py-0.5 break-words">{{ $agenda->organizer?->unit?->name ?? '-' }}</td>
+                <td class="text-white font-semibold py-0.5 break-words">{{ $agenda->unit?->name ?? '-' }}</td>
             </tr>
             <tr>
-                <td class="text-white/60 font-medium py-0.5 pr-3 whitespace-nowrap align-top">Penyelenggara</td>
+                <td class="text-white/60 font-medium py-0.5 pr-3 whitespace-nowrap align-top">Pimpinan {{$agenda->type}}</td>
                 <td class="text-white/60 py-0.5 pr-1 align-top">:</td>
-                <td class="text-white font-semibold py-0.5 break-words">{{ $agenda->organizer?->full_name ?? '-' }}</td>
-            </tr>
-            <tr>
-                <td class="text-white/60 font-medium py-0.5 pr-3 whitespace-nowrap align-top">Pimpinan Rapat</td>
-                <td class="text-white/60 py-0.5 pr-1 align-top">:</td>
-                <td class="text-white font-semibold py-0.5 break-words">{{ $agenda->meetingChair?->full_name ?? '-' }}</td>
+                <td class="text-white font-semibold py-0.5 break-words">{{ $agenda->eventLeader?->full_name ?? '-' }}</td>
             </tr>
             <tr>
                 <td class="text-white/60 font-medium py-0.5 pr-3 whitespace-nowrap align-top">Deskripsi</td>
