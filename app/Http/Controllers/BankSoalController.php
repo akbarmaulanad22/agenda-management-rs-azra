@@ -43,11 +43,21 @@ class BankSoalController extends Controller
         ]);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $bankSoals = BankSoal::withCount('questions')->latest()->paginate(15);
+        $q = trim((string) $request->input('q', ''));
+        $operator = $this->searchOperator();
 
-        return view('admin.bank-soals.index', compact('bankSoals'));
+        $bankSoals = BankSoal::withCount('questions')
+            ->when($q !== '', function ($query) use ($q, $operator) {
+                $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q);
+                $query->where('title', $operator, "%{$escaped}%");
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.bank-soals.index', compact('bankSoals', 'q'));
     }
 
     public function create()
