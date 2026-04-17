@@ -6,7 +6,7 @@
         </div>
     </x-slot>
 
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div class="flex items-center gap-2">
             <div class="w-10 h-10 rounded-2xl bg-primary-50 flex items-center justify-center">
                 <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
@@ -19,6 +19,27 @@
         </a>
     </div>
 
+    <div class="mb-6">
+        <x-search-filter
+            :action="route('admin.employees.index')"
+            :q="$q"
+            placeholder="Cari nama atau NIP..."
+        >
+            <x-slot name="filters">
+                <div class="sm:w-64">
+                    <x-searchable-select
+                        name="unit_id"
+                        search-url="{{ route('admin.units.search') }}"
+                        :selected-id="$selectedUnit?->id"
+                        :selected-label="$selectedUnit?->name"
+                        placeholder="Filter unit..."
+                        bg-color="bg-white"
+                    />
+                </div>
+            </x-slot>
+        </x-search-filter>
+    </div>
+
     <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full">
@@ -27,8 +48,9 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">NIP</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Nama Lengkap</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Unit</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Profesi</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Posisi Pekerjaan</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Jabatan</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Profesi</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -42,10 +64,13 @@
                                     <span class="text-sm font-semibold text-gray-800">{{ $employee->full_name }}</span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $employee->unit->name ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500"><span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600">{{ $employee->unit->name ?? '-' }}</span></td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $employee->job_position }}</td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600">{{ $employee->structural_role }}</span>
+                            <td class="px-6 py-4 text-sm text-gray-500">
+                                {{ $employee->structural_role }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-500">
+                                {{ $employee->profession }}
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1">

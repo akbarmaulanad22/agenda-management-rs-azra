@@ -19,6 +19,14 @@
         </a>
     </div>
 
+    <div class="mb-6">
+        <x-search-filter
+            :action="route('admin.rooms.index')"
+            :q="$q"
+            placeholder="Cari nama ruangan..."
+        />
+    </div>
+
     <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full">

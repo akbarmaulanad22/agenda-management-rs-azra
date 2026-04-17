@@ -5,6 +5,7 @@
     'selectedLabel' => null,
     'placeholder' => 'Cari...',
     'required' => false,
+    'bgColor' => 'bg-gray-50/50',
 ])
 
 <div
@@ -130,7 +131,7 @@
             @keydown.escape="open = false"
             placeholder="{{ $placeholder }}"
             autocomplete="off"
-            class="block w-full px-4 py-3 pr-10 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+            class="block w-full px-4 py-3 pr-10 rounded-2xl border border-gray-200 {{ $bgColor }} text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
         >
         <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform duration-200" :class="open && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
     </div>

@@ -43,11 +43,18 @@ class RoomController extends Controller
         ]);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = Room::latest()->paginate(15);
+        $q = trim((string) $request->input('q'));
+        $operator = $this->searchOperator();
 
-        return view('admin.rooms.index', compact('rooms'));
+        $rooms = Room::query()
+            ->orderBy('room_name')
+            ->when($q !== '', fn ($query) => $query->where('room_name', $operator, "%{$q}%"))
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.rooms.index', compact('rooms', 'q'));
     }
 
     public function create()

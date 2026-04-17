@@ -38,11 +38,18 @@ class UnitController extends Controller
         ]);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $units = Unit::latest()->paginate(15);
+        $q = trim((string) $request->input('q'));
+        $operator = $this->searchOperator();
 
-        return view('admin.units.index', compact('units'));
+        $units = Unit::query()
+            ->orderBy('name')
+            ->when($q !== '', fn ($query) => $query->where('name', $operator, "%{$q}%"))
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.units.index', compact('units', 'q'));
     }
 
     public function create()

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -46,11 +47,25 @@ class EmployeeController extends Controller
         ]);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $employees = Employee::with('unit')->orderBy("full_name")->paginate(15);
+        $q = trim((string) $request->input('q'));
+        $unitId = $request->input('unit_id');
+        $operator = $this->searchOperator();
 
-        return view("admin.employees.index", compact("employees"));
+        $employees = Employee::with('unit')
+            ->orderBy('full_name')
+            ->when($q !== '', fn ($query) => $query->where(function ($query) use ($q, $operator) {
+                $query->where('full_name', $operator, "%{$q}%")
+                    ->orWhere('nip', $operator, "%{$q}%");
+            }))
+            ->when($unitId, fn ($query) => $query->where('unit_id', $unitId))
+            ->paginate(15)
+            ->withQueryString();
+
+        $selectedUnit = $unitId ? Unit::find($unitId) : null;
+
+        return view("admin.employees.index", compact("employees", "q", "selectedUnit"));
     }
 
     public function create()

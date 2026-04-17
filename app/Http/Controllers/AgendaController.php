@@ -4,22 +4,52 @@ namespace App\Http\Controllers;
 
 use App\Models\Agenda;
 use App\Models\AgendaQuestionAnswer;
+use App\Models\Employee;
 use App\Models\Question;
+use App\Models\Room;
+use App\Models\Unit;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Http\Requests\AgendaRequest;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class AgendaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $agendas = Agenda::with(["room", "unit", "eventLeader"])
-            ->latest()
-            ->paginate(10);
+        $q = trim((string) $request->input('q'));
+        $type = $request->input('type');
+        $roomId = $request->input('room_id');
+        $unitId = $request->input('unit_id');
+        $eventLeaderId = $request->input('event_leader_id');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+        $operator = $this->searchOperator();
 
-        return view("admin.agendas.index", compact("agendas"));
+        $agendas = Agenda::with(['room', 'unit', 'eventLeader'])
+            ->latest()
+            ->when($q !== '', fn ($query) => $query->where('title', $operator, "%{$q}%"))
+            ->when($type, fn ($query) => $query->where('type', $type))
+            ->when($roomId, fn ($query) => $query->where('room_id', $roomId))
+            ->when($unitId, fn ($query) => $query->where('unit_id', $unitId))
+            ->when($eventLeaderId, fn ($query) => $query->where('event_leader_id', $eventLeaderId))
+            ->when($dateFrom, fn ($query) => $query->whereDate('event_date', '>=', $dateFrom))
+            ->when($dateTo, fn ($query) => $query->whereDate('event_date', '<=', $dateTo))
+            ->paginate(10)
+            ->withQueryString();
+
+        $typeLabels = ['rapat' => 'Rapat', 'diklat' => 'Diklat', 'pelatihan' => 'Pelatihan'];
+        $typeLabel = $type ? ($typeLabels[$type] ?? null) : null;
+        $selectedRoom = $roomId ? Room::find($roomId) : null;
+        $selectedUnit = $unitId ? Unit::find($unitId) : null;
+        $selectedEventLeader = $eventLeaderId ? Employee::find($eventLeaderId) : null;
+
+        return view('admin.agendas.index', compact(
+            'agendas', 'q', 'type', 'typeLabel', 'selectedRoom', 'selectedUnit',
+            'selectedEventLeader', 'dateFrom', 'dateTo'
+        ));
     }
 
     public function create()
@@ -199,8 +229,9 @@ class AgendaController extends Controller
                 "Tanggal",
                 "Pukul Mulai",
                 "Pukul Selesai",
+                "Ruangan",
                 "Unit",
-                "Pimpinan Acara",
+                "Pimpinan Agenda",
             ]);
 
             foreach (
@@ -216,6 +247,7 @@ class AgendaController extends Controller
                     $agenda->event_date->format("Y-m-d"),
                     $agenda->event_time,
                     $agenda->event_end_time ?? "-",
+                    $agenda->room?->name ?? "-",
                     $agenda->unit?->name ?? "-",
                     $agenda->eventLeader?->full_name ?? "-",
                 ]);
@@ -407,7 +439,7 @@ class AgendaController extends Controller
                 $merger->SetFont("Helvetica", "", 7.5);
                 $merger->Cell($colWidth - 30, 3.5, $headerUnit, 0, 1);
 
-                // Row 2: Waktu + Pimpinan Acara
+                // Row 2: Waktu + Pimpinan Agenda
                 $merger->SetXY(12, 16);
                 $merger->SetFont("Helvetica", "B", 7.5);
                 $merger->Cell(22, 3.5, "Waktu", 0, 0);
@@ -416,7 +448,7 @@ class AgendaController extends Controller
                 $merger->Cell($colWidth - 26, 3.5, $headerTime, 0, 0);
 
                 $merger->SetFont("Helvetica", "B", 7.5);
-                $merger->Cell(26, 3.5, "Pimpinan Acara", 0, 0);
+                $merger->Cell(26, 3.5, "Pimpinan Agenda", 0, 0);
                 $merger->Cell(4, 3.5, ":", 0, 0);
                 $merger->SetFont("Helvetica", "", 7.5);
                 $merger->Cell($colWidth - 30, 3.5, $headerLeader, 0, 1);
@@ -682,6 +714,11 @@ class AgendaController extends Controller
             ->all();
 
         $agenda->presenters()->sync($syncData);
+    }
+
+    private function searchOperator(): string
+    {
+        return DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
     }
 
     private function syncAgendaQuestionsFromTemplate(

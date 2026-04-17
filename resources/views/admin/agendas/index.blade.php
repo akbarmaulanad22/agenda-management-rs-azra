@@ -25,16 +25,88 @@
         </div>
     </div>
 
+    <div class="mb-6">
+        <form method="GET" action="{{ route('admin.agendas.index') }}" class="flex flex-col gap-3">
+            <div class="flex flex-col sm:flex-row gap-3">
+                <div class="flex-1">
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ $q }}"
+                        placeholder="Cari judul agenda..."
+                        class="block w-full px-4 py-3 rounded-2xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                    >
+                </div>
+                <div class="flex gap-2 shrink-0">
+                    <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-primary text-white text-sm font-bold shadow-md shadow-primary/20 hover:bg-primary-700 hover:shadow-lg active:scale-[0.98] transition-all duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                        Cari
+                    </button>
+                    <a href="{{ route('admin.agendas.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gray-100 text-gray-600 text-sm font-bold hover:bg-gray-200 active:scale-[0.98] transition-all duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Reset
+                    </a>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <div class="w-40">
+                    <x-searchable-select
+                        name="type"
+                        search-url="{{ route('admin.agendas.types.search') }}"
+                        :selected-id="$type"
+                        :selected-label="$typeLabel"
+                        placeholder="Filter tipe..."
+                        bg-color="bg-white"
+                    />
+                </div>
+                <div class="w-52">
+                    <x-searchable-select
+                        name="room_id"
+                        search-url="{{ route('admin.rooms.search') }}"
+                        :selected-id="$selectedRoom?->id"
+                        :selected-label="$selectedRoom?->room_name"
+                        placeholder="Filter ruangan..."
+                        bg-color="bg-white"
+                    />
+                </div>
+                <div class="w-52">
+                    <x-searchable-select
+                        name="unit_id"
+                        search-url="{{ route('admin.units.search') }}"
+                        :selected-id="$selectedUnit?->id"
+                        :selected-label="$selectedUnit?->name"
+                        placeholder="Filter unit..."
+                        bg-color="bg-white"
+                    />
+                </div>
+                <div class="w-52">
+                    <x-searchable-select
+                        name="event_leader_id"
+                        search-url="{{ route('admin.employees.search') }}"
+                        :selected-id="$selectedEventLeader?->id"
+                        :selected-label="$selectedEventLeader?->full_name"
+                        placeholder="Filter pimpinan..."
+                        bg-color="bg-white"
+                    />
+                </div>
+                <x-date-range-picker :date-from="$dateFrom" :date-to="$dateTo" />
+            </div>
+        </form>
+    </div>
+
     <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-gray-100">
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Judul</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Deskripsi</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tipe</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Jam</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Ruangan</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Unit</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Pimpinan Agenda</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -44,6 +116,7 @@
                             <td class="px-6 py-4">
                                 <a href="{{ route('admin.agendas.show', $agenda) }}" class="text-sm font-semibold text-gray-800 group-hover:text-primary transition-colors">{{ $agenda->title }}</a>
                             </td>
+                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-pre-wrap">{{ $agenda->description ?? '-' }}</td>
                             <td class="px-6 py-4">
                                 @if($agenda->type === 'diklat')
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-600">Diklat</span>
@@ -54,8 +127,10 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->event_date->translatedFormat('d M Y') }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }} - {{\Carbon\Carbon::parse($agenda->event_time)->format('H:i') ?? "Selesai"}} </td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->room->room_name ?? '-' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->unit?->name ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->eventLeader?->full_name ?? '-' }}</td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-1">
                                     <a href="{{ route('admin.agendas.show', $agenda) }}" class="p-2 rounded-xl hover:bg-blue-50 text-gray-400 hover:text-blue-500 transition-colors" title="Detail">
