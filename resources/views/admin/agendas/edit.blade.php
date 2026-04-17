@@ -55,12 +55,12 @@
                         <div class="pb-4 border-b border-gray-100">
                             <h4 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                                Informasi Agenda
+                                <span x-text="'Informasi ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))">Informasi Agenda</span>
                             </h4>
 
                             <div class="space-y-4">
                                 <div>
-                                    <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Judul Agenda</label>
+                                    <label for="title" class="block text-sm font-semibold text-gray-700 mb-2"><span x-text="'Judul ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))">Judul Agenda</span></label>
                                     <input type="text" name="title" id="title" value="{{ old('title', $agenda->title) }}" placeholder="Judul agenda" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
                                     @error('title') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                 </div>
@@ -73,7 +73,7 @@
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label for="event_date" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Acara</label>
+                                        <label for="event_date" class="block text-sm font-semibold text-gray-700 mb-2"><span x-text="'Tanggal ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))">Tanggal Acara</span></label>
                                         <input type="date" name="event_date" id="event_date" value="{{ old('event_date', $agenda->event_date->format('Y-m-d')) }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
                                         @error('event_date') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                     </div>
@@ -108,9 +108,11 @@
                                     </template>
 
                                     <template x-if="type === 'rapat'">
-                                        <div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50/70 px-4 py-3">
-                                            <p class="text-sm font-semibold text-gray-700">Pukul Selesai</p>
-                                            <p class="text-xs text-gray-500 mt-1">Agenda rapat tidak memakai batasan pukul selesai.</p>
+                                        <div>
+                                            <label for="event_end_time" class="block text-sm font-semibold text-gray-700 mb-2">Pukul Selesai</label>
+                                            <input type="time" id="event_end_time" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" readOnly disabled>
+                                            <p class="text-xs text-gray-400 mt-1">Agenda rapat tidak memakai batasan pukul selesai.</p>
+                                            @error('event_end_time') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                         </div>
                                     </template>
                                 </div>
@@ -130,7 +132,9 @@
                                     </div>
 
                                     <div>
-                                        <label for="event_leader_id" class="block text-sm font-semibold text-gray-700 mb-2">Pimpinan Acara</label>
+                                        <label for="event_leader_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                                            <span x-text="'Pimpinan ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))"></span>
+                                        </label>
                                         <x-searchable-select
                                             name="event_leader_id"
                                             search-url="{{ route('admin.employees.search') }}"
@@ -209,25 +213,29 @@
                         <div class="pb-4 border-b border-gray-100">
                             <h4 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
-                                Berkas Agenda
+                                <span x-text="'Berkas ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))"></span>
                             </h4>
 
                             <div class="space-y-4">
                                 <div>
-                                    <label for="letter_file" class="block text-sm font-semibold text-gray-700 mb-2">Surat Undangan</label>
+                                    <label for="letter_file" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="pr-3"> Surat Undangan </span>
                                     @if($agenda->letter_file_path)
-                                        <p class="text-xs text-gray-500 mb-2">File saat ini: <span class="font-medium text-gray-700">{{ basename($agenda->letter_file_path) }}</span></p>
+                                        <a href="{{ Storage::url($agenda->letter_file_path) }}" class="text-xs mb-2 text-blue-500 hover:underline visited:text-purple-500">Lihat file saat ini</a>
                                     @endif
+                                    </label>
                                     <input type="file" name="letter_file" id="letter_file" accept=".pdf" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none file:mr-4 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
                                     <p class="text-xs text-gray-400 mt-1">Format PDF, maksimal 5MB.</p>
                                     @error('letter_file') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                 </div>
 
                                 <div>
-                                    <label for="material_file" class="block text-sm font-semibold text-gray-700 mb-2">Materi Agenda</label>
-                                    @if($agenda->material_file_path)
-                                        <p class="text-xs text-gray-500 mb-2">File saat ini: <span class="font-medium text-gray-700">{{ basename($agenda->material_file_path) }}</span></p>
-                                    @endif
+                                    <label for="material_file" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <span class="pr-3" x-text="'Materi ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))"></span>
+                                        @if($agenda->material_file_path)
+                                            <a href="{{ Storage::url($agenda->material_file) }}" class="text-xs mb-2 text-blue-500 hover:underline">Lihat file saat ini</a>
+                                        @endif
+                                    </label>
                                     <input type="file" name="material_file" id="material_file" accept=".pdf" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none file:mr-4 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
                                     <p class="text-xs text-gray-400 mt-1">Format PDF, maksimal 10MB.</p>
                                     @error('material_file') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror

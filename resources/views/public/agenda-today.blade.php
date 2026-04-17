@@ -147,7 +147,7 @@
                                         </div>
                                         <div>
                                             <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Unit</span>
-                                            <p class="text-xs font-semibold text-gray-700 mt-0.5">{{ $agenda->organizer?->unit?->name ?? '-' }}</p>
+                                            <p class="text-xs font-semibold text-gray-700 mt-0.5">{{ $agenda->unit?->name ?? '-' }}</p>
                                         </div>
                                         <div>
                                             <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Hadir</span>
@@ -201,7 +201,7 @@
                 'title' => $a->title,
                 'organizer' => $a->organizer?->full_name ?? '',
                 'room' => $a->room->room_name ?? '',
-                'unit' => $a->organizer?->unit?->name ?? '',
+                'unit' => $a->unit?->name ?? '',
                 'description' => $a->description ?? ''
             ];
         });
