@@ -28,12 +28,11 @@ class CsvExportSanitizationTest extends TestCase
             'title' => 'Agenda Sanitasi',
             'description' => "Baris satu\r\nBaris dua\n\nBaris tiga",
             'room_id' => $room->id,
-            'organizer_id' => $organizer->id,
-            'meeting_chair_id' => $organizer->id,
+            'unit_id' => $unit->id,
+            'event_leader_id' => $organizer->id,
             'event_date' => '2026-04-15',
             'event_time' => '08:00',
             'event_end_time' => '10:00',
-            'status' => 'completed',
         ]);
 
         $response = $this->actingAs($user)->get(route('admin.agendas.export-csv'));
@@ -63,12 +62,11 @@ class CsvExportSanitizationTest extends TestCase
             'title' => 'Agenda Peserta',
             'description' => "Topik awal\nTopik lanjutan\r\nKesimpulan",
             'room_id' => $room->id,
-            'organizer_id' => $organizer->id,
-            'meeting_chair_id' => $organizer->id,
+            'unit_id' => $unit->id,
+            'event_leader_id' => $organizer->id,
             'event_date' => '2026-04-16',
             'event_time' => '09:00',
             'event_end_time' => '11:00',
-            'status' => 'completed',
         ]);
 
         $agenda->employees()->attach($employee->id, ['signature_image_path' => 'signatures/peserta.png']);

@@ -92,6 +92,7 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Unit</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Jabatan</th>
                         <th class="px-6 py-4 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Ikut Agenda</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Jam Rapat</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Jam Diklat/Pelatihan</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -119,6 +120,9 @@
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-primary-50 text-primary">
                                     {{ number_format($employee->attendance_count) }} kali
                                 </span>
+                            </td>
+                            <td class="px-6 py-4 text-right text-sm font-semibold text-gray-800">
+                                {{ number_format($employee->rapat_hours, 2, ',', '.') }} jam
                             </td>
                             <td class="px-6 py-4 text-right text-sm font-semibold text-gray-800">
                                 {{ number_format($employee->training_hours, 2, ',', '.') }} jam

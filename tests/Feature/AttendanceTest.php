@@ -31,9 +31,8 @@ class AttendanceTest extends TestCase
             'title' => 'Test Agenda',
             'event_date' => now()->toDateString(),
             'event_time' => '10:00',
-            'status' => 'active',
-            'organizer_id' => $organizer->id,
-            'meeting_chair_id' => $organizer->id,
+            'unit_id' => $unit->id,
+            'event_leader_id' => $organizer->id,
             'room_id' => $room->id,
         ]);
 

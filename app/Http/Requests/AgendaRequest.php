@@ -33,7 +33,7 @@ class AgendaRequest extends FormRequest
             "event_leader_id" => "required|exists:employees,id",
             "room_id" => "required|exists:rooms,id",
             "type" => "required|in:diklat,pelatihan,rapat",
-            "bank_soal_id" => "nullable|exists:bank_soals,id",
+            "bank_soal_id" => "nullable|required_if:type,diklat|required_if:type,pelatihan|exists:bank_soals,id",
             "presenter_ids" => "nullable|array",
             "presenter_ids.*" => "nullable|distinct|exists:employees,id",
             "letter_file" => "nullable|file|mimes:pdf|max:5120",

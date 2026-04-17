@@ -11,6 +11,7 @@ use App\Models\BankSoal;
 use App\Models\Employee;
 use App\Models\Question;
 use App\Models\Room;
+use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -22,16 +23,15 @@ class AgendaTypeChangeTest extends TestCase
     private function validAgendaData(array $overrides = []): array
     {
         $room = Room::factory()->create();
-        $organizer = Employee::factory()->create();
         $chair = Employee::factory()->create();
 
         return array_merge([
             'title' => 'Test Agenda',
             'event_date' => '2026-05-01',
             'event_time' => '10:00',
-            'status' => 'active',
-            'organizer_id' => $organizer->id,
-            'meeting_chair_id' => $chair->id,
+            'event_end_time' => '11:00',
+            'unit_id' => Unit::factory()->create()->id,
+            'event_leader_id' => $chair->id,
             'room_id' => $room->id,
             'type' => 'rapat',
         ], $overrides);
@@ -49,7 +49,9 @@ class AgendaTypeChangeTest extends TestCase
     {
         $bankSoal = $this->createBankSoalWithQuestions(3);
         $agenda = Agenda::factory()->create([
-            'status' => 'active',
+            'event_date' => today(),
+            'event_time' => '09:00',
+            'event_end_time' => '12:00',
             'type' => $type,
             'bank_soal_id' => $bankSoal->id,
         ]);
@@ -90,10 +92,10 @@ class AgendaTypeChangeTest extends TestCase
         $data = array_merge([
             'title' => $agenda->title,
             'event_date' => $agenda->event_date->format('Y-m-d'),
-            'event_time' => $agenda->event_time,
-            'status' => $agenda->status,
-            'organizer_id' => $agenda->organizer_id,
-            'meeting_chair_id' => $agenda->meeting_chair_id,
+            'event_time' => '09:00',
+            'event_end_time' => '12:00',
+            'unit_id' => $agenda->unit_id,
+            'event_leader_id' => $agenda->event_leader_id,
             'room_id' => $agenda->room_id,
             'type' => $agenda->type,
             'bank_soal_id' => $agenda->bank_soal_id,
@@ -165,7 +167,7 @@ class AgendaTypeChangeTest extends TestCase
 
     public function test_changing_rapat_to_diklat_deletes_notes(): void
     {
-        $agenda = Agenda::factory()->create(['status' => 'active', 'type' => 'rapat']);
+        $agenda = Agenda::factory()->create(['type' => 'rapat', 'event_time' => '09:00']);
         $agenda->notes()->createMany([
             ['topic' => 'Topik 1', 'decision' => 'Keputusan 1'],
             ['topic' => 'Topik 2', 'decision' => 'Keputusan 2'],
@@ -182,7 +184,7 @@ class AgendaTypeChangeTest extends TestCase
 
     public function test_changing_rapat_to_diklat_hides_notulensi_on_admin_show(): void
     {
-        $agenda = Agenda::factory()->create(['status' => 'active', 'type' => 'rapat']);
+        $agenda = Agenda::factory()->create(['type' => 'rapat', 'event_time' => '09:00']);
         $agenda->notes()->create(['topic' => 'Topik', 'decision' => 'Keputusan']);
 
         $bankSoal = $this->createBankSoalWithQuestions();
@@ -197,7 +199,7 @@ class AgendaTypeChangeTest extends TestCase
 
     public function test_changing_rapat_to_diklat_blocks_new_note_creation(): void
     {
-        $agenda = Agenda::factory()->create(['status' => 'active', 'type' => 'rapat']);
+        $agenda = Agenda::factory()->create(['type' => 'rapat', 'event_date' => today(), 'event_time' => '09:00']);
 
         $bankSoal = $this->createBankSoalWithQuestions();
         $this->updateAgenda($agenda, ['type' => 'diklat', 'bank_soal_id' => $bankSoal->id]);
@@ -212,7 +214,7 @@ class AgendaTypeChangeTest extends TestCase
 
     public function test_changing_rapat_to_diklat_snapshots_questions(): void
     {
-        $agenda = Agenda::factory()->create(['status' => 'active', 'type' => 'rapat']);
+        $agenda = Agenda::factory()->create(['type' => 'rapat', 'event_time' => '09:00']);
 
         $bankSoal = $this->createBankSoalWithQuestions(5);
         $this->updateAgenda($agenda, ['type' => 'diklat', 'bank_soal_id' => $bankSoal->id]);

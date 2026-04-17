@@ -62,6 +62,7 @@ class EmployeeRecapController extends Controller
                     "Unit",
                     "Jabatan",
                     "Total Ikut Agenda",
+                    "Jam Rapat",
                     "Jam Diklat/Pelatihan",
                 ]);
 
@@ -75,6 +76,7 @@ class EmployeeRecapController extends Controller
                         $row->unit_name,
                         $row->job_position,
                         (int) $row->attendance_count,
+                        number_format((float) $row->rapat_hours, 2, ".", ""),
                         number_format((float) $row->training_hours, 2, ".", ""),
                     ]);
                 }

@@ -18,7 +18,7 @@ class AgendaNotulensiAccessTest extends TestCase
 
     private function createActiveAgenda(string $type): Agenda
     {
-        $attrs = ['status' => 'active', 'type' => $type];
+        $attrs = ['type' => $type, 'event_date' => today()];
 
         if (in_array($type, ['diklat', 'pelatihan'])) {
             $bankSoal = BankSoal::factory()->create();

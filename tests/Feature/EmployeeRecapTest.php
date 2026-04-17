@@ -92,12 +92,10 @@ class EmployeeRecapTest extends TestCase
     ): Agenda {
         return Agenda::factory()->create([
             'room_id' => $roomId,
-            'organizer_id' => $organizerId,
-            'meeting_chair_id' => $organizerId,
+            'event_leader_id' => $organizerId,
             'event_date' => $date,
             'event_time' => $startTime,
             'event_end_time' => $endTime,
-            'status' => 'completed',
         ]);
     }
 }

@@ -17,7 +17,6 @@ class PublicQuizTest extends TestCase
     private function createActiveAgendaWithQuestions(int $questionCount = 3): Agenda
     {
         $agenda = Agenda::factory()->create([
-            'status' => 'active',
             'event_date' => today(),
             'type' => 'diklat',
         ]);
@@ -63,7 +62,6 @@ class PublicQuizTest extends TestCase
     public function test_quiz_page_404_for_agenda_without_questions(): void
     {
         $agenda = Agenda::factory()->create([
-            'status' => 'active',
             'type' => 'rapat',
         ]);
 
@@ -75,7 +73,6 @@ class PublicQuizTest extends TestCase
     public function test_quiz_page_404_for_non_active_agenda(): void
     {
         $agenda = Agenda::factory()->create([
-            'status' => 'draft',
             'type' => 'diklat',
         ]);
         AgendaQuestion::factory()->create(['agenda_id' => $agenda->id]);
@@ -280,8 +277,8 @@ class PublicQuizTest extends TestCase
     public function test_attendance_page_hides_posttest_link_for_rapat(): void
     {
         $agenda = Agenda::factory()->create([
-            'status' => 'active',
             'type' => 'rapat',
+            'event_date' => today(),
         ]);
 
         $response = $this->get(route('attendance.show', $agenda));
