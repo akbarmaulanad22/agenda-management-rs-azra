@@ -97,17 +97,17 @@
     <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full">
-                <thead>
+                <thead class="bg-primary-700 text-white">
                     <tr class="border-b border-gray-100">
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Judul</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Deskripsi</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tipe</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Jam</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Ruangan</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Unit</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Pimpinan Agenda</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Judul</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Deskripsi</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Tipe</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Tanggal</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Jam</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Ruangan</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Unit</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Pimpinan Agenda</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">

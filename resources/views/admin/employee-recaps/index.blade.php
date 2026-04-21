@@ -85,16 +85,16 @@
     <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full">
-                <thead>
+                <thead class="bg-primary-700 text-white">
                     <tr class="border-b border-gray-100">
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">NIP</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Nama Pegawai</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Unit</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Jabatan</th>
-                        <th class="px-6 py-4 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Ikut Agenda</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Jam Rapat</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Jam Diklat/Pelatihan</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Aksi</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">NIP</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Nama Pegawai</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Unit</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Jabatan</th>
+                        <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider">Ikut Agenda</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">Jam Rapat</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">Jam Diklat/Pelatihan</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">

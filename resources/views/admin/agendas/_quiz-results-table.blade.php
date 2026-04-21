@@ -6,14 +6,14 @@
 @endphp
 <div class="overflow-x-auto">
     <table class="w-full">
-        <thead>
+        <thead class="bg-primary-700 text-white">
             <tr class="border-b border-gray-100">
-                <th class="pr-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider w-10">No</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Nama</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Jabatan</th>
-                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Benar</th>
-                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Nilai</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Waktu</th>
+                <th class="pr-4 py-3 text-left text-xs font-semibold uppercase tracking-wider w-10">No</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Nama</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Jabatan</th>
+                <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider">Benar</th>
+                <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider">Nilai</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Waktu</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">

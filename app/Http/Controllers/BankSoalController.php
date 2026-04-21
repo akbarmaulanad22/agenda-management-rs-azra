@@ -75,8 +75,8 @@ class BankSoalController extends Controller
             'questions.*.option_a' => 'required|string|max:255',
             'questions.*.option_b' => 'required|string|max:255',
             'questions.*.option_c' => 'required|string|max:255',
-            'questions.*.option_d' => 'required|string|max:255',
-            'questions.*.option_e' => 'required|string|max:255',
+            'questions.*.option_d' => 'nullable|string|max:255',
+            'questions.*.option_e' => 'nullable|string|max:255',
             'questions.*.correct_option' => 'required|in:a,b,c,d,e',
         ]);
 
@@ -116,8 +116,8 @@ class BankSoalController extends Controller
             'questions.*.option_a' => 'required|string|max:255',
             'questions.*.option_b' => 'required|string|max:255',
             'questions.*.option_c' => 'required|string|max:255',
-            'questions.*.option_d' => 'required|string|max:255',
-            'questions.*.option_e' => 'required|string|max:255',
+            'questions.*.option_d' => 'nullable|string|max:255',
+            'questions.*.option_e' => 'nullable|string|max:255',
             'questions.*.correct_option' => 'required|in:a,b,c,d,e',
         ]);
 

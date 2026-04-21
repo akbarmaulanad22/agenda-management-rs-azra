@@ -103,11 +103,12 @@ class AgendaController extends Controller
         $presenterIds = $this->extractPresenterIds($validated);
         $agendaData = $this->buildAgendaData($validated);
 
-        $agenda = Agenda::create($agendaData);
-
-        $agenda->update($this->storeAgendaFiles($request, $agenda));
-        $this->syncAgendaPresenters($agenda, $presenterIds);
-        $this->syncAgendaQuestionsFromTemplate($agenda);
+        DB::transaction(function () use ($agendaData, $presenterIds, $request) {
+            $agenda = Agenda::create($agendaData);
+            $agenda->update($this->storeAgendaFiles($request, $agenda));
+            $this->syncAgendaPresenters($agenda, $presenterIds);
+            $this->syncAgendaQuestionsFromTemplate($agenda);
+        });
 
         return redirect()
             ->route("admin.agendas.index")
@@ -191,18 +192,17 @@ class AgendaController extends Controller
 
         $oldType = $agenda->type;
         $oldBankSoalId = $agenda->bank_soal_id;
-        $agenda->update($agendaData);
 
-        if ($agenda->type !== "rapat" && $oldType === "rapat") {
-            $agenda->notes()->delete();
-        }
+        DB::transaction(function () use ($agenda, $agendaData, $presenterIds, $oldType, $oldBankSoalId) {
+            $agenda->update($agendaData);
 
-        $this->syncAgendaPresenters($agenda, $presenterIds);
-        $this->syncAgendaQuestionsFromTemplate(
-            $agenda,
-            $oldType,
-            $oldBankSoalId,
-        );
+            if ($agenda->type !== "rapat" && $oldType === "rapat") {
+                $agenda->notes()->delete();
+            }
+
+            $this->syncAgendaPresenters($agenda, $presenterIds);
+            $this->syncAgendaQuestionsFromTemplate($agenda, $oldType, $oldBankSoalId);
+        });
 
         return redirect()
             ->route("admin.agendas.index")

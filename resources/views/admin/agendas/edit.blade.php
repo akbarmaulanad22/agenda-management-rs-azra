@@ -15,7 +15,7 @@
         </div>
     </x-slot>
 
-    <div class="max-w-3xl">
+    <div>
         <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden">
             <div class="px-8 py-6 border-b border-gray-100">
                 <h3 class="text-lg font-bold text-gray-900">Ubah Agenda</h3>
@@ -58,93 +58,88 @@
                                 <span x-text="'Informasi ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))">Informasi Agenda</span>
                             </h4>
 
-                            <div class="space-y-4">
-                                <div>
+                            <div class="grid grid-cols-4 gap-4">
+                                <div class="col-span-2">
                                     <label for="title" class="block text-sm font-semibold text-gray-700 mb-2"><span x-text="'Judul ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))">Judul Agenda</span></label>
                                     <input type="text" name="title" id="title" value="{{ old('title', $agenda->title) }}" placeholder="Judul agenda" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
                                     @error('title') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                 </div>
 
                                 <div>
+                                    <label for="event_date" class="block text-sm font-semibold text-gray-700 mb-2"><span x-text="'Tanggal ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))">Tanggal Acara</span></label>
+                                    <input type="date" name="event_date" id="event_date" value="{{ old('event_date', $agenda->event_date->format('Y-m-d')) }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
+                                    @error('event_date') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                                </div>
+
+                                <div>
+                                    <label for="room_id" class="block text-sm font-semibold text-gray-700 mb-2">Ruangan</label>
+                                    <x-searchable-select
+                                        name="room_id"
+                                        search-url="{{ route('admin.rooms.search') }}"
+                                        :selected-id="old('room_id', $agenda->room_id)"
+                                        :selected-label="old('room_id') ? null : $agenda->room?->room_name"
+                                        placeholder="Cari ruangan..."
+                                        required
+                                    />
+                                    @error('room_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                                </div>
+
+                                <div>
+                                    <label for="event_time" class="block text-sm font-semibold text-gray-700 mb-2">Pukul Mulai</label>
+                                    <input type="time" name="event_time" id="event_time" value="{{ old('event_time', $agenda->event_time ? \Carbon\Carbon::parse($agenda->event_time)->format('H:i') : '') }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
+                                    @error('event_time') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                                </div>
+
+                                <template x-if="type === 'diklat' || type === 'pelatihan'">
+                                    <div>
+                                        <label for="event_end_time" class="block text-sm font-semibold text-gray-700 mb-2">Pukul Selesai</label>
+                                        <input type="time" name="event_end_time" id="event_end_time" value="{{ old('event_end_time', $agenda->event_end_time ? \Carbon\Carbon::parse($agenda->event_end_time)->format('H:i') : '') }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                                        <p class="text-xs text-gray-400 mt-1">Digunakan untuk diklat dan pelatihan.</p>
+                                        @error('event_end_time') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                                    </div>
+                                </template>
+
+                                <template x-if="type === 'rapat'">
+                                    <div>
+                                        <label for="event_end_time" class="block text-sm font-semibold text-gray-700 mb-2">Pukul Selesai</label>
+                                        <input type="time" id="event_end_time" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" readOnly disabled>
+                                        <p class="text-xs text-gray-400 mt-1">Agenda rapat tidak memakai batasan pukul selesai.</p>
+                                        @error('event_end_time') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                                    </div>
+                                </template>
+
+                                <div>
+                                    <label for="unit_id" class="block text-sm font-semibold text-gray-700 mb-2">Unit</label>
+                                    <x-searchable-select
+                                        name="unit_id"
+                                        search-url="{{ route('admin.units.search') }}"
+                                        :selected-id="old('unit_id', $agenda->unit_id)"
+                                        :selected-label="old('unit_id') ? null : $agenda->unit?->name"
+                                        placeholder="Cari unit..."
+                                        required
+                                    />
+                                    @error('unit_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                                </div>
+
+                                <div>
+                                    <label for="event_leader_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <span x-text="'Pimpinan ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))"></span>
+                                    </label>
+                                    <x-searchable-select
+                                        name="event_leader_id"
+                                        search-url="{{ route('admin.employees.search') }}"
+                                        :selected-id="old('event_leader_id', $agenda->event_leader_id)"
+                                        :selected-label="old('event_leader_id') ? null : $agenda->eventLeader?->full_name"
+                                        placeholder="Cari pegawai..."
+                                        required
+                                    />
+                                    @error('event_leader_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                                </div>
+
+                                <div class="col-span-4">
                                     <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi</label>
                                     <textarea name="description" id="description" rows="3" placeholder="Deskripsikan agenda..." class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">{{ old('description', $agenda->description) }}</textarea>
                                     @error('description') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="event_date" class="block text-sm font-semibold text-gray-700 mb-2"><span x-text="'Tanggal ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))">Tanggal Acara</span></label>
-                                        <input type="date" name="event_date" id="event_date" value="{{ old('event_date', $agenda->event_date->format('Y-m-d')) }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
-                                        @error('event_date') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                                    </div>
-                                    <div>
-                                        <label for="room_id" class="block text-sm font-semibold text-gray-700 mb-2">Ruangan</label>
-                                        <x-searchable-select
-                                            name="room_id"
-                                            search-url="{{ route('admin.rooms.search') }}"
-                                            :selected-id="old('room_id', $agenda->room_id)"
-                                            :selected-label="old('room_id') ? null : $agenda->room?->room_name"
-                                            placeholder="Cari ruangan..."
-                                            required
-                                        />
-                                        @error('room_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="event_time" class="block text-sm font-semibold text-gray-700 mb-2">Pukul Mulai</label>
-                                        <input type="time" name="event_time" id="event_time" value="{{ old('event_time', $agenda->event_time ? \Carbon\Carbon::parse($agenda->event_time)->format('H:i') : '') }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
-                                        @error('event_time') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                                    </div>
-
-                                    <template x-if="type === 'diklat' || type === 'pelatihan'">
-                                        <div>
-                                            <label for="event_end_time" class="block text-sm font-semibold text-gray-700 mb-2">Pukul Selesai</label>
-                                            <input type="time" name="event_end_time" id="event_end_time" value="{{ old('event_end_time', $agenda->event_end_time ? \Carbon\Carbon::parse($agenda->event_end_time)->format('H:i') : '') }}" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
-                                            <p class="text-xs text-gray-400 mt-1">Digunakan untuk diklat dan pelatihan.</p>
-                                            @error('event_end_time') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                                        </div>
-                                    </template>
-
-                                    <template x-if="type === 'rapat'">
-                                        <div>
-                                            <label for="event_end_time" class="block text-sm font-semibold text-gray-700 mb-2">Pukul Selesai</label>
-                                            <input type="time" id="event_end_time" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" readOnly disabled>
-                                            <p class="text-xs text-gray-400 mt-1">Agenda rapat tidak memakai batasan pukul selesai.</p>
-                                            @error('event_end_time') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                                        </div>
-                                    </template>
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="unit_id" class="block text-sm font-semibold text-gray-700 mb-2">Unit</label>
-                                        <x-searchable-select
-                                            name="unit_id"
-                                            search-url="{{ route('admin.units.search') }}"
-                                            :selected-id="old('unit_id', $agenda->unit_id)"
-                                            :selected-label="old('unit_id') ? null : $agenda->unit?->name"
-                                            placeholder="Cari unit..."
-                                            required
-                                        />
-                                        @error('unit_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                                    </div>
-
-                                    <div>
-                                        <label for="event_leader_id" class="block text-sm font-semibold text-gray-700 mb-2">
-                                            <span x-text="'Pimpinan ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))"></span>
-                                        </label>
-                                        <x-searchable-select
-                                            name="event_leader_id"
-                                            search-url="{{ route('admin.employees.search') }}"
-                                            :selected-id="old('event_leader_id', $agenda->event_leader_id)"
-                                            :selected-label="old('event_leader_id') ? null : $agenda->eventLeader?->full_name"
-                                            placeholder="Cari pegawai..."
-                                            required
-                                        />
-                                        @error('event_leader_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -216,7 +211,7 @@
                                 <span x-text="'Berkas ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))"></span>
                             </h4>
 
-                            <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label for="letter_file" class="block text-sm font-semibold text-gray-700 mb-2">
                                     <span class="pr-3"> Surat Undangan </span>
@@ -225,7 +220,7 @@
                                     @endif
                                     </label>
                                     <input type="file" name="letter_file" id="letter_file" accept=".pdf" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none file:mr-4 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
-                                    <p class="text-xs text-gray-400 mt-1">Format PDF, maksimal 5MB.</p>
+                                    <p class="text-xs text-gray-400 mt-1">Format PDF, maksimal 500kb.</p>
                                     @error('letter_file') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                 </div>
 
