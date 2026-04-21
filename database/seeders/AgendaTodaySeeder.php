@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Agenda;
+use App\Models\BankSoal;
 use App\Models\Question;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,8 @@ class AgendaTodaySeeder extends Seeder
 
     public function run(): void
     {
+        $bankSoalId = BankSoal::where('title', 'Template Bank Soal Perawat')->value('id');
+
         $agendas = [
             // --- DIKLAT (4) ---
             [
@@ -37,7 +40,7 @@ class AgendaTodaySeeder extends Seeder
                 'room_id'         => 1,
                 'unit_id'         => 2,
                 'event_leader_id' => 1,
-                'bank_soal_id'    => 7,
+                'bank_soal_id'    => $bankSoalId,
                 'letter_file'     => $this->letterFiles[0],
                 'material_file'   => $this->materialFiles[0],
                 'presenter_ids'   => [8, 9],
@@ -52,7 +55,7 @@ class AgendaTodaySeeder extends Seeder
                 'room_id'         => 4,
                 'unit_id'         => 3,
                 'event_leader_id' => 2,
-                'bank_soal_id'    => 7,
+                'bank_soal_id'    => $bankSoalId,
                 'letter_file'     => $this->letterFiles[1],
                 'material_file'   => $this->materialFiles[1],
                 'presenter_ids'   => [7],
@@ -67,7 +70,7 @@ class AgendaTodaySeeder extends Seeder
                 'room_id'         => 1,
                 'unit_id'         => 2,
                 'event_leader_id' => 3,
-                'bank_soal_id'    => 7,
+                'bank_soal_id'    => $bankSoalId,
                 'letter_file'     => $this->letterFiles[0],
                 'material_file'   => $this->materialFiles[0],
                 'presenter_ids'   => [10, 6],
@@ -82,7 +85,7 @@ class AgendaTodaySeeder extends Seeder
                 'room_id'         => 2,
                 'unit_id'         => 1,
                 'event_leader_id' => 4,
-                'bank_soal_id'    => 7,
+                'bank_soal_id'    => $bankSoalId,
                 'letter_file'     => $this->letterFiles[2],
                 'material_file'   => $this->materialFiles[1],
                 'presenter_ids'   => [5],
@@ -99,7 +102,7 @@ class AgendaTodaySeeder extends Seeder
                 'room_id'         => 1,
                 'unit_id'         => 5,
                 'event_leader_id' => 5,
-                'bank_soal_id'    => 7,
+                'bank_soal_id'    => $bankSoalId,
                 'letter_file'     => $this->letterFiles[0],
                 'material_file'   => $this->materialFiles[0],
                 'presenter_ids'   => [3, 8],
@@ -114,7 +117,7 @@ class AgendaTodaySeeder extends Seeder
                 'room_id'         => 2,
                 'unit_id'         => 2,
                 'event_leader_id' => 6,
-                'bank_soal_id'    => 7,
+                'bank_soal_id'    => $bankSoalId,
                 'letter_file'     => $this->letterFiles[1],
                 'material_file'   => $this->materialFiles[1],
                 'presenter_ids'   => [9],
@@ -129,7 +132,7 @@ class AgendaTodaySeeder extends Seeder
                 'room_id'         => 3,
                 'unit_id'         => 1,
                 'event_leader_id' => 1,
-                'bank_soal_id'    => 7,
+                'bank_soal_id'    => $bankSoalId,
                 'letter_file'     => $this->letterFiles[2],
                 'material_file'   => $this->materialFiles[0],
                 'presenter_ids'   => [10, 7],

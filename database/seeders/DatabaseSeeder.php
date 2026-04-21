@@ -38,6 +38,9 @@ class DatabaseSeeder extends Seeder
             "description" => "Ruang rapat direksi",
         ]);
 
-        // Employee::factory(20)->create();
+        $this->call([
+            BankSoalSeeder::class,
+            AgendaTodaySeeder::class,
+        ]);
     }
 }
