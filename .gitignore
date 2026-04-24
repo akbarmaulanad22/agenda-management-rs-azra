@@ -24,3 +24,11 @@ Homestead.yaml
 Thumbs.db
 .claude
 .mcp.json
+/opencode.json
+/playwright.config.ts
+/seed.spec.ts
+/test-results/
+/tests/seed.spec.ts
+/tests/agenda-today.spec.ts
+/.opencode/
+/specs/

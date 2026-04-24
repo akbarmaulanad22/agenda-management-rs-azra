@@ -31,14 +31,13 @@
 
             {{-- Search --}}
             <div class="mt-4 relative">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4 text-white/50 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+                <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
                 <input type="text" x-model="search" placeholder="Cari agenda..."
-                    class="w-full rounded-2xl border-0 bg-white/15 text-white placeholder-white/50 shadow-sm focus:ring-2 focus:ring-white/30 pl-11 pr-4 py-2.5 text-sm backdrop-blur-sm">
+                    class="w-full rounded-2xl border-0 bg-white/15 text-white placeholder-white/50 shadow-sm focus:ring-2 focus:ring-white/30 pl-12 pr-4 py-3 text-sm">
             </div>
         </div>
 
@@ -51,54 +50,54 @@
         <div class="px-4">
             @if($agendas->count())
                 {{-- ===== TABLET+: Table View ===== --}}
-                <div class="hidden sm:block bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden">
+                <div class="hidden sm:block bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
                     <table class="w-full table-fixed">
                         <thead>
-                            <tr class="border-b border-gray-200/60">
-                                <th class="w-[30%] text-left px-2 sm:px-5 py-2 sm:py-3 text-[9px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Judul</th>
-                                <th class="w-[15%] text-left px-1 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Waktu</th>
-                                <th class="w-[22%] text-left px-1 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Ruangan</th>
-                                <th class="w-[20%] text-left px-1 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Unit</th>
-                                <th class="w-[13%] text-right px-1 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Hadir</th>
+                            <tr class="bg-primary text-white">
+                                <th class="w-[28%] text-left px-4 py-3.5 text-xs font-bold uppercase tracking-wider border-r border-primary-400">Agenda</th>
+                                <th class="w-[15%] text-left px-4 py-3.5 text-xs font-bold uppercase tracking-wider border-r border-primary-400">Waktu</th>
+                                <th class="w-[20%] text-left px-4 py-3.5 text-xs font-bold uppercase tracking-wider border-r border-primary-400">Ruangan</th>
+                                <th class="w-[18%] text-left px-4 py-3.5 text-xs font-bold uppercase tracking-wider border-r border-primary-400">Unit</th>
+                                <th class="w-[19%] text-right px-4 py-3.5 text-xs font-bold uppercase tracking-wider">Kehadiran</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100/80">
-                            @foreach($agendas as $agenda)
+                        <tbody class="divide-y divide-gray-200">
+                            @foreach($agendas as $index => $agenda)
                                 <tr data-id="{{ $agenda->id }}"
                                     x-show="isVisible({{ $agenda->id }})"
                                     x-transition:enter="transition ease-out duration-200"
                                     x-transition:enter-start="opacity-0 translate-y-1"
                                     x-transition:enter-end="opacity-100 translate-y-0"
                                     onclick="window.location='{{ route('attendance.show', $agenda) }}'"
-                                    class="group cursor-pointer hover:bg-primary-50/40 transition-all duration-200">
+                                    class="group cursor-pointer {{ $index % 2 == 0 ? 'bg-white' : 'bg-primary-50/30' }} hover:bg-primary-50 transition-all duration-200">
 
                                     {{-- Judul --}}
-                                    <td class="px-2 sm:px-5 py-2 sm:py-3.5">
-                                        <div class="truncate text-[11px] sm:text-sm font-semibold text-gray-800 group-hover:text-primary transition-colors">{{ $agenda->title }}</div>
+                                    <td class="px-4 py-3.5 border-r border-gray-100">
+                                        <div class="truncate text-sm font-semibold text-gray-800 group-hover:text-primary transition-colors">{{ $agenda->title }}</div>
                                         @if($agenda->description)
-                                            <p class="text-xs text-gray-400 mt-0.5 whitespace-pre-wrap">{{ $agenda->description }}</p>
+                                            <p class="text-xs text-gray-400 mt-0.5 whitespace-pre-wrap line-clamp-1">{{ $agenda->description }}</p>
                                         @endif
                                     </td>
 
                                     {{-- Waktu --}}
-                                    <td class="px-1 sm:px-4 py-2 sm:py-3.5 text-[11px] sm:text-sm text-gray-600">
+                                    <td class="px-4 py-3.5 text-sm text-gray-600 border-r border-gray-100">
                                         <span class="font-medium">{{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }}@if($agenda->event_end_time) – {{ \Carbon\Carbon::parse($agenda->event_end_time)->format('H:i') }}@endif</span>
-                                        <span class="hidden sm:inline text-gray-400 text-xs ml-0.5">WIB</span>
+                                        <span class="text-gray-400 text-xs ml-0.5">WIB</span>
                                     </td>
 
                                     {{-- Ruangan --}}
-                                    <td class="px-1 sm:px-4 py-2 sm:py-3.5">
-                                        <div class="truncate text-[11px] sm:text-sm text-gray-600">{{ $agenda->room->room_name ?? '-' }}</div>
+                                    <td class="px-4 py-3.5 border-r border-gray-100">
+                                        <div class="truncate text-sm text-gray-600">{{ $agenda->room->room_name ?? '-' }}</div>
                                     </td>
 
                                     {{-- Unit --}}
-                                    <td class="px-1 sm:px-4 py-2 sm:py-3.5">
-                                        <div class="truncate text-[11px] sm:text-sm text-gray-500">{{ $agenda->unit?->name ?? '-' }}</div>
+                                    <td class="px-4 py-3.5 border-r border-gray-100">
+                                        <div class="truncate text-sm text-gray-500">{{ $agenda->unit?->name ?? '-' }}</div>
                                     </td>
 
                                     {{-- Hadir --}}
-                                    <td class="px-1 sm:px-4 py-2 sm:py-3.5 text-right">
-                                        <span class="inline-flex items-center justify-center px-1 sm:px-2 py-0.5 rounded-lg text-[10px] sm:text-xs font-bold {{ $agenda->signed_count > 0 ? 'bg-secondary-50 text-secondary-700' : 'bg-gray-100 text-gray-400' }}">
+                                    <td class="px-4 py-3.5 text-right">
+                                        <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg text-xs font-bold {{ $agenda->signed_count > 0 ? 'bg-secondary-50 text-secondary-700' : 'bg-gray-100 text-gray-400' }}">
                                             {{ $agenda->signed_count }}
                                         </span>
                                     </td>
