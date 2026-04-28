@@ -38,9 +38,9 @@
                         <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
-                    @forelse($bankSoals as $bankSoal)
-                        <tr class="group hover:bg-gray-50/50 transition-colors">
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($bankSoals as $index => $bankSoal)
+                        <tr class="group transition-colors hover:bg-primary-50/40 {{ $index % 2 === 0 ? 'bg-white' : 'bg-slate-50' }}">
                             <td class="px-6 py-4">
                                 <a href="{{ route('admin.bank-soals.show', $bankSoal) }}" class="text-sm font-semibold text-gray-800 hover:text-primary transition-colors">{{ $bankSoal->title }}</a>
                             </td>

@@ -101,7 +101,6 @@
                     <tr class="border-b border-gray-100">
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Judul</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Deskripsi</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Tipe</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Tanggal</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Jam</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Ruangan</th>
@@ -110,22 +109,13 @@
                         <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
-                    @forelse($agendas as $agenda)
-                        <tr class="group hover:bg-gray-50/50 transition-colors">
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($agendas as $index => $agenda)
+                        <tr class="group transition-colors hover:bg-primary-50/40 {{ $index % 2 === 0 ? 'bg-white' : 'bg-slate-50' }}">
                             <td class="px-6 py-4">
                                 <a href="{{ route('admin.agendas.show', $agenda) }}" class="text-sm font-semibold text-gray-800 group-hover:text-primary transition-colors">{{ $agenda->title }}</a>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500 whitespace-pre-wrap">{{ $agenda->description ?? '-' }}</td>
-                            <td class="px-6 py-4">
-                                @if($agenda->type === 'diklat')
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-600">Diklat</span>
-                                @elseif($agenda->type === 'pelatihan')
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-violet-50 text-violet-600">Pelatihan</span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600">Rapat</span>
-                                @endif
-                            </td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->event_date->translatedFormat('d M Y') }}</td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }} - {{\Carbon\Carbon::parse($agenda->event_time)->format('H:i') ?? "Selesai"}} </td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $agenda->room->room_name ?? '-' }}</td>
@@ -142,19 +132,6 @@
                                     <a href="{{ route('admin.agendas.export-pdf', $agenda) }}" class="p-2 rounded-xl hover:bg-amber-50 text-gray-400 hover:text-amber-500 transition-colors" title="Export PDF">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
                                     </a>
-                                    <div x-data="{ copied: false }" class="relative">
-                                        <button
-                                            @click="navigator.clipboard.writeText('{{ route('attendance.show', $agenda) }}'); copied = true; setTimeout(() => copied = false, 2000)"
-                                            class="p-2 rounded-xl hover:bg-primary-50 text-gray-400 hover:text-primary transition-colors"
-                                            title="Copy Link Absensi"
-                                        >
-                                            <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.282a4.5 4.5 0 00-1.242-7.244l4.5-4.5a4.5 4.5 0 016.364 6.364l-1.757 1.757"/></svg>
-                                            <svg x-show="copied" x-cloak class="w-4 h-4 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
-                                        </button>
-                                        <div x-show="copied" x-transition x-cloak class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-lg">
-                                            Tersalin!
-                                        </div>
-                                    </div>
                                     <form action="{{ route('admin.agendas.destroy', $agenda) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="p-2 rounded-xl hover:bg-rose-50 text-gray-400 hover:text-rose-500 transition-colors" title="Hapus">

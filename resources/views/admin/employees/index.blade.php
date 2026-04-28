@@ -54,9 +54,9 @@
                         <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
-                    @forelse($employees as $employee)
-                        <tr class="group hover:bg-gray-50/50 transition-colors">
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($employees as $index => $employee)
+                        <tr class="group transition-colors hover:bg-primary-50/40 {{ $index % 2 === 0 ? 'bg-white' : 'bg-slate-50' }}">
                             <td class="px-6 py-4 text-sm text-gray-500 font-mono">{{ $employee->nip }}</td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">

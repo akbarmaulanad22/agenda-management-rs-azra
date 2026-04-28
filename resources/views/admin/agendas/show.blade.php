@@ -27,7 +27,7 @@
                         @endif
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
-                            <a href="{{ route('attendance.show', $agenda) }}" target="_blank"
+                            <!--<a href="{{ route('attendance.show', $agenda) }}" target="_blank"
                                 class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-primary text-white text-sm font-bold shadow-md shadow-primary/20 hover:bg-primary-700 active:scale-[0.98] transition-all duration-200">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -42,7 +42,7 @@
                                         d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
                                 </svg>
                                 Link Input Publik
-                            </a>
+                            </a>-->
                         <a href="{{ route('admin.agendas.export-pdf', $agenda) }}"
                             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-amber-500 text-white text-sm font-bold shadow-md shadow-amber-500/20 hover:bg-amber-600 active:scale-[0.98] transition-all duration-200">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -64,61 +64,61 @@
 
                 {{-- Info Grid --}}
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                    <div class="p-4 rounded-2xl border border-gray-100 bg-primary/5">
                         <div class="flex items-center gap-2 mb-1.5">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5"
+                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" stroke-width="1.5"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                             </svg>
-                            <span class="text-[11px] font-semibold text-gray-400 uppercase">Tanggal</span>
+                            <span class="text-[11px] font-semibold text-primary uppercase bg-primary/10 px-2 py-0.5 rounded-lg">Tanggal</span>
                         </div>
                         <p class="text-sm font-bold text-gray-800">{{ $agenda->event_date->translatedFormat('d F Y') }}
                         </p>
                     </div>
-                    <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                    <div class="p-4 rounded-2xl border border-gray-100 bg-secondary/5">
                         <div class="flex items-center gap-2 mb-1.5">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5"
+                            <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" stroke-width="1.5"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span class="text-[11px] font-semibold text-gray-400 uppercase">Waktu</span>
+                            <span class="text-[11px] font-semibold text-secondary uppercase bg-secondary/10 px-2 py-0.5 rounded-lg">Waktu</span>
                         </div>
                         <p class="text-sm font-bold text-gray-800">
                             {{ \Carbon\Carbon::parse($agenda->event_time)->format('H:i') }}@if($agenda->event_end_time) – {{ \Carbon\Carbon::parse($agenda->event_end_time)->format('H:i') }}@endif WIB
                         </p>
                     </div>
-                    <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                    <div class="p-4 rounded-2xl border border-gray-100 bg-violet-50/50">
                         <div class="flex items-center gap-2 mb-1.5">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5"
+                            <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" stroke-width="1.5"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3H21m-3.75 3H21" />
                             </svg>
-                            <span class="text-[11px] font-semibold text-gray-400 uppercase">Ruangan</span>
+                            <span class="text-[11px] font-semibold text-violet-500 uppercase bg-violet-50 px-2 py-0.5 rounded-lg">Ruangan</span>
                         </div>
                         <p class="text-sm font-bold text-gray-800">{{ $agenda->room->room_name ?? '-' }}</p>
                     </div>
-                    <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                    <div class="p-4 rounded-2xl border border-gray-100 bg-amber-50/50">
                         <div class="flex items-center gap-2 mb-1.5">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5"
+                            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
                             </svg>
-                            <span class="text-[11px] font-semibold text-gray-400 uppercase">Unit</span>
+                            <span class="text-[11px] font-semibold text-amber-500 uppercase bg-amber-50 px-2 py-0.5 rounded-lg">Unit</span>
                         </div>
                         <p class="text-sm font-bold text-gray-800">{{ $agenda->unit?->name ?? '-' }}</p>
                     </div>
-                    <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                    <div class="p-4 rounded-2xl border border-gray-100 bg-rose-50/50">
                         <div class="flex items-center gap-2 mb-1.5">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5"
+                            <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="1.5"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
                             </svg>
-                            <span class="text-[11px] font-semibold text-gray-400 uppercase">Pimpinan {{ $agenda->type }}</span>
+                            <span class="text-[11px] font-semibold text-rose-500 uppercase bg-rose-50 px-2 py-0.5 rounded-lg">Pimpinan {{ $agenda->type }}</span>
                         </div>
                         <p class="text-sm font-bold text-gray-800">{{ $agenda->eventLeader?->full_name ?? '-' }}</p>
                     </div>
@@ -228,27 +228,28 @@
                     @endif
                 </div>
 
-                <div class="px-8 py-6">
+                <div class="px-8 py-6 rounded-2xl">
                     @if($quizComparison->count() > 0 && $quizStats)
                         {{-- Unified Table --}}
                         <div class="overflow-x-auto">
-                            <table class="w-full">
-                                <thead>
-                                    <tr class="border-b border-gray-100">
-                                        <th class="pr-3 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider w-10">No</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Nama</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Jabatan</th>
-                                        <th class="px-2 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Pretest Benar</th>
-                                        <th class="px-2 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Pretest Nilai</th>
-                                        <th class="px-2 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Posttest Benar</th>
-                                        <th class="px-2 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Posttest Nilai</th>
-                                        <th class="px-3 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Perubahan</th>
+                            <div class="overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
+                                <table class="min-w-full">
+                                    <thead class="bg-primary-700 text-white">
+                                    <tr>
+                                        <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider w-10">No</th>
+                                        <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider">Nama</th>
+                                        <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider">Jabatan</th>
+                                        <th class="px-2 py-3 text-center text-xs font-semibold uppercase tracking-wider">Pretest Benar</th>
+                                        <th class="px-2 py-3 text-center text-xs font-semibold uppercase tracking-wider">Pretest Nilai</th>
+                                        <th class="px-2 py-3 text-center text-xs font-semibold uppercase tracking-wider">Posttest Benar</th>
+                                        <th class="px-2 py-3 text-center text-xs font-semibold uppercase tracking-wider">Posttest Nilai</th>
+                                        <th class="px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider">Perubahan</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-50">
+                                <tbody class="divide-y divide-gray-100">
                                     @foreach($quizComparison as $index => $row)
-                                        <tr class="hover:bg-gray-50/50 transition-colors">
-                                            <td class="pr-3 py-3 text-sm text-gray-400 font-medium">{{ $index + 1 }}</td>
+                                        <tr class="transition-colors hover:bg-primary-50/40 {{ $index % 2 === 0 ? 'bg-white' : 'bg-slate-50' }}">
+                                            <td class="px-3 py-3 text-sm text-gray-400 font-medium">{{ $index + 1 }}</td>
                                             <td class="px-3 py-3">
                                                 <div class="text-sm font-semibold text-gray-800">{{ $row['employee']->full_name }}
                                                 </div>
@@ -297,21 +298,11 @@
                                                     @if($row['improvement'] > 0)
                                                         <span
                                                             class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-600">
-                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                                                            </svg>
-                                                            +{{ $row['improvement'] }}
+                                                            {{ $row['improvement'] }}
                                                         </span>
                                                     @elseif($row['improvement'] < 0)
                                                         <span
                                                             class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md text-xs font-bold bg-red-50 text-red-500">
-                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                                            </svg>
                                                             {{ $row['improvement'] }}
                                                         </span>
                                                     @else
@@ -325,7 +316,8 @@
                                         </tr>
                                     @endforeach
                                 </tbody>
-                            </table>
+                                </table>
+                            </div>
                         </div>
                     @else
                         <div class="text-center py-8">
@@ -362,36 +354,23 @@
             </div>
 
             @if($agenda->employees->count() > 0)
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="border-b border-gray-100">
-                                <th
-                                    class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider w-12">
-                                    No</th>
-                                <th
-                                    class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                    Nama</th>
-                                <th
-                                    class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                    NIP</th>
-                                <th
-                                    class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                    Jabatan</th>
-                                <th
-                                    class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                    Organisasi</th>
-                                <th
-                                    class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                    Status</th>
-                                <th
-                                    class="px-6 py-3.5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                    TTD</th>
+                <div class="px-8 py-6 overflow-x-auto">
+                    <div class="overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
+                        <table class="min-w-full">
+                            <thead class="bg-primary-700 text-white">
+                                <tr>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider w-12">No</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Nama</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">NIP</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Jabatan</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Organisasi</th>
+                                <th class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3.5 text-center text-xs font-semibold uppercase tracking-wider">TTD</th>
                             </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50">
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
                             @foreach($agenda->employees as $index => $employee)
-                                <tr class="hover:bg-gray-50/50 transition-colors">
+                                <tr class="transition-colors hover:bg-primary-50/40 {{ $index % 2 === 0 ? 'bg-white' : 'bg-slate-50' }}">
                                     <td class="px-6 py-3.5 text-sm text-gray-400 font-medium">{{ $index + 1 }}</td>
                                     <td class="px-6 py-3.5">
                                         <div class="flex items-center gap-3">
@@ -437,8 +416,9 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
             @else
@@ -475,30 +455,31 @@
                     </span>
                 </div>
                 @if($agenda->notes->count() > 0)
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="border-b border-gray-100">
+                    <div class="px-8 py-6 overflow-x-auto">
+                        <div class="overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
+                            <table class="min-w-full">
+                                <thead class="bg-primary-700 text-white">
+                                    <tr>
                                     <th
-                                        class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider w-12">
+                                        class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider w-12">
                                         No</th>
                                     <th
-                                        class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                        class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
                                         Topik</th>
                                     <th
-                                        class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                        class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
                                         Keputusan</th>
                                     <th
-                                        class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                        class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
                                         Keterangan</th>
                                     <th
-                                        class="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                        class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
                                         Tanggal</th>
                                 </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
                                 @foreach($agenda->notes as $index => $note)
-                                    <tr class="hover:bg-gray-50/50 transition-colors">
+                                    <tr class="transition-colors hover:bg-primary-50/40 {{ $index % 2 === 0 ? 'bg-white' : 'bg-slate-50' }}">
                                         <td class="px-6 py-3.5 text-sm text-gray-400 font-medium">{{ $index + 1 }}</td>
                                         <td class="px-6 py-3.5 text-sm font-semibold text-gray-800">{{ $note->topic }}</td>
                                         <td class="px-6 py-3.5 text-sm text-gray-500">{{ $note->decision }}</td>
@@ -507,8 +488,9 @@
                                             {{ $note->created_at->format('d M Y, H:i') }}</td>
                                     </tr>
                                 @endforeach
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 @else
                     <div class="text-center py-12">
@@ -531,7 +513,7 @@
                 <h3 class="text-base font-bold text-gray-900">Dokumentasi Foto</h3>
                 <p class="text-sm text-gray-400 mt-0.5">{{ $agenda->images->count() }} foto dokumentasi</p>
             </div>
-            <div class="p-8">
+            <div class="px-8 py-6">
                 @if($agenda->images->count() > 0)
                     <div class="columns-2 md:columns-3 gap-4 space-y-4">
                         @foreach($agenda->images as $imgIndex => $image)
