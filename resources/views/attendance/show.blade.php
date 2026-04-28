@@ -15,15 +15,15 @@
 </head>
 
 <body class="bg-gray-50 min-h-screen font-sans">
-    <div x-data="attendanceApp()" class="max-w-3xl mx-auto pb-8">
+    <div x-data="attendanceApp()" x-init="init()" class="max-w-6xl mx-auto pb-8">
         {{-- Header --}}
         <x-agenda-header :agenda="$agenda">
             <x-slot:actions>
                 <div class="flex items-center gap-2">
                     @if($agenda->allowsQuiz() && $agenda->agendaQuestions->count() > 0)
                         <a href="{{ route('attendance.quiz', $agenda) }}"
-                            class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-[11px] font-medium px-3 py-1.5 rounded-full hover:bg-white/25 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                            class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-[10px] md:text-[11px] font-medium px-3 py-1.5 rounded-full hover:bg-white/25 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
@@ -31,8 +31,8 @@
                         </a>
                     @endif
                     <a href="{{ route('agenda.input', $agenda) }}"
-                        class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-[11px] font-medium px-3 py-1.5 rounded-full hover:bg-white/25 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                        class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-[10px] md:text-[11px] font-medium px-3 py-1.5 rounded-full hover:bg-white/25 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
@@ -46,26 +46,26 @@
         <div x-show="currentStep === 'attendance'" class="px-4 mt-5">
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                 <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 rounded-xl bg-primary-50 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <div class="w-7 h-7 md:w-8 md:h-8 rounded-xl bg-primary-50 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
                     </div>
                     <div>
-                        <h2 class="font-bold text-gray-900 text-sm">Absen Kehadiran</h2>
-                        <p class="text-xs text-gray-400">Cari nama Anda untuk melakukan absensi</p>
+                        <h2 class="font-bold text-gray-900 text-[10px] md:text-[11px] md:text-sm">Absen Kehadiran</h2>
+                        <p class="text-[9px] md:text-[10px] md:text-xs text-gray-400">Cari nama Anda untuk melakukan absensi</p>
                     </div>
                 </div>
                 <div class="relative">
                     <svg xmlns="http://www.w3.org/2000/svg"
-                        class="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" fill="none"
+                        class="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400 absolute left-3 md:left-4 top-1/2 -translate-y-1/2 pointer-events-none" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                     <input type="text" x-model="search" placeholder="Ketik nama Anda untuk mencari..."
-                        class="w-full rounded-2xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary pl-11 pr-4 py-3 text-sm bg-white">
+                        class="w-full rounded-2xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary pl-9 py-1.5 md:pl-12 pr-4 md:py-3 text-[11px] md:text-xs bg-white">
                 </div>
 
                 {{-- Search Results (only show when searching) --}}
@@ -77,13 +77,13 @@
                                 ? 'bg-gray-50 border-gray-100 opacity-60'
                                 : 'bg-white border-gray-200 cursor-pointer hover:border-primary/30 hover:shadow-sm active:scale-[0.99]'">
                             <div class="min-w-0 flex-1">
-                                <div class="font-semibold text-gray-900 text-sm" x-text="p.name"></div>
-                                <div class="text-xs text-gray-500 mt-0.5" x-text="p.position + ' - ' + p.organization"></div>
+                                <div class="font-semibold text-gray-900 text-[11px] md:text-sm" x-text="p.name"></div>
+                                <div class="text-[10px] md:text-xs text-gray-500 mt-0.5" x-text="p.position + ' - ' + p.organization"></div>
                             </div>
                             <div class="shrink-0 ml-3">
                                 <template x-if="p.signed_at">
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none"
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] md:text-xs font-medium bg-green-50 text-green-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
@@ -91,8 +91,8 @@
                                     </span>
                                 </template>
                                 <template x-if="!p.signed_at">
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none"
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] md:text-xs font-medium bg-primary-50 text-primary">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -107,21 +107,17 @@
                     <template x-if="filteredEmployees.length === 0 && search.length >= 2">
                         <div class="text-center py-6">
                             <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-300" fill="none"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-300" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
-                            <p class="text-gray-400 text-sm">Nama tidak ditemukan.</p>
+                            <p class="text-gray-400 text-[11px] md:text-sm">Nama tidak ditemukan.</p>
                         </div>
                     </template>
                 </div>
 
-                {{-- Hint when not searching --}}
-                <div x-show="search.length < 2" class="mt-3 text-center py-4">
-                    <p class="text-xs text-gray-300">Ketik minimal 2 huruf untuk menampilkan hasil</p>
-                </div>
             </div>
         </div>
 
@@ -130,11 +126,11 @@
             {{-- Employee info bar --}}
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4 flex items-center justify-between">
                 <div class="min-w-0">
-                    <div class="font-bold text-gray-900 text-sm" x-text="selectedEmployee?.name"></div>
-                    <div class="text-xs text-gray-500" x-text="selectedEmployee?.position + ' - ' + selectedEmployee?.organization"></div>
+                    <div class="font-bold text-gray-900 text-[10px] md:text-[11px] md:text-sm" x-text="selectedEmployee?.name"></div>
+                    <div class="text-[9px] md:text-[10px] md:text-xs text-gray-500" x-text="selectedEmployee?.position + ' - ' + selectedEmployee?.organization"></div>
                 </div>
-                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] md:text-xs font-semibold bg-blue-50 text-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     Pretest
@@ -144,14 +140,14 @@
             {{-- Pretest Info Card --}}
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-4 mb-4">
                 <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <div class="w-7 h-7 md:w-8 md:h-8 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-blue-900">Pretest — Sebelum Pelatihan</h3>
-                        <p class="text-xs text-blue-600 mt-0.5">Silakan jawab soal di bawah ini untuk mengukur pemahaman awal Anda. Soal yang sama akan diberikan kembali di akhir pelatihan (posttest).</p>
+                        <h3 class="text-[10px] md:text-[11px] md:text-sm font-bold text-blue-900">Pretest — Sebelum Pelatihan</h3>
+                        <p class="text-[9px] md:text-[10px] md:text-xs text-blue-600 mt-0.5">Silakan jawab soal di bawah ini untuk mengukur pemahaman awal Anda. Soal yang sama akan diberikan kembali di akhir pelatihan (posttest).</p>
                     </div>
                 </div>
             </div>
@@ -161,9 +157,9 @@
                 <template x-for="(q, index) in questions" :key="q.id">
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                         <div class="flex items-start gap-3 mb-4">
-                            <span class="shrink-0 w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center text-xs font-bold text-blue-600"
+                            <span class="shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-lg bg-blue-50 flex items-center justify-center text-[10px] md:text-xs font-bold text-blue-600"
                                 x-text="index + 1"></span>
-                            <p class="text-sm text-gray-800 font-medium leading-relaxed" x-text="q.question_text"></p>
+                            <p class="text-[10px] md:text-sm text-gray-800 font-medium leading-relaxed" x-text="q.question_text"></p>
                         </div>
                         <div class="space-y-2 ml-10">
                             <template x-for="opt in ['a','b','c','d','e']" :key="opt">
@@ -176,8 +172,8 @@
                                         x-model="pretestAnswers[q.id]"
                                         class="mt-0.5 text-blue-500 focus:ring-blue-500">
                                     <div class="flex items-start gap-2 min-w-0">
-                                        <span class="shrink-0 text-xs font-bold text-gray-400 uppercase mt-0.5" x-text="opt + '.'"></span>
-                                        <span class="text-sm text-gray-700" x-text="q['option_' + opt]"></span>
+                                        <span class="shrink-0 text-[10px] md:text-xs font-bold text-gray-400 uppercase mt-0.5" x-text="opt + '.'"></span>
+                                        <span class="text-[10px] md:text-sm text-gray-700" x-text="q['option_' + opt]"></span>
                                     </div>
                                 </label>
                             </template>
@@ -193,41 +189,12 @@
                     <span x-show="!pretestSubmitting">Kirim Pretest</span>
                     <span x-show="pretestSubmitting">Mengirim...</span>
                 </button>
-                <p class="text-center text-xs mt-2" :class="allPretestAnswered ? 'text-gray-300' : 'text-amber-500'">
+                <p class="text-center text-[10px] md:text-xs mt-2" :class="allPretestAnswered ? 'text-gray-300' : 'text-amber-500'">
                     <span x-show="!allPretestAnswered" x-text="pretestAnsweredCount + ' dari ' + questions.length + ' soal dijawab'"></span>
                     <span x-show="allPretestAnswered">Semua soal sudah dijawab</span>
                 </p>
             </div>
 
-            {{-- Skip pretest button --}}
-            <div class="mt-3 text-center">
-                <button @click="skipPretest()" class="text-xs text-gray-400 hover:text-gray-600 transition">
-                    Lewati pretest &rarr;
-                </button>
-            </div>
-        </div>
-
-        {{-- ===== PRETEST RESULT ===== --}}
-        <div x-show="currentStep === 'pretest-done'" x-cloak class="px-4 mt-5">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
-                <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-500" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900">Pretest Selesai!</h3>
-                <p class="text-sm text-gray-500 mt-2">Absensi dan pretest Anda telah tercatat. Kerjakan posttest setelah pelatihan selesai.</p>
-                <div class="mt-4">
-                    <button @click="backToAttendance()"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-2xl hover:bg-primary-700 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        Kembali
-                    </button>
-                </div>
-            </div>
         </div>
 
         {{-- Attendee List Section --}}
@@ -236,45 +203,45 @@
                 {{-- Section Header --}}
                 <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl bg-green-50 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <div class="w-7 h-7 md:w-8 md:h-8 rounded-xl bg-green-50 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                         <div>
-                            <h2 class="font-bold text-gray-900 text-sm">Peserta yang Sudah Hadir</h2>
-                            <p class="text-xs text-gray-400" x-text="attendees.length + ' peserta'"></p>
+                            <h2 class="font-bold text-gray-900 text-[10px] md:text-[11px] md:text-sm">Peserta yang Sudah Hadir</h2>
+                            <p class="text-[9px] md:text-[10px] md:text-xs text-gray-400" x-text="attendees.length + ' peserta'"></p>
                         </div>
                     </div>
                 </div>
 
                 {{-- Attendee Table --}}
-                <div x-show="attendees.length > 0" class="overflow-hidden">
-                    <table class="w-full text-[11px] table-fixed">
+                <div x-show="attendees.length > 0" class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                    <table class="w-full table-fixed" >
                         <thead>
-                            <tr class="bg-gray-50/80">
-                                <th class="text-left px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider" style="width:24px">No</th>
-                                <th class="text-left px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Nama</th>
-                                <th class="text-left px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Jabatan</th>
-                                <th class="text-left px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider">Organisasi</th>
-                                <th class="text-center px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider" style="width:40px">Jam</th>
-                                <th class="text-center px-1.5 py-2 text-[9px] font-semibold text-gray-500 uppercase tracking-wider" style="width:52px">TTD</th>
+                            <tr class="bg-gradient-to-r from-primary to-primary-700">
+                                <th class="text-left px-1.5 py-2 text-[6px] md:text-[9px] font-semibold text-white uppercase tracking-wider border-r border-primary-500" style="width:24px">No</th>
+                                <th class="text-left px-1.5 py-2 text-[6px] md:text-[9px] font-semibold text-white uppercase tracking-wider border-r border-primary-500">Nama</th>
+                                <th class="text-left px-1.5 py-2 text-[6px] md:text-[9px] font-semibold text-white uppercase tracking-wider border-r border-primary-500">Jabatan</th>
+                                <th class="text-left px-1.5 py-2 text-[6px] md:text-[9px] font-semibold text-white uppercase tracking-wider border-r border-primary-500">Organisasi</th>
+                                <th class="text-center px-1.5 py-2 text-[6px] md:text-[9px] font-semibold text-white uppercase tracking-wider border-r border-primary-500 w-[40px] md:w-[60px]" style="width:40px">Jam</th>
+                                <th class="text-center px-1.5 py-2 text-[6px] md:text-[9px] font-semibold text-white uppercase tracking-wider w-[52px] md:w-[108px]">TTD</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody>
                             <template x-for="(a, index) in attendees" :key="a.id">
-                                <tr class="hover:bg-gray-50/40 transition-colors">
-                                    <td class="px-1.5 py-1.5 text-gray-400 text-[10px]" x-text="index + 1"></td>
-                                    <td class="px-1.5 py-1.5">
-                                        <span class="font-semibold text-gray-900 text-[11px] break-words" x-text="a.name"></span>
+                                <tr :class="index % 2 === 0 ? 'bg-white' : 'bg-gray-50 hover:bg-gray-50/40'" class="transition-colors">
+                                    <td class="px-1.5 py-1 md:py-1.5 text-gray-400 text-[7px] md:text-[9px]" x-text="index + 1"></td>
+                                    <td class="px-1 py-1 md:py-1.5">
+                                        <p class="text-[8px] md:text-[10px] font-semibold text-gray-900 break-words" x-text="a.name"></p>
                                     </td>
-                                    <td class="px-1.5 py-1.5 text-gray-500 text-[11px] break-words" x-text="a.position"></td>
-                                    <td class="px-1.5 py-1.5 text-gray-500 text-[11px] break-words" x-text="a.organization"></td>
-                                    <td class="px-1.5 py-1.5 text-center">
-                                        <span class="text-[10px] font-medium text-gray-600" x-text="a.signed_at"></span>
+                                    <td class="px-1.5 py-1 md:py-1.5 text-gray-600 text-[7px] md:text-[9px]" x-text="a.position"></td>
+                                    <td class="px-1.5 py-1 md:py-1.5 text-gray-600 text-[7px] md:text-[9px]" x-text="a.organization"></td>
+                                    <td class="px-1.5 py-1 md:py-1.5 text-center text-[7px] md:text-[9px]">
+                                        <span class="text-[7px] md:text-[9px] font-medium text-gray-600" x-text="a.signed_at"></span>
                                     </td>
                                     <td class="px-1.5 py-1.5 text-center">
-                                        <img :src="a.signature_url" alt="TTD" class="h-7 w-auto mx-auto rounded border border-gray-100 bg-white object-contain">
+                                        <img :src="a.signature_url" alt="TTD" class="h-7 w-auto mx-auto  bg-white object-contain">
                                     </td>
                                 </tr>
                             </template>
@@ -285,14 +252,14 @@
                 {{-- Empty state --}}
                 <div x-show="attendees.length === 0" class="py-10 text-center">
                     <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-300" fill="none"
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4  text-gray-300" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-1.053M18 8.625a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4.5 11.25a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0z" />
                         </svg>
                     </div>
-                    <p class="text-gray-400 text-sm font-medium">Belum ada peserta yang hadir</p>
-                    <p class="text-gray-300 text-xs mt-1">Gunakan pencarian di atas untuk melakukan absensi</p>
+                    <p class="text-gray-400 text-[10px] md:text-sm font-medium">Belum ada peserta yang hadir</p>
+                    <p class="text-gray-300 text-[9px] md:text-xs mt-1">Gunakan pencarian di atas untuk melakukan absensi</p>
                 </div>
             </div>
         </div>
@@ -316,8 +283,8 @@
                 x-transition:leave-start="translate-y-0 opacity-100 sm:scale-100"
                 x-transition:leave-end="translate-y-8 opacity-0 sm:translate-y-0 sm:scale-95"
                 class="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl" @click.stop>
-                <h3 class="text-lg font-bold text-gray-900 mb-1">Tanda Tangan</h3>
-                <p class="text-sm text-gray-500 mb-4" x-text="selectedEmployee?.name"></p>
+                <h3 class="text-[11px] md:text-lg font-bold text-gray-900 mb-1">Tanda Tangan</h3>
+                <p class="text-[10px] md:text-sm text-gray-500 mb-4" x-text="selectedEmployee?.name"></p>
 
                 <div class="border-2 border-dashed border-gray-200 rounded-xl mb-4 bg-gray-50 overflow-hidden">
                     <canvas id="signature-canvas" class="w-full bg-white"
@@ -326,18 +293,18 @@
 
                 <div class="flex gap-3">
                     <button @click="clearPad()"
-                        class="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition active:scale-[0.98]">
+                        class="flex-1 px-3 py-1.5 md:px-4 md:py-2.5 border border-gray-200 text-gray-700 text-[10px] md:text-sm font-medium rounded-xl hover:bg-gray-50 transition active:scale-[0.98]">
                         Hapus
                     </button>
                     <button @click="submitSignature()" :disabled="submitting"
-                        class="flex-1 px-4 py-2.5 bg-gradient-to-r from-primary to-primary-700 text-white text-sm font-semibold rounded-xl hover:from-primary-700 hover:to-primary-800 transition disabled:opacity-50 active:scale-[0.98]">
+                        class="flex-1 px-3 py-1.5 md:px-4 md:py-2.5 bg-gradient-to-r from-primary to-primary-700 text-white text-[10px] md:text-sm font-semibold rounded-xl hover:from-primary-700 hover:to-primary-800 transition disabled:opacity-50 active:scale-[0.98]">
                         <span x-show="!submitting">Simpan</span>
                         <span x-show="submitting">Menyimpan...</span>
                     </button>
                 </div>
 
                 <button @click="closeModal()"
-                    class="mt-3 w-full text-center text-sm text-gray-400 hover:text-gray-600 transition">
+                    class="mt-3 w-full text-center text-[10px] md:text-sm text-gray-400 hover:text-gray-600 transition">
                     Batal
                 </button>
             </div>
@@ -345,8 +312,8 @@
 
         {{-- Success Toast --}}
         <div x-show="showToast" x-transition x-cloak
-            class="fixed top-4 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg z-50 text-sm font-medium flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+            class="fixed top-4 left-1 translate-x-2 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg z-50 text-[10px] md:text-sm font-medium flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
@@ -355,8 +322,8 @@
 
         {{-- Error Toast --}}
         <div x-show="showError" x-transition x-cloak
-            class="fixed top-4 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 text-sm font-medium flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+            class="fixed top-4 left-1 translate-x-2 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 text-[10px] md:text-sm font-medium flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -367,7 +334,7 @@
     <script>
         function attendanceApp() {
             return {
-                currentStep: 'attendance', // 'attendance' | 'pretest' | 'pretest-done'
+                currentStep: 'attendance', // 'attendance' | 'pretest'
                 search: '',
                 employees: @json($employeesJson),
                 attendees: @json($attendeesJson),
@@ -387,6 +354,12 @@
                 // Pretest state
                 pretestAnswers: {},
                 pretestSubmitting: false,
+
+                init() {
+                    @if(Session::has('success'))
+                        this.showSuccessToast('{{ Session::get('success') }}');
+                    @endif
+                },
 
                 get filteredEmployees() {
                     if (this.search.length < 2) return [];
@@ -517,7 +490,7 @@
 
                         if (response.ok) {
                             this.pretestCompletedIds.push(this.selectedEmployee.id);
-                            this.currentStep = 'pretest-done';
+                            this.currentStep = 'attendance';
                             this.showSuccessToast('Pretest berhasil disimpan!');
                         } else {
                             this.showErrorToast(data.message || 'Terjadi kesalahan.');
@@ -527,10 +500,6 @@
                     } finally {
                         this.pretestSubmitting = false;
                     }
-                },
-
-                skipPretest() {
-                    this.backToAttendance();
                 },
 
                 backToAttendance() {

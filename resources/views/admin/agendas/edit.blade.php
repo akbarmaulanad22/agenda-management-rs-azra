@@ -32,23 +32,22 @@
                             Tipe Agenda
                         </h4>
 
-                        <div>
-                            <label for="type" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Tipe Agenda</label>
-                            <select
-                                name="type"
-                                id="type"
-                                x-model="type"
-                                class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
-                                required
-                            >
-                                <option value="">Pilih tipe agenda</option>
-                                <option value="diklat" {{ old('type', $agenda->type) === 'diklat' ? 'selected' : '' }}>Diklat</option>
-                                <option value="pelatihan" {{ old('type', $agenda->type) === 'pelatihan' ? 'selected' : '' }}>Pelatihan</option>
-                                <option value="rapat" {{ old('type', $agenda->type) === 'rapat' ? 'selected' : '' }}>Rapat</option>
-                            </select>
-                            <p class="text-xs text-gray-400 mt-1">Mengubah tipe agenda akan menyesuaikan field yang ditampilkan di bawah.</p>
-                            @error('type') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                        <div class="flex gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="type" value="diklat" x-model="type" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary" required>
+                                <span class="text-sm font-medium text-gray-700">Diklat</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="type" value="pelatihan" x-model="type" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary">
+                                <span class="text-sm font-medium text-gray-700">Pelatihan</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="type" value="rapat" x-model="type" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary">
+                                <span class="text-sm font-medium text-gray-700">Rapat</span>
+                            </label>
                         </div>
+                        <p class="text-xs text-gray-400 mt-2">Mengubah tipe agenda akan menyesuaikan field yang ditampilkan di bawah.</p>
+                        @error('type') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                     </div>
 
                     <div x-show="type" x-transition.opacity class="space-y-5" x-cloak>
@@ -58,8 +57,8 @@
                                 <span x-text="'Informasi ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))">Informasi Agenda</span>
                             </h4>
 
-                            <div class="grid grid-cols-4 gap-4">
-                                <div class="col-span-2">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
                                     <label for="title" class="block text-sm font-semibold text-gray-700 mb-2"><span x-text="'Judul ' + (type === 'diklat' ? 'Diklat' : (type === 'pelatihan' ? 'Pelatihan' : 'Rapat'))">Judul Agenda</span></label>
                                     <input type="text" name="title" id="title" value="{{ old('title', $agenda->title) }}" placeholder="Judul agenda" class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none" required>
                                     @error('title') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
@@ -136,7 +135,7 @@
                                     @error('event_leader_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
                                 </div>
 
-                                <div class="col-span-4">
+                                <div>
                                     <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi</label>
                                     <textarea name="description" id="description" rows="3" placeholder="Deskripsikan agenda..." class="block w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm text-gray-900 placeholder-gray-400 transition duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">{{ old('description', $agenda->description) }}</textarea>
                                     @error('description') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class AgendaTodaySeeder extends Seeder
 {
-    private string $today = "2026-04-24";
+    private string $today = "2026-04-27";
 
     private array $letterFiles = [
         "Undangan Diklat Wajib PMKP dan PK 6 APRIL 2026.pdf",
