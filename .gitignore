@@ -32,3 +32,4 @@ Thumbs.db
 /tests/agenda-today.spec.ts
 /.opencode/
 /specs/
+/.agents/

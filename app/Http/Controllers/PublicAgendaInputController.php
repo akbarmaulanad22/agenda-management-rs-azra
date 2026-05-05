@@ -9,13 +9,22 @@ use Illuminate\Http\Request;
 
 class PublicAgendaInputController extends Controller
 {
-    public function show(Agenda $agenda)
+    public function showNote(Agenda $agenda)
     {
         abort_unless($agenda->event_date->isToday(), 404);
 
-        $agenda->load(["room", "notes", "images"]);
+        $agenda->load(["room", "notes"]);
 
-        return view("public.agenda-input", compact("agenda"));
+        return view("public.agenda-note-input", compact("agenda"));
+    }
+
+    public function showImage(Agenda $agenda)
+    {
+        abort_unless($agenda->event_date->isToday(), 404);
+
+        $agenda->load(["room", "images"]);
+
+        return view("public.agenda-image-input", compact("agenda"));
     }
 
     public function storeNote(Request $request, Agenda $agenda)
@@ -33,7 +42,7 @@ class PublicAgendaInputController extends Controller
         $agenda->notes()->create($validated);
 
         return redirect()
-            ->route("agenda.input", $agenda)
+            ->route("agenda.note.index", $agenda)
             ->with("success", "Catatan berhasil ditambahkan.");
     }
 
@@ -43,7 +52,7 @@ class PublicAgendaInputController extends Controller
 
         $request->validate([
             "images" => "required|array",
-            "images.*" => "image|mimes:jpg,jpeg,png|max:3072",
+            "images.*" => "image|mimes:jpg,jpeg,png,webp|max:3072",
         ]);
 
         $count = 0;
@@ -58,7 +67,7 @@ class PublicAgendaInputController extends Controller
         }
 
         return redirect()
-            ->route("agenda.input", $agenda)
+            ->route("agenda.image.index", $agenda)
             ->with("success", $count . " foto berhasil diunggah.");
     }
 }

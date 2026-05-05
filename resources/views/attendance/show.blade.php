@@ -30,13 +30,23 @@
                             Posttest
                         </a>
                     @endif
-                    <a href="{{ route('agenda.input', $agenda) }}"
+                    @if($agenda->allowsNotes())
+                        <a href="{{ route('agenda.note.index', $agenda) }}"
+                            class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-[10px] md:text-[11px] font-medium px-3 py-1.5 rounded-full hover:bg-white/25 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Notulensi
+                        </a>
+                    @endif
+                    <a href="{{ route('agenda.image.index', $agenda) }}"
                         class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-[10px] md:text-[11px] font-medium px-3 py-1.5 rounded-full hover:bg-white/25 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                        Input Agenda
+                        Foto
                     </a>
                 </div>
             </x-slot:actions>
@@ -251,15 +261,15 @@
 
                 {{-- Empty state --}}
                 <div x-show="attendees.length === 0" class="py-10 text-center">
-                    <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4  text-gray-300" fill="none"
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 md:w-5 md:h-5  text-gray-300" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-1.053M18 8.625a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4.5 11.25a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0z" />
                         </svg>
                     </div>
-                    <p class="text-gray-400 text-[10px] md:text-sm font-medium">Belum ada peserta yang hadir</p>
-                    <p class="text-gray-300 text-[9px] md:text-xs mt-1">Gunakan pencarian di atas untuk melakukan absensi</p>
+                    <p class="text-gray-400 text-[12px] md:text-sm font-medium">Belum ada peserta yang hadir</p>
+                    <p class="text-gray-300 text-[10px] md:text-xs mt-1">Gunakan pencarian di atas untuk melakukan absensi</p>
                 </div>
             </div>
         </div>

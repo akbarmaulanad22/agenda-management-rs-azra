@@ -38,86 +38,7 @@
             </div>
         @endif
 
-        <div x-data="{ activeTab: localStorage.getItem('agendaTab') || '{{ $agenda->allowsNotes() ? 'notes' : 'photos' }}' }" x-effect="localStorage.setItem('agendaTab', activeTab)">
-
-        {{-- Tabs --}}
-        <div class="px-4 mt-5">
-            <div class="flex bg-white rounded-2xl p-1 border border-gray-200 shadow-sm">
-                @if($agenda->allowsNotes())
-                <button @click="activeTab = 'notes'" :class="activeTab === 'notes' ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-2.5 rounded-xl text-[10px] md:text-[11px] font-semibold transition-all duration-200">
-                    Notulensi
-                </button>
-                @endif
-                <button @click="activeTab = 'photos'" :class="activeTab === 'photos' ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:text-gray-700'" class="flex-1 py-2.5 rounded-xl text-[10px] md:text-[11px] font-semibold transition-all duration-200">
-                    Foto
-                </button>
-            </div>
-        </div>
-
-        {{-- Notes Tab --}}
-        @if($agenda->allowsNotes())
-        <div x-show="activeTab === 'notes'" x-transition class="px-4 mt-5 space-y-4">
-            {{-- Add Note Form --}}
-            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <h3 class="text-[10px] md:text-sm font-bold text-gray-800 mb-4">Tambah Catatan Baru</h3>
-                <form action="{{ route('agenda.input.note', $agenda) }}" method="POST" class="space-y-3">
-                    @csrf
-                    <div>
-                        <label for="topic" class="block text-[10px] md:text-xs font-semibold text-gray-600 mb-1.5">Topik Pembahasan</label>
-                        <input type="text" name="topic" id="topic" value="{{ old('topic') }}" placeholder="Masukkan topik yang dibahas" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary px-4 py-2.5 text-[10px] md:text-sm bg-gray-50/50" required>
-                        @error('topic') <p class="text-rose-500 text-[10px] md:text-xs mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label for="decision" class="block text-[10px] md:text-xs font-semibold text-gray-600 mb-1.5">Keputusan</label>
-                        <textarea name="decision" id="decision" rows="3" placeholder="Tuliskan keputusan yang diambil" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary px-4 py-2.5 text-[10px] md:text-sm bg-gray-50/50" required>{{ old('decision') }}</textarea>
-                        @error('decision') <p class="text-rose-500 text-[10px] md:text-xs mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label for="remarks" class="block text-[10px] md:text-xs font-semibold text-gray-600 mb-1.5">Keterangan <span class="text-gray-400">(opsional)</span></label>
-                        <textarea name="remarks" id="remarks" rows="2" placeholder="Informasi tambahan" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary px-4 py-2.5 text-[10px] md:text-sm bg-gray-50/50">{{ old('remarks') }}</textarea>
-                        @error('remarks') <p class="text-rose-500 text-[10px] md:text-xs mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <button type="submit" class="w-full px-4 py-2.5 rounded-xl bg-primary text-white text-[10px] md:text-sm font-semibold shadow-md shadow-primary/20 hover:bg-primary-700 active:scale-[0.98] transition-all">
-                        Simpan Catatan
-                    </button>
-                </form>
-            </div>
-
-            {{-- Existing Notes --}}
-            @if($agenda->notes->count() > 0)
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="px-4 py-3 border-b border-gray-100">
-                        <h3 class="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-wider">Catatan Sebelumnya ({{ $agenda->notes->count() }})</h3>
-                    </div>
-                    <table class="w-full">
-                        <thead>
-                            <tr class="border-b border-gray-100">
-                                <th class="px-2 py-2 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider w-7">No</th>
-                                <th class="px-2 py-2 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Topik</th>
-                                <th class="px-2 py-2 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Keputusan</th>
-                                <th class="px-2 py-2 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Ket.</th>
-                                <th class="px-2 py-2 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider w-16">Tanggal</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50">
-                            @foreach($agenda->notes->sortByDesc('created_at') as $index => $note)
-                                <tr>
-                                    <td class="px-2 py-2 text-[10px] text-gray-400 align-top">{{ $index + 1 }}</td>
-                                    <td class="px-2 py-2 text-[10px] font-semibold text-gray-800 align-top break-words">{{ $note->topic }}</td>
-                                    <td class="px-2 py-2 text-[10px] text-gray-600 align-top break-words">{{ $note->decision }}</td>
-                                    <td class="px-2 py-2 text-[10px] text-gray-400 align-top break-words">{{ $note->remarks ?? '—' }}</td>
-                                    <td class="px-2 py-2 text-[10px] text-gray-400 align-top">{{ $note->created_at->format('d/m/y H:i') }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
-        </div>
-        @endif
-
-        {{-- Photos Tab --}}
-        <div x-show="activeTab === 'photos'" x-transition class="px-4 mt-5 space-y-4">
+        <div x-transition class="px-4 mt-5 space-y-4">
             {{-- Upload Form --}}
             <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                 <h3 class="text-[10px] md:text-sm font-bold text-gray-800 mb-4">Unggah Foto Dokumentasi</h3>
@@ -162,8 +83,8 @@
                 {{-- Empty state --}}
                 <template x-if="imagePreviews.length === 0">
                     <div class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
-                        <svg class="w-12 h-12 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M2.25 18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V6a2.25 2.25 0 00-2.25-2.25h-15A2.25 2.25 0 002.25 6v12z"/></svg>
-                        <p class="text-gray-500 font-medium">Ambil atau pilih foto</p>
+                        <svg class="w-8 h-8 md:w-10 md:h-10 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M2.25 18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V6a2.25 2.25 0 00-2.25-2.25h-15A2.25 2.25 0 002.25 6v12z"/></svg>
+                        <p class="text-gray-500 font-medium text-[12px]">Ambil atau pilih foto</p>
                         <p class="text-[10px] md:text-xs text-gray-400 mt-1">Gunakan tombol di atas, maks. 3MB per foto</p>
                     </div>
                 </template>
@@ -184,8 +105,6 @@
             @endif
         </div>
 
-        </div>
-
         {{-- Footer --}}
         <div class="text-center mt-8 px-4">
             <p class="text-[10px] md:text-xs text-gray-300">D-ASSA &middot; Digital Agenda & Attendance System</p>
@@ -194,44 +113,67 @@
 <script>
 function photoUploader() {
     return {
-        activeTab: '{{ $agenda->allowsNotes() ? "notes" : "photos" }}',
         imagePreviews: [],
         uploading: false,
 
         handleFiles(event) {
             const files = event.target.files;
             for (const file of files) {
-                if (file.size > 3 * 1024 * 1024) {
-                    alert('Ukuran file "' + file.name + '" melebihi 3MB, dilewati.');
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('Ukuran file \"' + file.name + '\" melebihi 10MB, dilewati.');
                     continue;
                 }
-                this.cropToSquare(file).then(cropped => {
+                this.compressImage(file).then(compressed => {
                     this.imagePreviews.push({
-                        url: URL.createObjectURL(cropped),
-                        file: cropped
+                        url: URL.createObjectURL(compressed),
+                        file: compressed
                     });
                 });
             }
             event.target.value = '';
         },
 
-        cropToSquare(file) {
-            return new Promise(resolve => {
+        compressImage(file, maxWidth = 1024, maxHeight = 1024, targetSize = 500 * 1024) {
+            return new Promise((resolve) => {
                 const img = new Image();
                 img.onload = () => {
-                    const size = Math.min(img.width, img.height);
-                    const ox = (img.width - size) / 2;
-                    const oy = (img.height - size) / 2;
-                    const out = 800;
+                    let width = img.width;
+                    let height = img.height;
+                    const aspectRatio = width / height;
+
+                    if (width > maxWidth || height > maxHeight) {
+                        if (aspectRatio > 1) {
+                            width = maxWidth;
+                            height = Math.round(maxWidth / aspectRatio);
+                        } else {
+                            height = maxHeight;
+                            width = Math.round(maxHeight * aspectRatio);
+                        }
+                    }
+
                     const canvas = document.createElement('canvas');
-                    canvas.width = out;
-                    canvas.height = out;
+                    canvas.width = width;
+                    canvas.height = height;
                     const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, ox, oy, size, size, 0, 0, out, out);
-                    canvas.toBlob(blob => {
-                        resolve(new File([blob], file.name, { type: 'image/jpeg' }));
-                    }, 'image/jpeg', 0.85);
-                    URL.revokeObjectURL(img.src);
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    let quality = 0.8;
+
+                    const changeExtensionToWebp = (name) => {
+                        return name.replace(/\.[^/.]+$/, '') + '.webp';
+                    };
+
+                    const processBlob = (blob) => {
+                        if (blob.size <= targetSize || quality <= 0.1) {
+                            resolve(new File([blob], changeExtensionToWebp(file.name), { type: 'image/webp', lastModified: Date.now() }));
+                            URL.revokeObjectURL(img.src);
+                            return;
+                        }
+                        quality -= 0.05;
+                        canvas.toBlob(processBlob, 'image/webp', quality);
+                    };
+
+                    canvas.toBlob(processBlob, 'image/webp', quality);
                 };
                 img.src = URL.createObjectURL(file);
             });
@@ -248,7 +190,7 @@ function photoUploader() {
             const fd = new FormData();
             this.imagePreviews.forEach(p => fd.append('images[]', p.file));
             try {
-                const res = await fetch('{{ route("agenda.input.image", $agenda) }}', {
+                const res = await fetch('{{ route("agenda.image.store", $agenda) }}', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,

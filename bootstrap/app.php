@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\LogRequestActivity;
+use App\Support\Logging\RequestLogContext;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -11,8 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->prepend(LogRequestActivity::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->context(function (Throwable $exception, array $context): array {
+            return RequestLogContext::exceptionContext(
+                RequestLogContext::currentRequest(),
+                $exception,
+            );
+        });
     })->create();

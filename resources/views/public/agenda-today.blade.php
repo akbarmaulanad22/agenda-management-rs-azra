@@ -51,7 +51,7 @@
                 <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
                     <table class="w-full table-fixed text-[11px]">
                         <thead
-                            class="bg-gradient-to-r from-primary to-primary-700">
+                            class="bg-gradient-to-r from-[#0F766E] to-[#0D9488]">
                             <tr>
                                 <th class="px-1 py-2 text-center text-[6px] md:text-[9px] font-semibold uppercase tracking-wider text-white border-r border-primary-500" style="width:30px">No</th>
                                 <th class="px-1 py-2 text-left text-[6px] md:text-[9px] font-semibold uppercase tracking-wider text-white border-r border-primary-500">Agenda</th>
@@ -78,7 +78,7 @@
                                         @endif
                                     </td>
                                     <td class="px-1.5 py-1 md:py-1.5 text-gray-600 text-[7px] md:text-[9px]">{{ $agenda->room->room_name ?? '-' }}</td>
-                                    <td class="px-1.5 py-1 md:py-1.5 text-gray-600 text-[7px] md:text-[9px]">{{ $agenda->organizer?->full_name ?? $agenda->unit->name ?? '-' }}</td>
+                                    <td class="px-1.5 py-1 md:py-1.5 text-gray-600 text-[7px] md:text-[9px]">{{ $agenda->unit->name ?? '-' }}</td>
                                     <td class="px-1.5 py-1 md:py-1.5 text-center">
                                         <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg font-bold bg-secondary-50 text-secondary-700 text-[7px] md:text-[9px]">
                                             {{ $agenda->signed_count }}
