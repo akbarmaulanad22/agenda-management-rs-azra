@@ -37,6 +37,7 @@ class PublicAgendaInputController extends Controller
             "topic" => "required|string|max:255",
             "decision" => "required|string",
             "remarks" => "nullable|string",
+            "pj" => "required|string|max:255",
         ]);
 
         $agenda->notes()->create($validated);

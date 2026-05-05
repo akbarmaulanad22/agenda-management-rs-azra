@@ -468,10 +468,13 @@
                                         Topik</th>
                                     <th
                                         class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
-                                        Keputusan</th>
+                                        Pembahasan</th>
                                     <th
                                         class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
-                                        Keterangan</th>
+                                        Kesimpulan</th>
+                                    <th
+                                        class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                                        PJ</th>
                                     <th
                                         class="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
                                         Tanggal</th>
@@ -484,8 +487,9 @@
                                         <td class="px-6 py-3.5 text-sm font-semibold text-gray-800">{{ $note->topic }}</td>
                                         <td class="px-6 py-3.5 text-sm text-gray-500">{{ $note->decision }}</td>
                                         <td class="px-6 py-3.5 text-sm text-gray-500">{{ $note->remarks ?? '—' }}</td>
+                                        <td class="px-6 py-3.5 text-sm text-gray-500">{{ $note->pj ?? '—' }}</td>
                                         <td class="px-6 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ $note->created_at->format('d M Y, H:i') }}</td>
+                                            {{ $note->created_at->format('H:i') }}</td>
                                     </tr>
                                 @endforeach
                                 </tbody>

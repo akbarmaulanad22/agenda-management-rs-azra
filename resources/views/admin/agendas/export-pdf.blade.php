@@ -65,8 +65,10 @@
                     <tr>
                         <th class="num">No</th>
                         <th>Topik</th>
-                        <th>Keputusan</th>
-                        <th>Keterangan</th>
+                        <th>Pembahasan</th>
+                        <th>Kesimpulan</th>
+                        <th>PJ</th>
+                        <th>Waktu</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,6 +78,8 @@
                             <td>{{ $note->topic }}</td>
                             <td>{{ $note->decision }}</td>
                             <td>{{ $note->remarks ?? '-' }}</td>
+                            <td>{{ $note->pj ?? '-' }}</td>
+                            <td>{{ $note->created_at->format('H:i') ?? '-' ?? '-' }}</td>
                         </tr>
                     @endforeach
                 </tbody>

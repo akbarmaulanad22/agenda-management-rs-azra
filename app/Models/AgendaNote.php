@@ -10,12 +10,7 @@ class AgendaNote extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'agenda_id',
-        'topic',
-        'decision',
-        'remarks',
-    ];
+    protected $fillable = ["agenda_id", "topic", "decision", "remarks", "pj"];
 
     public function agenda(): BelongsTo
     {
