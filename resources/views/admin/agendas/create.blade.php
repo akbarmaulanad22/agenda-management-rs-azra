@@ -19,36 +19,47 @@
                 <h3 class="text-lg font-bold text-gray-900">Buat Agenda Baru</h3>
                 <p class="text-sm text-gray-400 mt-0.5">Pilih tipe agenda terlebih dahulu, lalu lengkapi form sesuai kebutuhan.</p>
             </div>
-            <div class="p-8" x-data="{ type: '{{ old('type', '') }}', presenterCount: {{ $initialPresenterCount }} }">
+            <div class="p-8" x-data="{ type: '{{ old('type', $userUnit?->name === 'SDM' ? 'rapat' : '') }}', presenterCount: {{ $initialPresenterCount }} }">
                 <form action="{{ route('admin.agendas.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                     @csrf
 
                     <!--section 1-->
-                    <div class="pb-4 border-b border-primary-500">
-                        <h4 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.75 6.75A2.25 2.25 0 017 4.5h10a2.25 2.25 0 012.25 2.25v10A2.25 2.25 0 0117 19H7a2.25 2.25 0 01-2.25-2.25v-10z"/><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9h7.5M8.25 12h7.5M8.25 15h4.5"/></svg>
-                            Tipe Agenda
-                        </h4>
-
-                        <div class="flex gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="type" value="diklat" x-model="type" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary" required>
-                                <span class="text-sm font-medium text-gray-700">Diklat</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="type" value="pelatihan" x-model="type" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary">
-                                <span class="text-sm font-medium text-gray-700">Pelatihan</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="type" value="rapat" x-model="type" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary">
-                                <span class="text-sm font-medium text-gray-700">Rapat</span>
-                            </label>
+                    @if($userUnit?->name === 'SDM')
+                        {{-- SDM unit: type is locked to Rapat, selector is hidden --}}
+                        <input type="hidden" name="type" value="rapat">
+                        <div class="pb-4 border-b border-primary-500">
+                            <div class="flex items-center gap-2 rounded-2xl bg-primary/5 border border-primary/20 px-4 py-3">
+                                <svg class="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.75 6.75A2.25 2.25 0 017 4.5h10a2.25 2.25 0 012.25 2.25v10A2.25 2.25 0 0117 19H7a2.25 2.25 0 01-2.25-2.25v-10z"/><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9h7.5M8.25 12h7.5M8.25 15h4.5"/></svg>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-800">Tipe Agenda: <span class="text-primary">Rapat</span></p>
+                                    <p class="text-xs text-gray-400">Unit SDM hanya dapat membuat agenda bertipe Rapat.</p>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-xs text-gray-400 mt-2">Field form akan menyesuaikan setelah tipe agenda dipilih.</p>
-                        @error('type') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                    </div>
+                    @else
+                        {{-- Non-SDM units: show Diklat & Pelatihan only --}}
+                        <div class="pb-4 border-b border-primary-500">
+                            <h4 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.75 6.75A2.25 2.25 0 017 4.5h10a2.25 2.25 0 012.25 2.25v10A2.25 2.25 0 0117 19H7a2.25 2.25 0 01-2.25-2.25v-10z"/><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9h7.5M8.25 12h7.5M8.25 15h4.5"/></svg>
+                                Tipe Agenda
+                            </h4>
 
-                    <div x-show="type" x-transition.opacity class="space-y-5" x-cloak>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="type" value="diklat" x-model="type" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary" required>
+                                    <span class="text-sm font-medium text-gray-700">Diklat</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="type" value="pelatihan" x-model="type" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary">
+                                    <span class="text-sm font-medium text-gray-700">Pelatihan</span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Field form akan menyesuaikan setelah tipe agenda dipilih.</p>
+                            @error('type') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
+                        </div>
+                    @endif
+
+                    <div x-show="type || '{{ $userUnit?->name }}' === 'SDM'" x-transition.opacity class="space-y-5" x-cloak>
                         <!--section 2-->
                         <div class="pb-4 border-b border-primary-500">
                             <h4 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -87,17 +98,7 @@
                                     </div>
                                 </template>
 
-                                <div>
-                                    <label for="unit_id" class="block text-sm font-semibold text-gray-700 mb-2">Unit</label>
-                                    <x-searchable-select
-                                        name="unit_id"
-                                        search-url="{{ route('admin.units.search') }}"
-                                        :selected-id="old('unit_id')"
-                                        placeholder="Cari unit..."
-                                        required
-                                    />
-                                    @error('unit_id') <p class="text-rose-500 text-xs font-medium mt-1.5">{{ $message }}</p> @enderror
-                                </div>
+                                <input type="hidden" name="unit_id" value="{{ old('unit_id', $userUnit->id) }}">
 
                                 <div>
                                     <label for="event_leader_id" class="block text-sm font-semibold text-gray-700 mb-2">

@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(LogRequestActivity::class);
+        $middleware->alias([
+            'manager_it' => \App\Http\Middleware\RequireManagerIt::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->context(function (Throwable $exception, array $context): array {

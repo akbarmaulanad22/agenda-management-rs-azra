@@ -49,7 +49,7 @@
             </div>
 
             {{-- Navigation --}}
-            <nav class="flex-1 overflow-y-auto px-3 py-6 space-y-1.5">
+            <nav class="flex-1 overflow-y-auto scrollbar-hide px-3 py-6 space-y-1.5">
                 <p x-show="sidebarOpen"
                     class="px-3 mb-3 text-[10px] font-bold text-white/30 uppercase tracking-[0.15em]">Menu Utama</p>
 
@@ -150,6 +150,22 @@
                     </div>
                     <span x-show="sidebarOpen" class="text-sm font-semibold">Bank Soal</span>
                 </a>
+
+                {{-- Manajemen Akun (MANAGER IT only) --}}
+                @php $currentEmployee = Auth::user()->employee; @endphp
+                @if($currentEmployee && $currentEmployee->job_position === 'MANAGER IT')
+                <a href="{{ route('admin.users.index') }}"
+                    class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
+                              {{ request()->routeIs('admin.users.*') ? 'bg-white/15 text-white shadow-lg shadow-black/10' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
+                    <div
+                        class="w-9 h-9 rounded-xl {{ request()->routeIs('admin.users.*') ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10' }} flex items-center justify-center flex-shrink-0 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+                        </svg>
+                    </div>
+                    <span x-show="sidebarOpen" class="text-sm font-semibold">Manajemen Akun</span>
+                </a>
+                @endif
             </nav>
 
             {{-- User Section --}}
@@ -162,8 +178,13 @@
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                     </div>
                     <div x-show="sidebarOpen" class="overflow-hidden min-w-0">
-                        <p class="text-sm font-semibold text-white truncate">{{ Auth::user()->name }}</p>
-                        <p class="text-[11px] text-white/40 truncate">{{ Auth::user()->email }}</p>
+                        @php $employee = Auth::user()->employee; @endphp
+                        <p class="text-sm font-semibold text-white truncate">
+                            {{ $employee?->full_name ?? Auth::user()->name }}
+                        </p>
+                        <p class="text-[11px] text-white/40 truncate">
+                            {{ $employee?->job_position ?? Auth::user()->email }}
+                        </p>
                     </div>
                 </a>
 
@@ -251,6 +272,15 @@
     <style>
         [x-cloak] {
             display: none !important;
+        }
+
+        /* Hide scrollbar but keep scrolling */
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE & Edge */
+            scrollbar-width: none;     /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;             /* Chrome, Safari, Opera */
         }
     </style>
 </body>

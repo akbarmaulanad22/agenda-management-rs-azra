@@ -54,7 +54,8 @@ class AgendaController extends Controller
 
     public function create()
     {
-        return view("admin.agendas.create");
+        $userUnit = auth()->user()->employee?->unit;
+        return view("admin.agendas.create", compact('userUnit'));
     }
 
     public function searchTypes(Request $request)
@@ -177,7 +178,8 @@ class AgendaController extends Controller
             "bankSoal",
         ]);
 
-        return view("admin.agendas.edit", compact("agenda"));
+        $userUnit = auth()->user()->employee?->unit;
+        return view("admin.agendas.edit", compact("agenda", "userUnit"));
     }
 
     public function update(AgendaRequest $request, Agenda $agenda)

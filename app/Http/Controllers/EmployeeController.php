@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\NameConverter;
 use App\Models\Employee;
 use App\Models\Unit;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeeController extends Controller
 {
@@ -84,6 +87,9 @@ class EmployeeController extends Controller
             "profession" => "required|string|max:255",
         ]);
 
+        $user = $this->syncUser(null, $validated['full_name']);
+        $validated['user_id'] = $user->id;
+
         Employee::create($validated);
 
         return redirect()
@@ -110,6 +116,8 @@ class EmployeeController extends Controller
             "profession" => "required|string|max:255",
         ]);
 
+        $this->syncUser($employee->user_id, $validated['full_name']);
+
         $employee->update($validated);
 
         return redirect()
@@ -119,7 +127,13 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee)
     {
+        $userId = $employee->user_id;
+
         $employee->delete();
+
+        if ($userId) {
+            User::destroy($userId);
+        }
 
         return redirect()
             ->route("admin.employees.index")
@@ -129,5 +143,46 @@ class EmployeeController extends Controller
     private function searchOperator(): string
     {
         return DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+    }
+
+    /**
+     * Create or update the linked User record.
+     * Delegates name/email derivation to NameConverter.
+     */
+    private function syncUser(?int $userId, string $fullName): User
+    {
+        $converted = NameConverter::convert($fullName, 'rsazra.co.id');
+
+        $name      = $converted['name'] ?: 'user';
+        $baseEmail = $converted['email'];
+        $email     = $baseEmail;
+        $counter   = 1;
+
+        // Make email unique if already taken by a different user
+        while (
+            User::where('email', $email)
+                ->when($userId, fn ($q) => $q->where('id', '!=', $userId))
+                ->exists()
+        ) {
+            $local = substr($baseEmail, 0, strrpos($baseEmail, '@'));
+            $email = $local . $counter . '@rsazra.co.id';
+            $counter++;
+        }
+
+        if ($userId) {
+            $user = User::findOrFail($userId);
+            $user->update([
+                'name'  => $name,
+                'email' => $email,
+            ]);
+
+            return $user;
+        }
+
+        return User::create([
+            'name'     => $name,
+            'email'    => $email,
+            'password' => Hash::make('rsazra2026'),
+        ]);
     }
 }

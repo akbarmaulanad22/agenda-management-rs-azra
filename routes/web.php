@@ -11,6 +11,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\PublicAgendaInputController;
 use App\Http\Controllers\PublicQuizController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Public agenda list
@@ -86,6 +87,13 @@ Route::middleware("auth")
             "search",
         ])->name("bank-soals.search");
         Route::resource("bank-soals", BankSoalController::class);
+
+        // Account management — MANAGER IT only
+        Route::middleware('manager_it')->group(function () {
+            Route::get('users', [UserController::class, 'index'])->name('users.index');
+            Route::get('users/{user}/change-password', [UserController::class, 'editPassword'])->name('users.change-password');
+            Route::put('users/{user}/change-password', [UserController::class, 'updatePassword'])->name('users.update-password');
+        });
     });
 
 // Public attendance routes
