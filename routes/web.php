@@ -74,6 +74,10 @@ Route::middleware("auth")
             "searchTypes",
         ])->name("agendas.types.search");
         Route::resource("agendas", AgendaController::class);
+        Route::get("agendas/{agenda}/export-quiz-csv", [
+            AgendaController::class,
+            "exportQuizCsv",
+        ])->name("agendas.export-quiz-csv");
         Route::get("agendas/{agenda}/export-pdf", [
             AgendaController::class,
             "exportPdf",

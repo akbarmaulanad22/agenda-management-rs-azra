@@ -11,11 +11,11 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        User::factory()->create([
-            "name" => "Administrator",
-            "email" => "admin@dassa.test",
-            "password" => bcrypt("password"),
-        ]);
+        // User::factory()->create([
+        //     "name" => "Administrator",
+        //     "email" => "admin@dassa.test",
+        //     "password" => bcrypt("password"),
+        // ]);
 
         Room::create([
             "room_name" => "Training Center",

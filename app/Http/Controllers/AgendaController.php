@@ -513,6 +513,70 @@ class AgendaController extends Controller
         ]);
     }
 
+    public function exportQuizCsv(Agenda $agenda)
+    {
+        $agenda->load(['agendaQuestions', 'bankSoal', 'unit', 'room', 'eventLeader']);
+
+        $quizComparison = $this->buildQuizComparison($agenda);
+
+        $agendaTitle = preg_replace('/[^A-Za-z0-9\-_ ]/', '', $agenda->title);
+        $filename = "Hasil Pretest Posttest - {$agendaTitle}.csv";
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($agenda, $quizComparison) {
+            $file = fopen('php://output', 'w');
+
+            // BOM for Excel UTF-8 compatibility
+            fwrite($file, "\xEF\xBB\xBF");
+
+            // Meta rows
+            fputcsv($file, ['Judul Agenda', $agenda->title]);
+            fputcsv($file, ['Tanggal', $agenda->event_date->translatedFormat('d F Y')]);
+            fputcsv($file, ['Waktu', \Carbon\Carbon::parse($agenda->event_time)->format('H:i') . ($agenda->event_end_time ? ' - ' . \Carbon\Carbon::parse($agenda->event_end_time)->format('H:i') : '') . ' WIB']);
+            fputcsv($file, ['Unit', $agenda->unit?->name ?? '-']);
+            fputcsv($file, ['Bank Soal', $agenda->bankSoal?->title ?? 'Template telah dihapus']);
+            fputcsv($file, ['Jumlah Soal', $agenda->agendaQuestions->count()]);
+            fputcsv($file, []); // blank spacer
+
+            // Column headers
+            fputcsv($file, [
+                'No',
+                'Nama',
+                'Unit',
+                'Jabatan',
+                'Pretest Benar',
+                'Pretest Nilai',
+                'Posttest Benar',
+                'Posttest Nilai',
+                'Perubahan',
+            ]);
+
+            foreach ($quizComparison as $index => $row) {
+                $employee = $row['employee'];
+
+                fputcsv($file, [
+                    $index + 1,
+                    $employee->full_name,
+                    $employee->unit->name ?? '-',
+                    $employee->job_position,
+                    $row['pre_correct'] !== null ? $row['pre_correct'] . '/' . $row['pre_total'] : '-',
+                    $row['pre_score']   !== null ? $row['pre_score']   : '-',
+                    $row['post_correct'] !== null ? $row['post_correct'] . '/' . $row['post_total'] : '-',
+                    $row['post_score']  !== null ? $row['post_score']  : '-',
+                    $row['improvement'] !== null ? $row['improvement'] : '-',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function destroy(Agenda $agenda)
     {
         if ($agenda->letter_file_path) {
