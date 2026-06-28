@@ -1,58 +1,184 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# D-ASSA
 
-## About Laravel
+### Digital Agenda & Self-Service Attendance
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**A paperless platform for managing meetings & training, capturing attendance with on-screen digital signatures, and measuring learning impact with pre/post-test quizzes — all from a single web app.**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+[![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)](https://www.php.net)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Alpine.js](https://img.shields.io/badge/Alpine.js-3-8BC0D0?logo=alpinedotjs&logoColor=white)](https://alpinejs.dev)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Ready-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+</div>
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## The Problem
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Organizations still run meetings and training sessions on paper: printed attendance sheets that get lost, manual recaps in spreadsheets, and no reliable way to prove who actually attended or whether training improved knowledge. The process is slow, error-prone, and impossible to audit.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## The Solution
 
-## Agentic Development
+**D-ASSA** replaces the entire paper trail with one connected workflow:
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+> **Schedule an agenda → participants self-check-in with a real signature on their phone → knowledge is measured with pre/post-tests → leadership gets instant, exportable recaps.**
 
-```bash
-composer require laravel/boost --dev
+No app to install. No hardware. Participants simply open a link, find their name, and sign with their finger.
 
-php artisan boost:install
+---
+
+## Screenshots
+
+> 📸 Screenshots are generated automatically — see [`docs/screenshots/`](docs/screenshots/) to regenerate them.
+
+![Public Agenda List](docs/screenshots/public-agenda-list.png)
+*Public landing page — today's agendas, open to everyone, no login required*
+
+| Admin Dashboard | Agenda Management |
+| :---: | :---: |
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Agenda Management](docs/screenshots/agenda-management.png) |
+| *At-a-glance KPIs: employees, units, rooms & agenda mix* | *Create meetings & training with rooms, leaders & presenters* |
+
+| Self-Service Attendance | Digital Signature Pad |
+| :---: | :---: |
+| ![Attendance](docs/screenshots/attendance.png) | ![Signature Pad](docs/screenshots/signature-pad.png) |
+| *Live search — participants find their name instantly* | *Sign in directly on a mobile screen* |
+
+| Pre/Post-Test Quiz | Attendance & Quiz Recap |
+| :---: | :---: |
+| ![Quiz](docs/screenshots/quiz.png) | ![Recap](docs/screenshots/recap.png) |
+| *Measure knowledge gain for every training session* | *Per-employee recaps, exportable to CSV & PDF* |
+
+---
+
+## Key Features
+
+### 🗓️ Agenda & Event Management
+- Manage three event types out of the box: **Rapat** (meetings), **Diklat** & **Pelatihan** (training).
+- Assign a **room**, an **event leader**, and multiple **presenters** per agenda.
+- Attach the official **invitation letter** and **training material** files.
+- Generate a formal, print-ready **PDF** of any agenda.
+
+### ✍️ Self-Service Attendance (No Login Required)
+- Public check-in link per agenda — works on any phone browser.
+- **Live name search** powered by Alpine.js for instant filtering.
+- **HTML5 digital signature pad** — participants sign with their finger; the signature is stored as a PNG against their attendance record.
+- **Double check-in prevention** ensures one signature per participant per event.
+
+### 📊 Learning Measurement (Quizzes)
+- Reusable **question bank (Bank Soal)** for training material.
+- Automated **pre-test and post-test** flows attached to training agendas.
+- Per-participant scoring to demonstrate measurable **knowledge gain**.
+
+### 📝 Crowdsourced Documentation
+- Public endpoints for participants to submit **meeting notes** and **photos**, building a shared record of every session.
+
+### 📈 Reporting & Recaps
+- **Per-employee attendance recaps** across all agendas.
+- One-click **CSV export** for attendance, agendas, and **quiz results**.
+- Formal **PDF export** for official documentation.
+
+### 👥 Master Data & Access Control
+- Centralized management of **Employees**, **Units**, and **Rooms**.
+- Authentication via **Laravel Breeze**.
+- **Role-based access** — sensitive operations (e.g. user account management) are restricted to the **MANAGER IT** role.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| **Backend** | Laravel 13 · PHP 8.3 |
+| **Frontend** | Blade · Alpine.js 3 · Tailwind CSS 3 |
+| **Database** | PostgreSQL (production) · SQLite (local/dev) |
+| **Authentication** | Laravel Breeze |
+| **PDF Engine** | barryvdh/laravel-dompdf · FPDF / FPDI |
+| **Signatures** | `signature_pad` (HTML5 Canvas) |
+| **Spreadsheets** | SheetJS (`xlsx`) — lazy-loaded for a lean main bundle |
+| **Build Tooling** | Vite 8 |
+| **Testing** | PHPUnit · Playwright (E2E) |
+
+---
+
+## Architecture at a Glance
+
+```
+Public (no auth)                 Admin (auth + roles)
+─────────────────                ────────────────────
+/                Today's agenda   /dashboard          KPIs & recent activity
+/absen/{agenda}  Check-in + sign  /admin/agendas      Agendas + PDF/CSV export
+/absen/.../quiz  Pre/Post-test    /admin/employees    Staff master data
+/agenda/.../note Notes & photos   /admin/units|rooms  Org master data
+                                  /admin/bank-soals   Question bank
+                                  /admin/employee-recaps  Attendance reporting
+                                  /admin/users        Account mgmt (MANAGER IT)
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## Getting Started
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Prerequisites
+- PHP 8.3+ and Composer
+- Node.js 18+ and npm
+- PostgreSQL (or SQLite for a quick local run)
 
-## Code of Conduct
+### Installation
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# 1. Install dependencies
+composer install
+npm install
 
-## Security Vulnerabilities
+# 2. Configure environment
+cp .env.example .env
+php artisan key:generate
+# → set your DB_CONNECTION / DB_* values in .env
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 3. Create the storage symlink (for signatures & uploads)
+php artisan storage:link
 
-## License
+# 4. Run migrations (and seed demo data)
+php artisan migrate --seed
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 5. Build frontend assets
+npm run build
+```
+
+### Run locally
+
+```bash
+# Starts the PHP server, queue worker, log viewer and Vite together
+composer dev
+```
+
+The app is then available at **http://localhost:8000**.
+
+### Run the tests
+
+```bash
+composer test       # PHPUnit
+npx playwright test # End-to-end browser tests
+```
+
+---
+
+## Project Highlights
+
+- **Mobile-first attendance** — designed for participants signing in on their own phones, no installs.
+- **Verifiable records** — every check-in carries a real signature image and timestamp.
+- **Measurable outcomes** — pre/post-test scoring turns training into auditable data.
+- **Export-ready** — CSV and PDF outputs fit straight into existing reporting workflows.
+- **Performance-conscious** — heavy libraries are code-split into lazy chunks to keep load times fast.
+
+---
+
+<div align="center">
+
+**D-ASSA** — turning paper-based meetings and training into a measurable, auditable digital workflow.
+
+</div>
